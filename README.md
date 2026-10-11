@@ -192,8 +192,8 @@ In cloud, your user-level `CLAUDE.md` isn't there: rules come from the request a
   the same ones to Claude Code cloud sessions under Auto, and a whole run can start in cloud.
 - **Added by the port:** the cloud setup line, the per-turn reminder hook, recovery after context
   compaction, the machine lock on heavy commands, and the hand-off playbook.
-- **Left out:** `automations/benny` (Cursor Slack automations), external models, and native mobile
-  verification.
+- **Left out:** `automations/benny` (Cursor Slack automations), `make-bot-ui` (Cursor Grok Bot
+  automations) and external models.
 
 ### File by file
 
