@@ -57,9 +57,11 @@ jobs:
           # The skill's own commands: the repo scripts, git, reading upstream's
           # commits and PRs, opening the PR, and re-copying the vendored
           # commander (npm pack, tar, cp) when upstream moves its pin.
+          # A path prefix takes a bare trailing * : `:*` (like ` *`) needs a space
+          # after the prefix, so `bun scripts/:*` never matched `bun scripts/x.ts`.
           claude_args: |
             --model opus
-            --allowedTools "Read,Write,Edit,Glob,Grep,Agent,Bash(bun scripts/:*),Bash(bun run:*),Bash(git:*),Bash(gh api repos/cursor/plugins/:*),Bash(gh pr create:*),Bash(npm pack:*),Bash(tar:*),Bash(mkdir:*),Bash(cp:*),Bash(rm:*),Bash(ls:*)"
+            --allowedTools "Read,Write,Edit,Glob,Grep,Agent,Bash(bun scripts/*),Bash(bun run:*),Bash(git:*),Bash(gh api repos/cursor/plugins/*),Bash(gh pr create:*),Bash(npm pack:*),Bash(tar:*),Bash(mkdir:*),Bash(cp:*),Bash(rm:*),Bash(ls:*)"
       # The action reports success even when Claude stopped early, so the run
       # is only green when a sync PR for this version is open.
       - name: Check the sync PR
