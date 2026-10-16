@@ -93,12 +93,14 @@ in your model settings:
 git clone --depth 1 https://github.com/janrizmlibres/claude-pstack /opt/claude-pstack && bash /opt/claude-pstack/scripts/cloud-install.sh --config work_model=opus --config judgement_model=opus --config volume_model=sonnet
 ```
 
-It installs the plugin, lets subagents nest three deep, adds the `Read` rule, installs Chromium for
-browser checks on a best-effort basis (setup still finishes if the download fails), and adds a
-session-start hook that pulls the latest pstack, so cloud sessions stay current without your
-editing the line. A pulled update takes effect in the session that pulled it: skill text, hook
-output and agent descriptions all come from the new version. Changing a model means editing the
-line.
+It installs the plugin, lets subagents nest three deep, adds the `Read` rule, and installs Chromium
+for browser checks on a best-effort basis (setup still finishes if the download fails). Every
+cloud session starts from the environment's snapshot, so the plugin is installed from a `command`
+source that pulls the latest pstack: Claude Code reruns it shortly after each session starts,
+installs what changed, and switches the session to it a few minutes in, so cloud sessions stay
+current without your editing the line. Until then the session runs the snapshot's pstack, and
+the agent list it shows the model keeps the snapshot's descriptions. Changing a model means
+editing the line.
 
 - Put the line in **every environment that should carry pstack.**
 - **One environment per repo**, if you keep one for each project: set

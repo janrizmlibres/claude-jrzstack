@@ -4,13 +4,18 @@
 #   cloud-install.sh [ref] [--config KEY=VALUE]...
 #
 # Run from the clone the setup line makes. It checks the clone out at ref (a
-# branch, default main), adds the clone as a directory marketplace and installs
-# pstack from it at user scope with the --config values. A directory
-# marketplace is read in place, so every session loads the clone's current
-# files. It then merges, never replaces, into the VM's user settings: subagent
-# spawn depth 3, a Read rule for the plugin's files, and a SessionStart hook
-# that fast-forwards the clone on ref. Last, it installs Playwright Chromium,
-# warning but still exiting 0 when that fails.
+# branch, default main), then writes a marketplace beside it whose pstack entry
+# is a command source: the command fast-forwards the clone on ref and prints
+# its pstack directory. Claude Code copies that directory into the plugin
+# cache, and every cloud session starts from the environment's snapshot, so a
+# plain install would stay at the snapshot's commit. The command source is what
+# keeps it current: Claude Code reruns the command once per session, shortly
+# after start, installs the files when they changed, and switches the session
+# to them a few minutes in, at a turn where the reload costs no prompt cache.
+# It installs pstack from that marketplace at user scope with the --config
+# values, then merges, never replaces, into the VM's user settings: subagent
+# spawn depth 3 and a Read rule for the plugin cache. Last, it installs
+# Playwright Chromium, warning but still exiting 0 when that fails.
 set -euo pipefail
 
 usage() {
@@ -19,7 +24,7 @@ usage() {
 }
 
 main() {
-  local clone ref="" settings_dir settings pull hook
+  local clone ref="" market command settings_dir settings
   local -a configs=()
   clone="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
@@ -43,26 +48,29 @@ main() {
   git -C "$clone" fetch -q --depth 1 origin "$ref"
   git -C "$clone" checkout -q -B "$ref" FETCH_HEAD
 
-  claude plugin marketplace add "$clone" --scope user </dev/null
-  claude plugin install pstack@claude-pstack --scope user ${configs[@]+"${configs[@]}"} </dev/null
+  # The command must print only the directory, so the pull's output goes
+  # nowhere, and a failed pull still loads the clone as it is.
+  market="$clone-marketplace"
+  command="git -C $(printf %q "$clone") pull --ff-only -q origin $(printf %q "$ref") >/dev/null 2>&1; echo $(printf %q "$clone/pstack")"
+  mkdir -p "$market/.claude-plugin"
+  jq -n --arg command "$command" '{
+    name: "claude-pstack",
+    owner: {name: "Janriz Libres"},
+    description: "pstack for cloud sessions, pulled to the current ref at each session start.",
+    plugins: [{name: "pstack", source: {source: "command", command: $command, timeout: 60}}]
+  }' >"$market/.claude-plugin/marketplace.json"
+
+  # -y accepts the command just written; setup has no terminal to confirm it in.
+  claude plugin marketplace add "$market" --scope user </dev/null
+  claude plugin install pstack@claude-pstack --scope user -y ${configs[@]+"${configs[@]}"} </dev/null
 
   settings_dir="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
   settings="$settings_dir/settings.json"
   mkdir -p "$settings_dir"
   [[ -f $settings ]] || echo '{}' >"$settings"
-  # The pull hook replaces any earlier one on this clone, so a run on another
-  # ref leaves one hook. Its output goes nowhere, since a SessionStart hook's
-  # stdout lands in the session's context.
-  pull="git -C $(printf %q "$clone") pull"
-  hook="$pull --ff-only -q origin $(printf %q "$ref") >/dev/null 2>&1 || true"
-  jq --arg rule "Read(/$clone/pstack/**)" --arg pull "$pull " --arg hook "$hook" '
+  jq --arg rule "Read(/$settings_dir/plugins/cache/claude-pstack/**)" '
     .env = ((.env // {}) + {CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH: "3"})
     | .permissions.allow = ((.permissions.allow // []) | if any(. == $rule) then . else . + [$rule] end)
-    | .hooks.SessionStart = [
-        (.hooks.SessionStart // [])[]
-        | .hooks |= map(select((.command // "") | startswith($pull) | not))
-        | select(.hooks | length > 0)
-      ] + [{hooks: [{type: "command", command: $hook, timeout: 15}]}]
   ' "$settings" >"$settings.tmp"
   mv "$settings.tmp" "$settings"
 
