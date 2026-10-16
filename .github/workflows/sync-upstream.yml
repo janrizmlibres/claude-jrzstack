@@ -1,6 +1,7 @@
-# The weekly sync. A shell gate decides without a model call: it stops when
-# upstream matches the snapshot, and comments on an open sync PR instead of
-# starting another. Otherwise Claude runs the repo-local /sync-upstream skill
+# The upstream sync, started only by hand (`gh workflow run sync-upstream.yml`),
+# from a session that oversees the run and reviews its PR. A shell gate decides
+# without a model call: it stops when upstream matches the snapshot, and
+# comments on an open sync PR instead of starting another. Otherwise Claude runs the repo-local /sync-upstream skill
 # at the upstream commit the gate saw, which opens one PR on sync/<version>
 # against the branch this run is on. Nothing merges itself.
 #
@@ -10,8 +11,6 @@
 name: Sync upstream
 
 on:
-  schedule:
-    - cron: "23 6 * * 1"
   workflow_dispatch:
 
 permissions:
