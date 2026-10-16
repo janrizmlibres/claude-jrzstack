@@ -52,6 +52,7 @@ function fixture({ settings = vmSettings, clone }: { settings?: object | null; c
 
   return {
     clone,
+    home,
     install: (args: string[] = [], extraEnv: Record<string, string> = {}) =>
       runBashScript(join(clone, "scripts", "cloud-install.sh"), args, { cwd: tempDir(), home, env: { ...env, ...extraEnv } }),
     settingsText: () => readFileSync(settingsFile, "utf8"),
@@ -61,19 +62,27 @@ function fixture({ settings = vmSettings, clone }: { settings?: object | null; c
       return existsSync(log) ? readFileSync(log, "utf8").trimEnd().split("\n") : [];
     },
     resetCalls: (name: string) => writeFileSync(join(logs, `${name}.log`), ""),
-    /** Run a hook command as Claude Code does, through the shell, with the stubs on PATH. */
-    runHook: (command: string, extraEnv: Record<string, string> = {}) => {
-      const result = runShell(command, { cwd: tempDir(), home, env: { ...env, ...extraEnv } });
-      return { exitCode: result.exitCode, output: result.stdout + result.stderr };
+    /** Run a command source's command as Claude Code does, through `sh` from HOME, with the stubs on PATH. */
+    runCommand: (command: string, extraEnv: Record<string, string> = {}) => {
+      const result = runShell(command, { cwd: home, home, env: { ...env, ...extraEnv } });
+      return { exitCode: result.exitCode, stdout: result.stdout, stderr: result.stderr };
     },
   };
 }
 
-const pullHooks = (settings: { hooks: { SessionStart: { hooks: { command: string }[] }[] } }) =>
-  settings.hooks.SessionStart.flatMap((group) => group.hooks).filter((hook) => hook.command.includes(" pull "));
+/** The command source the installer wrote for pstack, from the marketplace beside the clone. */
+function commandSource(clone: string): { command: string; timeout: number } {
+  const market = JSON.parse(readFileSync(join(`${clone}-marketplace`, ".claude-plugin", "marketplace.json"), "utf8"));
+  expect(market.name).toBe("claude-pstack");
+  expect(market.plugins).toHaveLength(1);
+  expect(market.plugins[0].name).toBe("pstack");
+  const { source, ...rest } = market.plugins[0].source;
+  expect(source).toBe("command");
+  return rest;
+}
 
 describe("cloud-install.sh", () => {
-  test("merges depth 3, the Read rule and the pull hook into user settings, keeping the harness's keys", () => {
+  test("merges depth 3 and the plugin cache's Read rule into user settings, keeping the harness's keys", () => {
     const f = fixture();
 
     const result = f.install();
@@ -82,13 +91,9 @@ describe("cloud-install.sh", () => {
     expect(f.settings()).toEqual({
       ...vmSettings,
       env: { ...vmSettings.env, CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH: "3" },
-      permissions: { ...vmSettings.permissions, allow: ["Bash(git status:*)", `Read(/${f.clone}/pstack/**)`] },
-      hooks: {
-        ...vmSettings.hooks,
-        SessionStart: [
-          ...vmSettings.hooks.SessionStart,
-          { hooks: [{ type: "command", command: expect.any(String), timeout: 15 }] },
-        ],
+      permissions: {
+        ...vmSettings.permissions,
+        allow: ["Bash(git status:*)", `Read(/${f.home}/.claude/plugins/cache/claude-pstack/**)`],
       },
     });
   });
@@ -97,52 +102,46 @@ describe("cloud-install.sh", () => {
     const f = fixture({ settings: null });
 
     expect(f.install().exitCode).toBe(0);
-    expect(f.settings().env).toEqual({ CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH: "3" });
-    expect(f.settings().permissions.allow).toEqual([`Read(/${f.clone}/pstack/**)`]);
-    expect(pullHooks(f.settings())).toHaveLength(1);
+    expect(f.settings()).toEqual({
+      env: { CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH: "3" },
+      permissions: { allow: [`Read(/${f.home}/.claude/plugins/cache/claude-pstack/**)`] },
+    });
   });
 
-  test("the pull hook fast-forwards the clone on the installed ref, silently", () => {
+  test("the command source fast-forwards the clone on the installed ref and prints only its pstack directory", () => {
     const f = fixture();
     f.install(["release/v1"]);
-    const [hook] = pullHooks(f.settings());
+    const { command, timeout } = commandSource(f.clone);
     f.resetCalls("git");
 
-    const result = f.runHook(hook!.command);
+    const result = f.runCommand(command);
 
-    expect(result).toEqual({ exitCode: 0, output: "" });
+    expect(timeout).toBe(60);
+    expect(result).toEqual({ exitCode: 0, stdout: `${f.clone}/pstack\n`, stderr: "" });
     expect(f.calls("git")).toEqual([`-C ${f.clone} pull --ff-only -q origin release/v1`]);
   });
 
-  test("a failing pull never fails the session", () => {
+  test("a failing pull still prints the clone's pstack directory", () => {
     const f = fixture();
     f.install();
-    const [hook] = pullHooks(f.settings());
 
-    expect(f.runHook(hook!.command, { STUB_FAIL: "git" })).toEqual({ exitCode: 0, output: "" });
+    expect(f.runCommand(commandSource(f.clone).command, { STUB_FAIL: "git" })).toEqual({
+      exitCode: 0,
+      stdout: `${f.clone}/pstack\n`,
+      stderr: "",
+    });
   });
 
   test("a second run changes nothing", () => {
     const f = fixture();
     f.install(["--config", "work_model=sonnet"]);
-    const first = f.settingsText();
+    const first = { settings: f.settingsText(), source: commandSource(f.clone) };
 
     expect(f.install(["--config", "work_model=sonnet"]).exitCode).toBe(0);
-    expect(f.settingsText()).toBe(first);
+    expect({ settings: f.settingsText(), source: commandSource(f.clone) }).toEqual(first);
   });
 
-  test("a run on another ref replaces the pull hook instead of adding one", () => {
-    const f = fixture();
-    f.install();
-
-    f.install(["release/v1"]);
-
-    const hooks = pullHooks(f.settings());
-    expect(hooks).toHaveLength(1);
-    expect(hooks[0]!.command).toContain("origin release/v1");
-  });
-
-  test("checks the clone out at the ref, then installs the plugin with the --config values", () => {
+  test("checks the clone out at the ref, then installs the plugin from the command-source marketplace with the --config values", () => {
     const f = fixture();
 
     const result = f.install(["release/v1", "--config", "work_model=sonnet", "--config", "volume_model=haiku"]);
@@ -153,8 +152,8 @@ describe("cloud-install.sh", () => {
       `-C ${f.clone} checkout -q -B release/v1 FETCH_HEAD`,
     ]);
     expect(f.calls("claude")).toEqual([
-      `plugin marketplace add ${f.clone} --scope user`,
-      "plugin install pstack@claude-pstack --scope user --config work_model=sonnet --config volume_model=haiku",
+      `plugin marketplace add ${f.clone}-marketplace --scope user`,
+      "plugin install pstack@claude-pstack --scope user -y --config work_model=sonnet --config volume_model=haiku",
     ]);
   });
 
@@ -167,10 +166,10 @@ describe("cloud-install.sh", () => {
       `-C ${f.clone} fetch -q --depth 1 origin main`,
       `-C ${f.clone} checkout -q -B main FETCH_HEAD`,
     ]);
-    expect(pullHooks(f.settings())[0]!.command).toContain("origin main");
+    expect(commandSource(f.clone).command).toContain("origin main");
   });
 
-  test("with real git, checks a depth-1 clone of main out at the ref, and the hook fast-forwards it", () => {
+  test("with real git, checks a depth-1 clone of main out at the ref, and the command fast-forwards it", () => {
     const remote = new FakeRemote();
     remote.commit({
       write: { "scripts/cloud-install.sh": readFileSync(join(scriptsDir, "cloud-install.sh"), "utf8"), "pstack/v": "main\n" },
@@ -194,8 +193,9 @@ describe("cloud-install.sh", () => {
     git(remote.dir, "checkout", "-q", "release/v1");
     const rc2 = remote.commit({ write: { "pstack/v": "rc2\n" } });
 
-    expect(f.runHook(pullHooks(f.settings())[0]!.command)).toEqual({ exitCode: 0, output: "" });
+    expect(f.runCommand(commandSource(clone).command)).toEqual({ exitCode: 0, stdout: `${clone}/pstack\n`, stderr: "" });
     expect(git(clone, "rev-parse", "HEAD")).toBe(rc2);
+    expect(readFileSync(join(clone, "pstack", "v"), "utf8")).toBe("rc2\n");
   });
 
   test("installs Playwright Chromium", () => {
@@ -212,7 +212,7 @@ describe("cloud-install.sh", () => {
 
     expect(result.exitCode).toBe(0);
     expect(result.stderr).toContain("warning: Playwright Chromium did not install");
-    expect(pullHooks(f.settings())).toHaveLength(1);
+    expect(f.settings().env.CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH).toBe("3");
   });
 
   test("a failing plugin install fails the setup before settings are touched", () => {

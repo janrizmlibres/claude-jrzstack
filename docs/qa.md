@@ -19,7 +19,7 @@ Each candidate gets a tracking issue with the release checks as checkboxes, each
 | `entry-cloud` | release | cloud | The same in cloud, with `surface=cloud`. |
 | `env-pick` | release | local | `claude --cloud` picks the named environment from `--settings` with `remote.defaultEnvironmentId`, and from the project's `.claude/settings.local.json`. |
 | `local-only-fallback` | release | local | A local lead that can't start cloud workers (no Auto, or no default environment) falls back to local-only and says so once. |
-| `pulled-update` | release | cloud | Records which parts of an update pulled by the cloud `SessionStart` hook take effect in that session, for the README. |
+| `pulled-update` | release | cloud | A session started from a snapshot older than main reloads pstack at main shortly after it starts: skill list, skill text and agent types. |
 | `read-rule-local` | release | local | In default mode with the README's `Read` rule, the session and a subagent read a hidden sibling skill by path with no prompt or denial. |
 | `read-rule-cloud` | release | cloud | The same in a default-mode cloud session, under the setup line's `Read` rule. Started without Auto, so the maintainer approves its report push. |
 | `install-probe-local` | release | local | The marketplace and cloud plugin-install probe's local items hold on the candidate's marketplace install. |
