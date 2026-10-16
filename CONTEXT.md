@@ -157,7 +157,7 @@ A request's explicit permission to land. Withheld unless the request gives it; w
 _Avoid_: merge authority, landing authority
 
 **Setup line**:
-The command a user pastes into a cloud environment's setup script to install the port there, carrying their model choices. The only way the port reaches the cloud surface.
+The command a user pastes into a cloud environment's setup script to install the port there, carrying their model and effort choices. The only way the port reaches the cloud surface.
 _Avoid_: cloud line, install command
 
 ### Run input
