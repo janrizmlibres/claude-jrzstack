@@ -262,8 +262,10 @@ Every other file is translated from upstream at the same path, except `skills/co
 ## Keeping up with upstream
 
 A sync runs only when someone starts it: `gh workflow run sync-upstream.yml` starts a GitHub Action
-that checks upstream. In a checkout of this repo, `/sync-upstream oversee` starts it for you, watches
-the run, starts CI on its PR and reviews the ⚠️ rows, leaving the merge to you. When
+that checks upstream. In a checkout of this repo, `/sync-upstream oversee` first brings you the
+upstream changes that need a decision (a mechanic no conversion rule covers, an override, anything
+that widens what an agent may do) and lands your calls, then starts the run, watches it, starts CI
+on its PR and reviews the ⚠️ rows, leaving the merge to you. When
 upstream has moved, Claude opens one sync PR that brings the port up to date, with a row per upstream change and ⚠️ on the calls it was unsure of. Nothing
 merges itself. The snapshot, upstream's verbatim copy, lives in `upstream/`, and the sync re-renders the
 version line and file table above. In a checkout of this repo the same sync runs by hand as
