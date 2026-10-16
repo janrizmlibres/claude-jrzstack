@@ -1,19 +1,20 @@
 ---
 name: sync-upstream
-description: Bring the port up to upstream pstack in one PR, or re-translate after a conversion rule changed. `/sync-upstream [dry run] [ref]`, `/sync-upstream retranslate <rule>`.
+description: Bring the port up to upstream pstack in one PR, re-translate after a conversion rule changed, or oversee the sync workflow's run and review its PR. `/sync-upstream [dry run] [ref]`, `/sync-upstream retranslate <rule>`, `/sync-upstream oversee`.
 disable-model-invocation: true
 ---
 
 # Sync upstream
 
-Two modes, one PR each. Vocabulary is `CONTEXT.md`'s.
+Two modes open one PR each, and a third reviews the sync workflow's. Vocabulary is `CONTEXT.md`'s.
 
 - **Sync** (`/sync-upstream [dry run] [ref]`, ref default `main`): carry what upstream changed since the snapshot into the port, then advance the snapshot.
 - **Re-translation** (`/sync-upstream retranslate <rule>`): carry a changed conversion rule into every translated file it touches. The snapshot stays where it is.
+- **Oversight** (`/sync-upstream oversee`): start the sync workflow, watch its run, and review the PR it opens for the maintainer. It never merges.
 
 The sources of truth: `docs/conversion-rules.md` (every rule, applied to every file you translate), `port.json` (each file's kind; an unlisted `pstack/` file is a translated file of its counterpart under `upstream/`), and the scripts under `scripts/`, each documented in its header. The base branch is the branch checked out when you start. `<scratch>` is `.sync-upstream/` (create it), which git ignores.
 
-The sync workflow runs this skill with no one in the loop until its PR, and you may be running unattended too. Settle every call yourself: make the best call, mark its row ⚠️ and say why in the row's Reason. The PR is where the maintainer reviews.
+In Sync and Re-translation, the sync workflow runs this skill with no one in the loop until its PR, and you may be running unattended too. Settle every call yourself: make the best call, mark its row ⚠️ and say why in the row's Reason. The PR is where the maintainer reviews.
 
 ## Sync
 
@@ -55,3 +56,15 @@ The sync workflow runs this skill with no one in the loop until its PR, and you 
 4. **Re-apply the rule.** For each listed file, apply the rule as it now reads, from the counterpart's text, leaving the rest of the file as it is. Fan out as in step 5 of Sync. Overrides are hand-written: an override the rule bears on gets a ⚠️ row, never an edit.
 5. **Run the checks** of Sync step 8. The snapshot doesn't move: `git diff --stat <base> -- upstream/` must print nothing.
 6. **Open the PR** as in Sync step 9, titled `Re-translate for rule <n>: <title>`, its body a row per file (port file · lines changed · Reason) and the ⚠️ override rows.
+
+## Oversight
+
+You run in the maintainer's session, beside the workflow, not inside it. You report and recommend; the maintainer decides, and merges.
+
+1. **Check there is work.** Run `bun scripts/sync-changes.ts > <scratch>/changes.md`. "Nothing to sync" ends the run: say so. When a PR from a `sync/` branch is already open (`gh pr list --state open --json number,headRefName,url`), review it from step 4 instead of starting another run.
+2. **Start and watch the run.** `gh workflow run sync-upstream.yml --ref <base>`, then take its id from `gh run list --workflow sync-upstream.yml --limit 1 --json databaseId,status,url` and wait on `gh run watch <id> --exit-status` in the background. A run takes about 15 to 20 minutes.
+3. **Read the run, whatever its colour.** Save `gh run view <id> --log > <scratch>/run.log`, which holds the full transcript. Search it for permission denials (`"subtype": "permission_denied"`) and for the workarounds the model found around them, such as `bun run scripts/x.ts` in place of a denied `bun scripts/x.ts`. A denial means the workflow's `--allowedTools` misses a command the skill needs: fix the pattern in its own PR. A path prefix takes a bare trailing `*`, since `:*` needs a space after the prefix. A failed "Check the sync PR" step means no PR was opened: report the transcript's last turns and stop.
+4. **Start CI on the PR.** The workflow opens its PR with `GITHUB_TOKEN`, which starts no other workflow, so CI hasn't run. `gh pr close <n> && gh pr reopen <n>`, then `gh pr checks <n> --watch`.
+5. **Review every ⚠️ row** of the PR body. For each one, read upstream's change (`git diff origin/<base>...origin/<branch> -- upstream/<path>`, since the PR advances the snapshot), its intent, read as in Sync step 3, and the port file on the PR branch, then give a verdict: sound, or what is wrong and the fix. Look hardest at overrides, at new conversion rules, and at any change that lets an agent merge, push, delete or land. Spot-check a few translated rows without ⚠️ against `docs/conversion-rules.md` too.
+6. **Run the CI steps locally** on the PR branch, as `.github/workflows/ci.yml` runs them, and record each exit code.
+7. **Report** to the maintainer: the PR link, the run's turns and cost when the log shows them, every denial and workaround, each ⚠️ row's verdict, the CI results from steps 4 and 6, and the fixes you recommend, each as a commit on the PR branch or a PR of its own. Push a fix only when the maintainer says so. Never merge.
