@@ -71,10 +71,13 @@ The default answer is `/pstack:poteto-mode`, which runs most of the others when 
 | The user wants to | Skill |
 |---|---|
 | Do any non-trivial task with rigor | [`/pstack:poteto-mode`](../poteto-mode/SKILL.md) |
+| Check that the agent understood their goal and the problem before it starts | [`/pstack:in-your-own-words`](../in-your-own-words/SKILL.md) |
+| Aim a task higher before starting: more expert, more outcome-focused, not overspecified | [`/pstack:sharpen`](../sharpen/SKILL.md) |
 | Know how code works now, or where new code should live | [`/pstack:how`](../how/SKILL.md) |
 | Know why code is shaped this way, or where a number came from | [`/pstack:why`](../why/SKILL.md) |
 | Understand a change or subsystem, explained plainly | [`/pstack:teach`](../teach/SKILL.md) |
 | Catch up on their own recent work on a topic | [`/pstack:recall`](../recall/SKILL.md) |
+| Catch up on what changed in this session since their last message, in a few plain sentences and small visuals, with enough context to decide each action item | [`/pstack:ketchup`](../ketchup/SKILL.md) |
 | Know what a small diff could break outside itself | [`/pstack:blast-radius`](../blast-radius/SKILL.md) |
 | Settle types and module shape before code that crosses a function boundary | [`/pstack:architect`](../architect/SKILL.md) |
 | Get several attempts at one brief, each in its own direction, merged into the best one | [`/pstack:arena`](../arena/SKILL.md) |
@@ -107,7 +110,7 @@ Close calls:
 - `/pstack:arena` gives every runner the same brief in its own direction and merges the best parts. `/pstack:swarm` splits work into slices or a race and returns one report.
 - `/pstack:architect` implements right after it settles the design. Add "with checkpoint" to review the design before it writes code.
 - `/pstack:interrogate` reviews the diff. `/pstack:blast-radius` looks for breakage outside the diff and proves the one fact that makes the change safe.
-- `/pstack:recall` rebuilds context across recent sessions. Resuming one specific session or branch is the Session pickup playbook.
+- `/pstack:recall` rebuilds context across recent sessions. `/pstack:ketchup` covers only this session since the user's last message. Resuming one specific session or branch is the Session pickup playbook.
 - `/pstack:figure-it-out` designs one rigorous run. The Orchestrate playbook runs a program that spans days and many PRs. The Autonomous run playbook drives one task to a finish condition.
 
 Shipped hidden, or not in pstack:

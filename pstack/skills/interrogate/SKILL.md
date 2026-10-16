@@ -6,34 +6,25 @@ disable-model-invocation: true
 
 # Interrogate
 
-Spawn three reviewers to adversarially review code changes, each owning one lens of the rubric. Every reviewer runs on one model family, so the adversarial signal comes from the lenses: each reviewer spends its whole review on the part of the rubric the other two don't own.
+Spawn three reviewers to adversarially review code changes, each owning one lens of the rubric. Every reviewer runs on one model family, so the adversarial signal comes from the lenses: each reviewer spends its whole review on the part of the rubric the other two don't own. The deliverable is a synthesized verdict. Do NOT auto-apply changes.
 
-The deliverable is a synthesized verdict. Do NOT auto-apply changes.
-
-## Step 1, Determine Scope
+## Step 1, Scope
 
 Identify what to review from context:
 
-- If the user points at specific files or a diff, use that
-- If on a feature branch, run `git diff main...HEAD` (or the appropriate base branch) for the full changeset
-- If the user's message references recent work, gather the relevant files
+- If the user points at specific files or a diff, use that.
+- If on a feature branch, run `git diff main...HEAD` (or the appropriate base branch) for the full changeset.
+- If the user's message references recent work, gather the relevant files.
 
-Package the diff (or file contents) plus any surrounding context files the reviewers need to understand the code.
+Package the diff or file contents with any surrounding context files the reviewers need to understand the code.
 
-## Step 2, State the Intent
+## Step 2, Intent
 
-Before spawning reviewers, state the intent explicitly. Derive this from:
-
-- The user's message
-- Commit messages
-- PR description if one exists
-- The code itself
-
-Write one clear paragraph. If you're unsure about the intent, ask the user before proceeding.
+Before spawning reviewers, state the intent in one clear paragraph from the user's message, commit messages, the PR description if one exists, and the code. If you're unsure about the intent, ask the user before proceeding.
 
 ## Step 3, Spawn Reviewers
 
-Launch all three reviewers in a single message using the Agent tool, always all three, whatever the size of the change. Each runs on `poteto-reader` on the Judgement setting, with `model:` `${user_config.judgement_model}` and `effort:` `${user_config.judgement_effort}`, or the setting's defaults (`opus`, `high`) for a literal placeholder or an empty value.
+Launch all three reviewers in a single message using the Agent tool, always all three, whatever the size of the change. Each runs on `poteto-reader` on the Judgement setting, with `model:` `${user_config.judgement_model}` and `effort:` `${user_config.judgement_effort}`, or the setting's defaults (`opus`, `high`) for a literal placeholder or an empty value. Pick each subagent's effort for the job, per the Subagents section of the **poteto-mode** skill (read ${CLAUDE_PLUGIN_ROOT}/skills/poteto-mode/SKILL.md).
 
 The lens table assigns `references/rubric.md` and `references/code-quality-review.md` to the lenses by section heading:
 
@@ -68,28 +59,16 @@ As results come back, build a unified picture:
 
 ## Step 5, Lead Judgment
 
-You are the lead reviewer, a pragmatic senior engineer, not a neutral aggregator.
+You are the lead reviewer, a pragmatic senior engineer, not a neutral aggregator. Read `references/lead-judgment.md` for the full framework. Run its verification gate before you categorize: on one model family, verification replaces consensus, and an unverified finding can't go in Act on.
 
-Read `references/lead-judgment.md` for the full framework.
+Put every finding in one of four buckets, with the lens(es) that raised it, in-lens or as spillover, and a one-line rationale. For Act on and every dismissed `critical`, say how you verified it.
 
-Run its verification gate before you categorize: on one model family, verification replaces consensus, and an unverified finding can't go in Act on.
-
-Categorize every finding using these buckets:
-
-- **Act on**. Real issues affecting correctness, security, or maintainability given the actual goals. These would block a real PR.
-- **Consider**. Legitimate points, but you're not sure they outweigh the cost of addressing them right now. Worth the user's attention.
-- **Noted**. Technically valid but not actionable. Context-dependent, premature optimization, or low-impact given the current stage.
-- **Dismissed**. Wrong, nitpicky, or missing context. Brief explanation why.
-
-For each finding, include:
-- Which lens(es) raised it, in-lens or as spillover
-- The category (act on / consider / noted / dismissed)
-- A one-line rationale for the categorization
-- For Act on and every dismissed `critical`: how you verified it
+- **Act on**. Real issues affecting correctness, security, or maintainability given the actual goals. They would block a real PR.
+- **Consider**. Legitimate, but you're not sure they outweigh the cost of addressing them now. Worth the user's attention.
+- **Noted**. Technically valid but not actionable. Context-dependent, premature optimization, or low-impact at this stage.
+- **Dismissed**. Wrong, nitpicky, or missing context, with a brief reason.
 
 ## Output Format
-
-Present the verdict in this structure:
 
 ### Intent
 > [The stated intent paragraph from Step 2]
@@ -98,16 +77,16 @@ Present the verdict in this structure:
 - [Lens]: [the rubric headings it owned] (one bullet per lens)
 
 ### Act On
-[Findings that should be addressed. For each: description, which lenses raised it, how you verified it, why it matters.]
+[Each: description, which lenses raised it, how you verified it, why it matters.]
 
 ### Consider
-[Findings worth thinking about. For each: description, which lenses raised it, tradeoff involved, and what would verify it if unverified.]
+[Each: description, which lenses raised it, the tradeoff, and what would verify it if unverified.]
 
 ### Noted
-[Valid but low-priority. Brief list.]
+[Brief list.]
 
 ### Dismissed
-[Rejected findings with brief rationale.]
+[Each with a brief rationale.]
 
 ### Coverage Map
 

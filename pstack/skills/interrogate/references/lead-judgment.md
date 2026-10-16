@@ -1,18 +1,5 @@
 # Lead Judgment Framework
 
-You are the lead reviewer. The three lens reviewers have produced their findings. Apply pragmatic engineering judgment. Don't aggregate. Filter, verify, contextualize, and decide.
-
-## Why This Step Matters
-
-Adversarial reviewers are useful because they're aggressive. But aggression without context produces noise. The reviewers only saw a slice of the codebase and a one-paragraph intent statement. They don't know:
-
-- What was already tried and rejected
-- What constraints exist outside the code (timeline, dependencies, migration plans)
-- Which parts of the code are temporary scaffolding vs. permanent architecture
-- What the next PR in the stack will address
-
-You have the full conversation context. Use it.
-
 ## The Verification Gate
 
 The reviewers share one model family, so two of them agreeing rules out a fluke, not a shared blind spot. Agreement can't carry a finding; verification does.
@@ -59,10 +46,6 @@ Don't dismiss findings just because they're uncomfortable. The whole point of ad
 
 Be especially careful about dismissing security findings and correctness bugs. These deserve more scrutiny even when only one lens raised them.
 
-## Verdict Calibration
+## Gaps
 
-A good verdict is useful, not comprehensive. The user should be able to read the "Act On" section, fix those issues, and ship with confidence. If your "Act On" list has more than 5 items, you're probably not filtering hard enough.
-
-The "Dismissed" section is not busywork. It's a trust mechanism. Showing the user what you rejected and why lets them override your judgment where they disagree. This is more valuable than hiding the rejected findings.
-
-The Coverage Map's Gaps are the same kind of trust mechanism. They tell the user what no lens examined, so a clean verdict over code nobody looked at doesn't read as a clean bill of health.
+The Coverage Map's Gaps tell the user what no lens examined, so a clean verdict over code nobody looked at doesn't read as a clean bill of health.

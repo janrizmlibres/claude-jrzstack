@@ -64,7 +64,7 @@ Correct the log, not the story. The audit never edits or removes a row, even an 
 
 ## Fresh-context review of the trail
 
-Before handing back, spawn a fresh-context review on `poteto-reader` on the Judgement setting, given the trail and transcript paths and never your reasoning. Pass `model:` `${user_config.judgement_model}` and `effort:` `${user_config.judgement_effort}`, or the setting's defaults (`opus`, `high`) for a literal placeholder or an empty value. Self-review is not a substitute. The subagent reads the audit trail and the run's transcript, then flags what the user should pay attention to. Not a redo of the work, a scan for what's suboptimal or risky.
+Before handing back, spawn a fresh-context review on `poteto-reader` on the Judgement setting, given the trail and transcript paths and never your reasoning. Pass `model:` `${user_config.judgement_model}` and `effort:` `${user_config.judgement_effort}`, or the setting's defaults (`opus`, `high`) for a literal placeholder or an empty value. Self-review is not a substitute. The subagent reads the audit trail and the run's transcript, then flags what the user should pay attention to. Not a redo of the work, a scan for what's suboptimal or risky. Pick each subagent's effort for the job, per the Subagents section of the **poteto-mode** skill (read ${CLAUDE_PLUGIN_ROOT}/skills/poteto-mode/SKILL.md).
 
 - Decisions logged with weak or absent evidence.
 - Verification steps skipped or claimed without proof in the transcript.
