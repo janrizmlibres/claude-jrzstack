@@ -48,17 +48,20 @@ function fixture() {
     return path;
   };
 
-  const run = () =>
-    runPluginScript(audit, [], { cwd: repo, home, env: { PATH: `${bin}:${process.env.PATH ?? ""}` } });
+  const run = (args: string[] = []) =>
+    runPluginScript(audit, args, { cwd: repo, home, env: { PATH: `${bin}:${process.env.PATH ?? ""}` } });
 
   return { root, repo, worktree, transcript, run };
 }
 
 type Row = Record<string, string>;
 
-/** The audit's rows keyed by worktree path. */
+/** The audit's rows keyed by worktree path, below its `# base:` line. */
 function rows(stdout: string): Map<string, Row> {
-  const [header, ...body] = stdout.trimEnd().split("\n");
+  const [header, ...body] = stdout
+    .trimEnd()
+    .split("\n")
+    .filter((text) => !text.startsWith("# "));
   const columns = header!.split("\t");
   return new Map(
     body.map((text) => {
@@ -136,5 +139,32 @@ describe("worktree-audit.sh", () => {
     const row = rows(f.run().stdout).get(stray);
 
     expect(row).toMatchObject({ DIRTY: "wip:1", TRANSCRIPT: "-", BUCKET: "hold-wip" });
+  });
+
+  test("checks MERGED against origin/main by default and names the base", () => {
+    const f = fixture();
+    const feature = f.worktree(join(f.repo, ".claude", "worktrees", "feature"), "feature");
+
+    const result = f.run();
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout.split("\n")[0]).toBe("# base: origin/main");
+    expect(rows(result.stdout).get(feature)).toMatchObject({ MERGED: "no" });
+  });
+
+  test("checks MERGED against the base -b names, fetching it first", () => {
+    const f = fixture();
+    const feature = f.worktree(join(f.repo, ".claude", "worktrees", "feature"), "feature");
+    git(feature, "push", "-q", "origin", "feature:integration");
+
+    const result = f.run(["-b", "origin/integration"]);
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout.split("\n")[0]).toBe("# base: origin/integration");
+    expect(rows(result.stdout).get(feature)).toMatchObject({ MERGED: "YES" });
+  });
+
+  test("exits 2 on an unknown option", () => {
+    expect(fixture().run(["--nope"]).exitCode).toBe(2);
   });
 });

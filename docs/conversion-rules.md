@@ -427,3 +427,13 @@ after: At each tick, re-read this playbook at `${CLAUDE_PLUGIN_ROOT}/skills/pote
 after: Every worker starts from a commit its brief names.
 after: Also check that no path in `git diff --name-only HEAD...origin/main` is a path the PR changes.
 ```
+
+## 23. Agent stores
+
+Cursor gives each agent a store whose path the system prompt names; Claude Code has none. A decision trail upstream keeps in the agent's store rides in the bodies of the commits its writer pushes (an empty commit is fine), so a replacement reads it from the branch's log and a squash merge, which takes the PR body, never lands it. Orchestrate's store is the orch override's, checkpointed to its orphan branch.
+
+```detect
+pattern: \bagent's store\b
+before: Assume the VM dies. Soon after starting, push and start a decision trail in the root agent's store (path in the system prompt) per the **show-me-your-work** skill, then push after every unit worth keeping.
+after: Assume the VM dies. Soon after starting, push and start a decision trail per the **show-me-your-work** skill, then push after every unit worth keeping. Carry the trail's new rows in the body of each pushed commit (an empty commit is fine).
+```

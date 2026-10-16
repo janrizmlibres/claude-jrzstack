@@ -6,8 +6,6 @@ disable-model-invocation: true
 
 # Swarm
 
-Fan out N parallel workers, cloud workers by default when the lead is local. They may cover separate slices, race the same task, or mix both. The parent waits, aggregates, and returns one report.
-
 ## Start
 
 Open a todolist with one entry per phase before launching anything.
@@ -22,7 +20,7 @@ Open a todolist with one entry per phase before launching anything.
 1. State the done predicate and the artifact or report the swarm must return.
 2. Choose the shape. Partition into slices, race N workers, or mix both. For a race or mixed shape, declare `first pass`, `rank all`, or `best-of` before spawning. Only a `first pass` race may give its workers identical briefs. A `rank all` or `best-of` race needs distinct arms, each brief naming its own approach.
 3. Set N from the user or derive it from the shape. N is total workers, not the concurrency window.
-4. Workers run on the Volume setting, on `poteto-agent`, or `poteto-reader` for a worker that only reads. Pass `model:` `${user_config.volume_model}` and `effort:` `${user_config.volume_effort}`, or the setting's defaults (`sonnet`, `high`) for a literal placeholder or an empty value. A model race is opt-in and a cost check: run one only when the user asks, name each arm's model up front, pass it as that arm's `model:`, and label the report a cost check.
+4. Workers run on the Volume setting, on `poteto-agent`, or `poteto-reader` for a worker that only reads. Pass `model:` `${user_config.volume_model}` and `effort:` `${user_config.volume_effort}`, or the setting's defaults (`sonnet`, `high`) for a literal placeholder or an empty value. A model race is opt-in and a cost check: run one only when the user asks, name each arm's model up front, pass it as that arm's `model:`, and label the report a cost check. Pick each subagent's effort for the job, per the Subagents section of the **poteto-mode** skill (read ${CLAUDE_PLUGIN_ROOT}/skills/poteto-mode/SKILL.md).
 5. Give each worker its own writable output when it writes. When workers verify or measure commits, each brief names the exact SHAs. A measurement brief also names the method (sample count, what one sample is, order). The worker records both in its result.
 6. Size a `TIMEBOX` for each brief. Without an estimate, 30 minutes for a worker that only reads and 90 for one that writes code.
 
@@ -45,8 +43,6 @@ A worker that fails, erroring or returning nothing, retries once on the same mod
 Read the terminal results. Drop a result that does not record the SHAs and method its brief names, and respawn that worker once. After a second miss, record a gap. A gap does not count as a pass. For coverage, every required slice needs a result. For a race, apply the selection rule declared up front. Use first pass, rank all, or best-of. Do not paste raw worker dumps.
 
 Volume workers never escalate quietly. When no worker returns `PASS`, the report says so, and the parent may rerun on `opus`.
-
-Keep a compact result table, one-line evidenced issues, and explicit gaps or dropouts.
 
 ## Phase D: Report
 

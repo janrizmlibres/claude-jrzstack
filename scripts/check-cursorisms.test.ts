@@ -213,10 +213,10 @@ describe("check-cursorisms", () => {
     const examples = (key: "before" | "after") =>
       [...doc.matchAll(new RegExp(`^${key}:(.*)$`, "gm"))].map((match) => match[1]!.trim());
 
-    test("holds rules 1 to 22", () => {
+    test("holds rules 1 to 23", () => {
       const numbers = [...doc.matchAll(/^## (\d+)\. /gm)].map((match) => Number(match[1]));
 
-      expect(numbers).toEqual(Array.from({ length: 22 }, (_, i) => i + 1));
+      expect(numbers).toEqual(Array.from({ length: 23 }, (_, i) => i + 1));
     });
 
     test("flags every rule's before lines and passes its after lines", () => {

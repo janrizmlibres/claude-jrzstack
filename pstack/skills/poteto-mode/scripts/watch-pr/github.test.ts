@@ -5,13 +5,16 @@ import {
   GraphQLRefused,
   RestGitHubReader,
   WatcherQueryError,
+  buildReviewThreads,
   commandError,
   mapRollupNode,
   orderStack,
+  parseFastCheck,
   parsePullRequest,
-  parseReviewThreads,
+  parseReviewThreadPage,
   resolveChecks,
   resolveContext,
+  resolveReviewThreads,
 } from "./github.ts";
 import {
   type CcrThread,
@@ -129,6 +132,37 @@ describe("rollup node mapping", () => {
     ).toMatchObject({ kind: "code-review-gate" });
   });
 
+  it("classifies a Code Review Gate waiting on an owner approval as the gate", () => {
+    expect(
+      mapRollupNode({
+        __typename: "CheckRun",
+        name: "Code Review Gate",
+        status: "COMPLETED",
+        conclusion: "ACTION_REQUIRED",
+        description: "1 of 2 policies",
+      })
+    ).toMatchObject({
+      kind: "code-review-gate",
+      reportedState: "ACTION_REQUIRED",
+    });
+  });
+
+  it("classifies a fast-path Code Review Gate waiting on an owner approval as the gate", () => {
+    expect(
+      parseFastCheck({
+        name: "Code Review Gate",
+        state: "ACTION_REQUIRED",
+        bucket: "fail",
+      })
+    ).toMatchObject({
+      kind: "code-review-gate",
+      reportedState: "ACTION_REQUIRED",
+    });
+    expect(
+      parseFastCheck({ name: "ci", state: "ACTION_REQUIRED", bucket: "fail" })
+    ).toMatchObject({ kind: "failed", reportedState: "ACTION_REQUIRED" });
+  });
+
   it("maps StatusContext states and drops unknown typenames", () => {
     expect(
       mapRollupNode({
@@ -208,6 +242,7 @@ it("annotates Bugbot threads with distinct review-pass counts", () => {
       repository: {
         pullRequest: {
           reviewThreads: {
+            pageInfo: { hasNextPage: false, endCursor: null },
             nodes: [
               {
                 id: "one",
@@ -260,10 +295,105 @@ it("annotates Bugbot threads with distinct review-pass counts", () => {
       },
     },
   };
-  const threads = parseReviewThreads(response);
+  const threads = buildReviewThreads(parseReviewThreadPage(response).threads);
   expect(threads).toHaveLength(2);
   expect(threads.map((thread) => thread.isBugbot)).toEqual([true, true]);
   expect(threads.map((thread) => thread.bugbotReviewPasses)).toEqual([3, 3]);
+});
+
+describe("review thread pagination", () => {
+  const thread = (id: string, resolved = false) => ({
+    id,
+    firstComment: {
+      authorLogin: "someone",
+      body: "please fix",
+      path: "a.ts",
+      line: 1,
+      createdAt: "now",
+    },
+    resolved,
+  });
+
+  it("keeps walking pages until the cursor is exhausted", async () => {
+    const reader = fakeReader({
+      threadPages: [
+        { threads: [thread("one")], endCursor: "next" },
+        { threads: [thread("two")], endCursor: "last" },
+        { threads: [thread("three")], endCursor: null },
+      ],
+    });
+    const threads = await resolveReviewThreads(reader, context);
+    expect(threads.map((item) => item.id)).toEqual(["one", "two", "three"]);
+    expect(reader.calls).toEqual([
+      "reviewThreadPage:null",
+      "reviewThreadPage:next",
+      "reviewThreadPage:last",
+    ]);
+  });
+
+  it("sees an unresolved thread that sits past the first page", async () => {
+    const reader = fakeReader({
+      threadPages: [
+        { threads: [thread("early", true)], endCursor: "next" },
+        { threads: [thread("late")], endCursor: null },
+      ],
+    });
+    const threads = await resolveReviewThreads(reader, context);
+    expect(threads.map((item) => item.id)).toEqual(["late"]);
+  });
+
+  it("stops after a single page when the cursor is exhausted", async () => {
+    const reader = fakeReader({
+      threadPages: [{ threads: [thread("only")], endCursor: null }],
+    });
+    expect((await resolveReviewThreads(reader, context)).length).toBe(1);
+    expect(reader.calls).toEqual(["reviewThreadPage:null"]);
+  });
+
+  it("counts Bugbot review passes across every page", async () => {
+    const bugbot = (id: string, runId: string) => ({
+      id,
+      firstComment: {
+        authorLogin: "bugbot",
+        body: `RUN_ID: ${runId}`,
+        path: "a.ts",
+        line: 1,
+        createdAt: "now",
+      },
+      resolved: false,
+    });
+    const reader = fakeReader({
+      threadPages: [
+        { threads: [bugbot("one", "run-1")], endCursor: "next" },
+        { threads: [bugbot("two", "run-2")], endCursor: null },
+      ],
+    });
+    const threads = await resolveReviewThreads(reader, context);
+    expect(threads.map((item) => item.bugbotReviewPasses)).toEqual([2, 2]);
+  });
+
+  it("drops resolved threads from later pages too", async () => {
+    const reader = fakeReader({
+      threadPages: [
+        { threads: [thread("one")], endCursor: "next" },
+        { threads: [thread("two", true)], endCursor: null },
+      ],
+    });
+    expect(
+      (await resolveReviewThreads(reader, context)).map((item) => item.id)
+    ).toEqual(["one"]);
+  });
+
+  it("rejects a page that omits pageInfo instead of assuming one page", async () => {
+    const response = {
+      data: {
+        repository: {
+          pullRequest: { reviewThreads: { nodes: [] } },
+        },
+      },
+    };
+    expect(() => parseReviewThreadPage(response)).toThrow(WatcherQueryError);
+  });
 });
 
 describe("context and stack discovery", () => {
@@ -425,7 +555,7 @@ describe("REST reader", () => {
         restComment(30, "octocat", "outdated", null),
       ],
     });
-    const threads = await reader.reviewThreads(pr1);
+    const threads = await resolveReviewThreads(reader, pr1);
     expect(threads.map((thread) => thread.id)).toEqual(["10", "30"]);
     expect(threads[0].firstComment).toEqual({
       authorLogin: "octocat",
@@ -443,13 +573,13 @@ describe("REST reader", () => {
       restComment(index + 1, "octocat", `comment ${index + 1}`)
     );
     const { reader } = restReader({ threads: [ccrThread([140])], comments });
-    const [thread] = await reader.reviewThreads(pr1);
+    const [thread] = await resolveReviewThreads(reader, pr1);
     expect(thread.firstComment?.body).toBe("comment 140");
   });
 
   it("keeps a thread whose first comment is gone, with no first comment", async () => {
     const { reader } = restReader({ threads: [ccrThread([99])], comments: [] });
-    expect(await reader.reviewThreads(pr1)).toEqual([
+    expect(await resolveReviewThreads(reader, pr1)).toEqual([
       { id: "99", firstComment: null, isBugbot: false, bugbotReviewPasses: 0 },
     ]);
   });
@@ -463,9 +593,24 @@ describe("REST reader", () => {
           : api.get(path);
       },
     });
-    await expect(reader.reviewThreads(pr1)).rejects.toBeInstanceOf(
+    await expect(resolveReviewThreads(reader, pr1)).rejects.toBeInstanceOf(
       WatcherQueryError
     );
+  });
+
+  it("reads every thread in one page and refuses a GraphQL cursor", async () => {
+    const { reader, api } = restReader({
+      threads: [ccrThread([10]), ccrThread([20])],
+      comments: [restComment(10, "octocat"), restComment(20, "octocat")],
+    });
+    expect(await reader.reviewThreadPage(pr1, null)).toMatchObject({
+      endCursor: null,
+    });
+    const before = api.calls.length;
+    await expect(reader.reviewThreadPage(pr1, "cursor")).rejects.toBeInstanceOf(
+      WatcherQueryError
+    );
+    expect(api.calls.length).toBe(before);
   });
 
   it("reads the head commit's check runs and statuses as checks", async () => {
@@ -597,6 +742,7 @@ describe("REST and GraphQL readers reach the same verdict on the same threads", 
         repository: {
           pullRequest: {
             reviewThreads: {
+              pageInfo: { hasNextPage: false, endCursor: null },
               nodes: states.map((state, index) => ({
                 id: `thread-${index}`,
                 isResolved: state.resolved,
@@ -617,7 +763,10 @@ describe("REST and GraphQL readers reach the same verdict on the same threads", 
         },
       },
     };
-    return fakeReader({ current: pr1, threads: parseReviewThreads(response) });
+    return fakeReader({
+      current: pr1,
+      threadPages: [parseReviewThreadPage(response)],
+    });
   }
 
   function restParityReader(states: readonly ThreadState[]): GitHubReader {
@@ -709,7 +858,7 @@ describe("falling back to REST when GraphQL is refused", () => {
       "openPullRequests",
       "checksFastPath",
       "checkRollupPage",
-      "reviewThreads",
+      "reviewThreadPage",
       "commitRollups",
     ] as const;
     const wrapped = { calls } as GitHubReader & { calls: string[] };
@@ -730,24 +879,24 @@ describe("falling back to REST when GraphQL is refused", () => {
     const fallback = scripted(() => null);
     const reader = new FallbackGitHubReader(primary, fallback);
     await reader.pullRequest(pr1);
-    await reader.reviewThreads(pr1);
-    expect(primary.calls).toEqual(["pullRequest", "reviewThreads"]);
+    await resolveReviewThreads(reader, pr1);
+    expect(primary.calls).toEqual(["pullRequest", "reviewThreadPage"]);
     expect(fallback.calls).toEqual([]);
   });
 
   it("answers a refused call from REST and stays on REST for the rest of the run", async () => {
     const primary = scripted((method) =>
-      method === "reviewThreads" ? refusal() : null
+      method === "reviewThreadPage" ? refusal() : null
     );
     const fallback = scripted(() => null);
     const reader = new FallbackGitHubReader(primary, fallback);
     await reader.pullRequest(pr1);
-    await reader.reviewThreads(pr1);
+    await resolveReviewThreads(reader, pr1);
     await reader.pullRequest(pr1);
     await reader.commitRollups(pr1);
-    expect(primary.calls).toEqual(["pullRequest", "reviewThreads"]);
+    expect(primary.calls).toEqual(["pullRequest", "reviewThreadPage"]);
     expect(fallback.calls).toEqual([
-      "reviewThreads",
+      "reviewThreadPage",
       "pullRequest",
       "commitRollups",
     ]);
@@ -833,12 +982,14 @@ describe("reading a gh failure", () => {
 
 describe("review-bot logins", () => {
   const firstThread = (login: string, body = "finding") =>
-    parseReviewThreads({
-      data: {
-        repository: {
-          pullRequest: {
-            reviewThreads: {
-              nodes: [
+    buildReviewThreads(
+      parseReviewThreadPage({
+        data: {
+          repository: {
+            pullRequest: {
+              reviewThreads: {
+                pageInfo: { hasNextPage: false, endCursor: null },
+                nodes: [
                 {
                   id: "t",
                   isResolved: false,
@@ -854,12 +1005,13 @@ describe("review-bot logins", () => {
                     ],
                   },
                 },
-              ],
+                ],
+              },
             },
           },
         },
-      },
-    })[0];
+      }).threads
+    )[0];
 
   it.each([
     "claude",

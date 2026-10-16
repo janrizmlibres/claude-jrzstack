@@ -11,6 +11,11 @@
       "why": "Cursor's plugin manifest, replaced by Claude Code's in .claude-plugin/plugin.json"
     },
     {
+      "path": "pstack/plugin.json",
+      "kind": "dropped",
+      "why": "the Agent Plugins 1.0.0 root manifest, which Claude Code doesn't read; .claude-plugin/plugin.json is the port's manifest"
+    },
+    {
       "path": "pstack/.gitignore",
       "kind": "dropped",
       "why": "upstream's plugin-level ignore list: its node_modules/ line would hide the vendored commander, and the repo's root .gitignore covers the rest"
