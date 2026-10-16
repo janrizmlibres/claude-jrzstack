@@ -22,7 +22,7 @@ Every model-facing reference to a sibling skill (bold name, slash name, relative
 
 ```detect
 pattern: \b(?:[Ii]nvoke|[Rr]un) \$\{CLAUDE_PLUGIN_ROOT\}/skills/
-pattern: (?<!\$\{CLAUDE_PLUGIN_ROOT\}/skills/.*)(?<![\w:/.~$}\]-])/(?:poteto-mode|poteto-help|setup-pstack|architect|arena|automate-me|benchmark-checklist|blast-radius|bro|correct|create-verification-skill|figure-it-out|how|interrogate|maintain-verification-skill|make-bot-ui|no-comments|recall|reflect|show-me-your-work|swarm|tdd|teach|technical-writing|typescript-best-practices|unslop|why|deslop|control-ui|control-cli|principle-[a-z-]+)(?![\w-])(?!.*\$\{CLAUDE_PLUGIN_ROOT\}/skills/)
+pattern: (?<!\$\{CLAUDE_PLUGIN_ROOT\}/skills/.*)(?<![\w:/.~$}\]-])/(?:poteto-mode|poteto-help|setup-pstack|architect|arena|automate-me|benchmark-checklist|blast-radius|bro|correct|create-verification-skill|figure-it-out|how|in-your-own-words|interrogate|ketchup|maintain-verification-skill|make-bot-ui|no-comments|recall|reflect|sharpen|show-me-your-work|swarm|tdd|teach|technical-writing|typescript-best-practices|unslop|why|deslop|control-ui|control-cli|principle-[a-z-]+)(?![\w-])(?!.*\$\{CLAUDE_PLUGIN_ROOT\}/skills/)
 before: Use the **arena** skill: invoke ${CLAUDE_PLUGIN_ROOT}/skills/arena/SKILL.md.
 before: [`/poteto-mode`](./skills/poteto-mode/SKILL.md) and the agents route through the same wrapper.
 before: Run /setup-pstack once, then /principle-fix-root-causes when a bug recurs.
@@ -65,6 +65,8 @@ after: Distinct lenses are the point.
 
 Text names a setting (Work, Judgement, Volume), never a model ID or `pstack-models.mdc`. `subagent_type: poteto-agent` and `generalPurpose` (with or without `readonly`) map to the matching setting agent. A spawn passes `model:` only when `${user_config.<setting>_model}` resolved to one of `opus`, `sonnet`, `haiku`, `fable`; a literal placeholder or empty value means no `model:` and the agent's default applies. A spawn upstream leaves untyped gets its role's setting agent, a reader when it only reads: `automate-me`'s transcript miners run on `volume-reader`, `maintain-verification-skill`'s per-feature source readers on `work-reader`.
 
+A reasoning level, a speed, or both picked per spawn become the spawn's `effort:`. Upstream's "Match the model to the job" paragraph becomes poteto-mode's "Match the effort to the job": start from the setting's effort, `${user_config.<setting>_effort}` or its default (Work `medium`, Judgement `high`, Volume `high`), raise one step up to `max` for the hardest or subtlest work, lower one step for routine work and two for mechanical work, never below `low`; swarm verifiers stay at the Volume effort; change only `effort:`, never the agent or the model. Its step down for judgment is dropped, since judgment already runs on Judgement and the step would undercut that setting's default. Fast mode is a session toggle in Claude Code with no per-spawn form, so a fast-or-standard choice is dropped. Upstream's per-skill pointer to the Subagents section keeps its place and names effort alone.
+
 ```detect
 pattern: \bclaude-(?:opus|sonnet|haiku|fable)-\d
 pattern: \bgrok-\d
@@ -74,18 +76,26 @@ pattern: \bgeneralPurpose\b
 pattern: \binherit-parent\b
 pattern: \b[Gg]rok\b(?!-\d| [Bb]ot)
 pattern: \b(?:[Oo]pus|[Ss]onnet|[Hh]aiku|[Ff]able) \d
+pattern: \breasoning level\b
+pattern: \b(?:fast or standard|standard) speed\b
+pattern: \bMatch the model to the job\b
 before: | Reviewer A | `claude-opus-5-5-xhigh` |
 before: | Reviewer B | `grok-4.7-xhigh-fast` |
 before: Use the `interrogate reviewers` line in `~/.cursor/rules/pstack-models.mdc`, one reviewer per entry.
 before: **Use `subagent_type: "poteto-agent"` for any subagent you spawn inside a playbook step**
 before: One message, three calls, `subagent_type: generalPurpose`, and the model left unset for `auto` or `inherit-parent`.
 before: code delegates (feature, refactoring, bug fix, perf, hillclimb) go to grok, while the hardest changes, prose, and judgment go to opus 5.5.
+before: Pick each subagent's reasoning level and fast or standard speed for the job, per the Subagents section of the **poteto-mode** skill.
+before: **Match the model to the job.** Before each spawn, start from the role's line or default and pick the reasoning level and speed the job needs.
+before: Otherwise use standard speed, the same slug without `-fast`.
 after: | Breakage | `judgement-reader` |
 after: | Fit | `judgement-reader` |
 after: Spawn one reviewer per lens on the `judgement-reader` agent.
 after: **Use the `work` agent for any subagent you spawn inside a playbook step**
 after: One message, three calls on the `work-reader` agent, with `model:` passed only when `${user_config.judgement_model}` resolved.
 after: code delegates (feature, refactoring, bug fix, perf, hillclimb) run on Work, while the hardest changes, prose, and judgment run on Judgement.
+after: Pick each subagent's effort for the job, per the Subagents section of the **poteto-mode** skill.
+after: **Match the effort to the job.** Before each spawn, start from the setting's effort, chosen in `/config`.
 ```
 
 ## 5. Cross-family review becomes a fresh-context review
@@ -207,7 +217,7 @@ after: Write done as checks every iteration can run, and give `/goal` that condi
 
 ## 11. Other Cursor built-ins
 
-Cursor's `create-skill` → "a skill-authoring skill if one is installed (such as `skill-creator`); otherwise write the SKILL.md directly". `why`'s `mcps/` scan → list MCP servers from your own tool list. Built-ins with no counterpart (Plan Mode, babysit skill, dashboard) are dropped; "a Cursor restart" → "a Claude Code restart".
+Cursor's `create-skill` → "a skill-authoring skill if one is installed (such as `skill-creator`); otherwise write the SKILL.md directly". `why`'s `mcps/` scan → list MCP servers from your own tool list. Built-ins with no counterpart (Plan Mode, babysit skill, dashboard) are dropped; "a Cursor restart" → "a Claude Code restart". The terminal shows no pictures: a `/visualize` diagram becomes a Mermaid diagram in a fenced block, a `/visualize` chart for numbers becomes a small Markdown table and stops counting as a visual, and a screenshot or video embedded inline becomes a link to its file.
 
 ```detect
 pattern: \b[Cc]ursor(?:'s| built-in)
@@ -216,6 +226,8 @@ pattern: \brestart Cursor\b
 pattern: \b[Pp]lan [Mm]ode\b
 pattern: \bcreate-skill\b
 pattern: \bmcps/
+pattern: (?<![\w-])/visualize\b
+pattern: \b[Ee]mbed (?:screenshots|videos|images)\b
 before: Use Cursor's built-in `create-skill` skill to author the skill.
 before: Suspending in-flight work cleanly on an explicit pause, going offline, or a Cursor restart.
 before: pstack has no planning skill. Plan Mode works alongside it.
@@ -223,6 +235,8 @@ before: cursor already has a great plan mode which works great with pstack.
 before: Tell the agent you're about to go offline or restart Cursor.
 before: Otherwise inspect the `mcps/` directory for enabled MCP servers.
 before: `/loop` is a Cursor built-in wake mechanism, not a pstack skill.
+before: Draw diagrams and charts from facts you have: a Mermaid diagram for how things connect and a `/visualize` chart for numbers.
+before: Embed screenshots and videos inline when the change is visible, not only as links.
 after: Use a skill-authoring skill if one is installed (such as `skill-creator`); otherwise write the SKILL.md directly.
 after: Suspending in-flight work cleanly on an explicit pause, going offline, or a Claude Code restart.
 after: pstack has no planning skill.
@@ -230,6 +244,8 @@ after: If you want a plan, ask `/pstack:poteto-mode` for one.
 after: Tell the agent you're about to go offline or restart Claude Code.
 after: List the MCP servers from your own tool list.
 after: `/loop` is a Claude Code built-in, not a pstack skill.
+after: Draw diagrams from facts you have: a Mermaid diagram for how things connect, and a small table for numbers.
+after: Link the screenshots and videos the work produced when the change is visible.
 ```
 
 ## 12. Compaction
@@ -292,7 +308,7 @@ undetectable: each asks for a line to be present in poteto-mode's SKILL.md, and 
 
 ## 16. Install and settings
 
-`/add-plugin pstack` becomes the two `/plugin` commands, `/plugin marketplace add janrizmlibres/claude-pstack` then `/plugin install pstack@claude-pstack`, with the marketplace's auto-update on. `setup-pstack`'s model rule, its reasoning budgets and the `auto` and `inherit-parent` values become the three settings: the user picks each setting's model in `/config` or `/plugin configure` (in cloud, with the setup line's `--config`), the port fixes each setting's effort, and `/pstack:setup-pstack` shows them.
+`/add-plugin pstack` becomes the two `/plugin` commands, `/plugin marketplace add janrizmlibres/claude-pstack` then `/plugin install pstack@claude-pstack`, with the marketplace's auto-update on. `setup-pstack`'s model rule, its reasoning budgets and the `auto` and `inherit-parent` values become the three settings: the user picks each setting's model and starting effort in `/config` or `/plugin configure` (in cloud, with the setup line's `--config`), and `/pstack:setup-pstack` shows them. Rule 4 adjusts that effort per spawn.
 
 ```detect
 pattern: (?<![\w-])/add-plugin\b

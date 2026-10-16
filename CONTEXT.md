@@ -73,7 +73,7 @@ The job a worker does in a run: delegate, runner, reviewer, judge or synthesizer
 _Avoid_: seat, tier, slot
 
 **Setting**:
-A named model-and-effort pair that a role runs on: **Work**, **Judgement** or **Volume**. The user chooses a setting's model; the port fixes its effort.
+A named model-and-effort pair that a role runs on: **Work**, **Judgement** or **Volume**. The user chooses a setting's model and its starting effort; each spawn adjusts the effort to its job.
 _Avoid_: tier, budget, level
 
 **Volume role**:

@@ -24,7 +24,7 @@ Infer the need from the message and the conversation. A named situation, such as
 
 Check the state that changes the answer, and mention it only when it does:
 
-- The settings now: Work `${user_config.work_model}`, Judgement `${user_config.judgement_model}`, Volume `${user_config.volume_model}`. A literal placeholder or an empty value means that setting is unset and runs on its default: Work `opus`, Judgement `opus`, Volume `sonnet`.
+- The settings now: Work `${user_config.work_model}` at `${user_config.work_effort}`, Judgement `${user_config.judgement_model}` at `${user_config.judgement_effort}`, Volume `${user_config.volume_model}` at `${user_config.volume_effort}`. A literal placeholder or an empty value means that model or effort is unset and takes its default: Work `opus` at `medium`, Judgement `opus` at `high`, Volume `sonnet` at `high`.
 - The `pstack: surface=<cloud|local> mode=<permission_mode>` line the reminder hook prints. On the cloud surface, settings come from the setup line's `--config` values, not `/config`. In the default permission mode, reads of pstack's own files can prompt the user or be denied in subagents until they add the `Read` rule under Get set up.
 - No `verify-*` skill or other app harness in the project means agents have no scripted way to drive the app. Mention `/pstack:create-verification-skill` when the question is about proving a change works.
 

@@ -45,10 +45,11 @@ rule to `permissions.allow` in your user settings, `~/.claude/settings.json`:
 
 Auto mode needs nothing, and the cloud setup line adds its own rule.
 
-**Pick models** (optional): `/config` → pstack, or `/plugin configure pstack@claude-pstack`. Each
-setting takes `opus`, `sonnet`, `haiku` or `fable`; an unconfigured install runs on the defaults.
+**Pick models and effort** (optional): `/config` → pstack, or `/plugin configure pstack@claude-pstack`. Each
+setting takes a model (`opus`, `sonnet`, `haiku` or `fable`) and a starting effort (`low` to `max`),
+which a spawn raises for the hardest work and lowers for routine work; an unconfigured install runs on the defaults.
 
-| Setting | Runs | Default | Effort (fixed) |
+| Setting | Runs | Default model | Default effort |
 |---|---|---|---|
 | Work | code delegates, arena runners, sub-leads | `opus` | medium |
 | Judgement | judges, reviewers, the hardest tasks | `opus` | high |
