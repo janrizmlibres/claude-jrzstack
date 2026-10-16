@@ -244,8 +244,9 @@ Every other file is translated from upstream at the same path, except `skills/co
 
 ## Keeping up with upstream
 
-A weekly GitHub Action checks upstream. When it has moved, Claude opens one sync PR that brings the
-port up to date, with a row per upstream change and ⚠️ on the calls it was unsure of. Nothing
+A sync runs only when someone starts it: `gh workflow run sync-upstream.yml` starts a GitHub Action
+that checks upstream, ideally from a session that watches the run and reviews what it opens. When
+upstream has moved, Claude opens one sync PR that brings the port up to date, with a row per upstream change and ⚠️ on the calls it was unsure of. Nothing
 merges itself. The snapshot, upstream's verbatim copy, lives in `upstream/`, and the sync re-renders the
 version line and file table above. In a checkout of this repo the same sync runs by hand as
 `/sync-upstream` (`/sync-upstream dry run` lists the changes and stops), and

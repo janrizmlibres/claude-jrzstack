@@ -13,7 +13,7 @@ Two modes, one PR each. Vocabulary is `CONTEXT.md`'s.
 
 The sources of truth: `docs/conversion-rules.md` (every rule, applied to every file you translate), `port.json` (each file's kind; an unlisted `pstack/` file is a translated file of its counterpart under `upstream/`), and the scripts under `scripts/`, each documented in its header. The base branch is the branch checked out when you start. `<scratch>` is `.sync-upstream/` (create it), which git ignores.
 
-The weekly workflow runs this skill with no one watching, and you may be running unattended too. Settle every call yourself: make the best call, mark its row ⚠️ and say why in the row's Reason. The PR is where the maintainer reviews.
+The sync workflow runs this skill with no one in the loop until its PR, and you may be running unattended too. Settle every call yourself: make the best call, mark its row ⚠️ and say why in the row's Reason. The PR is where the maintainer reviews.
 
 ## Sync
 

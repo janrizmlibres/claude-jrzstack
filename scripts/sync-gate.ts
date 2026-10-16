@@ -1,5 +1,5 @@
 #!/usr/bin/env bun
-// sync-gate [ref]  decide, without a model, whether the weekly sync runs
+// sync-gate [ref]  decide, without a model, whether a sync run goes ahead
 //
 // Run from the repo root by the sync workflow, with `gh` authenticated for
 // this repo. Sparse-clones upstream at <ref> (default main) and compares it
@@ -83,7 +83,7 @@ function commentOnSyncPr(pr: Pr, clone: UpstreamClone, snapshot: SnapshotRecord,
   const repo = snapshot.repo.replace(/^https:\/\/github\.com\//, "").replace(/\.git$/, "");
   const body =
     `Upstream has moved on to v${version} (${repo}@${clone.commit}) since this PR's snapshot. ` +
-    "The weekly sync won't open another sync PR while this one is open; after it merges, the next run syncs the rest.";
+    "A sync won't open another sync PR while this one is open; after it merges, the next run syncs the rest.";
   gh(["pr", "comment", String(pr.number), "--body", body]);
   console.log(`Upstream has moved past sync PR #${pr.number}: said so on ${pr.url}. Not starting another sync.`);
 }

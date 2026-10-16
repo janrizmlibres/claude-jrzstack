@@ -1,6 +1,7 @@
-# The weekly sync. A shell gate decides without a model call: it stops when
-# upstream matches the snapshot, and comments on an open sync PR instead of
-# starting another. Otherwise Claude runs the repo-local /sync-upstream skill
+# The upstream sync, started only by hand (`gh workflow run sync-upstream.yml`),
+# from a session that oversees the run and reviews its PR. A shell gate decides
+# without a model call: it stops when upstream matches the snapshot, and
+# comments on an open sync PR instead of starting another. Otherwise Claude runs the repo-local /sync-upstream skill
 # at the upstream commit the gate saw, which opens one PR on sync/<version>
 # against the branch this run is on. Nothing merges itself.
 #
@@ -10,8 +11,6 @@
 name: Sync upstream
 
 on:
-  schedule:
-    - cron: "23 6 * * 1"
   workflow_dispatch:
 
 permissions:
@@ -58,9 +57,11 @@ jobs:
           # The skill's own commands: the repo scripts, git, reading upstream's
           # commits and PRs, opening the PR, and re-copying the vendored
           # commander (npm pack, tar, cp) when upstream moves its pin.
+          # A path prefix takes a bare trailing * : `:*` (like ` *`) needs a space
+          # after the prefix, so `bun scripts/:*` never matched `bun scripts/x.ts`.
           claude_args: |
             --model opus
-            --allowedTools "Read,Write,Edit,Glob,Grep,Agent,Bash(bun scripts/:*),Bash(bun run:*),Bash(git:*),Bash(gh api repos/cursor/plugins/:*),Bash(gh pr create:*),Bash(npm pack:*),Bash(tar:*),Bash(mkdir:*),Bash(cp:*),Bash(rm:*),Bash(ls:*)"
+            --allowedTools "Read,Write,Edit,Glob,Grep,Agent,Bash(bun scripts/*),Bash(bun run:*),Bash(git:*),Bash(gh api repos/cursor/plugins/*),Bash(gh pr create:*),Bash(npm pack:*),Bash(tar:*),Bash(mkdir:*),Bash(cp:*),Bash(rm:*),Bash(ls:*)"
       # The action reports success even when Claude stopped early, so the run
       # is only green when a sync PR for this version is open.
       - name: Check the sync PR
