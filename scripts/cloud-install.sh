@@ -10,7 +10,8 @@
 # cache, and every cloud session starts from the environment's snapshot, so a
 # plain install would stay at the snapshot's commit. The command source is what
 # keeps it current: Claude Code reruns the command once per session, shortly
-# after start, and reloads the plugin in that session when the files changed.
+# after start, installs the files when they changed, and switches the session
+# to them a few minutes in, at a turn where the reload costs no prompt cache.
 # It installs pstack from that marketplace at user scope with the --config
 # values, then merges, never replaces, into the VM's user settings: subagent
 # spawn depth 3 and a Read rule for the plugin cache. Last, it installs
