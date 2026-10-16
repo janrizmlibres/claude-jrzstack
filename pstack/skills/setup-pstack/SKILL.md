@@ -1,6 +1,6 @@
 ---
 name: setup-pstack
-description: Show which models and efforts pstack's three settings (Work, Judgement, Volume) use, point to /config to change them, and print the cloud setup line filled in with them. Use for /pstack:setup-pstack, "configure pstack models", "pstack effort", "pstack setup line", or changing pstack's model or effort choices.
+description: PROBE-B marker. Show which models and efforts pstack's three settings (Work, Judgement, Volume) use, point to /config to change them, and print the cloud setup line filled in with them. Use for /pstack:setup-pstack, "configure pstack models", "pstack effort", "pstack setup line", or changing pstack's model or effort choices.
 ---
 
 # Setup pstack
