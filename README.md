@@ -102,6 +102,20 @@ current without your editing the line. Until then the session runs the snapshot'
 the agent list it shows the model keeps the snapshot's descriptions. Changing a model means
 editing the line.
 
+Every session starts from the snapshot, so each one makes that switch until the snapshot is
+rebuilt: when you edit the line or the environment's network hosts, or after about seven days. To
+force a rebuild, keep a comment line under the setup line, such as `# rebuild 2026-10-16`, and
+change it.
+
+To check that a session has current pstack, run this in it:
+
+```
+c=$(jq -r '.plugins["pstack@claude-pstack"][0].installPath' ~/.claude/plugins/installed_plugins.json); diff -rq -x .in_use "$c" /opt/claude-pstack/pstack && echo "pstack current: $(git -C /opt/claude-pstack log -1 --format=%h)"
+```
+
+It passes when it prints `pstack current: <hash>` and the hash is main's. Compare files, not
+versions: the `version` in `installed_plugins.json` is a hash of the plugin's files, not a commit.
+
 - Put the line in **every environment that should carry pstack.**
 - **One environment per repo**, if you keep one for each project: set
   `"remote": { "defaultEnvironmentId": "<env_ id>" }` in that repo's `.claude/settings.local.json`.
