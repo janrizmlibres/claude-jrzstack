@@ -1,6 +1,6 @@
 ---
 name: poteto-reader
-description: PROBE-C marker. "pstack's reader, with no Edit, Write or NotebookEdit: explorers, reviewers, judges, investigators, synthesizers and bulk readers on any setting, each spawn passing its setting's model and effort. Spawned only by pstack playbooks."
+description: "PROBE-C marker. pstack's reader, with no Edit, Write or NotebookEdit: explorers, reviewers, judges, investigators, synthesizers and bulk readers on any setting, each spawn passing its setting's model and effort. Spawned only by pstack playbooks."
 model: opus
 effort: medium
 disallowedTools: Edit, Write, NotebookEdit
