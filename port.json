@@ -117,7 +117,7 @@
     {
       "path": "pstack/skills/poteto-mode/playbooks/eval.md",
       "kind": "override",
-      "why": "spawns its own blind samples, 3 per variant on the model the change meets in use, with one blind Judgement judge over all of them and an opt-in cross-model sweep, in place of arena's model fan-out and cross-family judge; a user-invoked skill's samples run on the general-purpose agent, which inherits the lead's model, since a setting agent's pstack body would skew them"
+      "why": "spawns its own blind samples, 3 per variant on the model the change meets in use, with one blind Judgement judge over all of them and an opt-in cross-model sweep, in place of arena's model fan-out and cross-family judge; a user-invoked skill's samples run on the general-purpose agent, which inherits the lead's model, since `poteto-agent`'s pstack body would skew them"
     },
     {
       "path": "pstack/skills/poteto-mode/playbooks/orchestrate.md",
