@@ -67,16 +67,16 @@ describe("check-plan.mjs", () => {
     });
 
     test("live lanes on a model rather than the Volume setting's agent", () => {
-      const plan = samplePlan.replaceAll("Ten lanes on the `volume` agent", "Ten lanes on `grok-4.7-xhigh-fast`");
+      const plan = samplePlan.replaceAll("Ten lanes on `poteto-agent` on the Volume setting", "Ten lanes on `grok-4.7-xhigh-fast`");
 
       const result = checkPlan(plan);
 
       expect(result.exitCode).toBe(1);
       expect(result.stderr).toContain(
-        'Add backoff to the retry loop (R1): Verify, live lacks "Ten lanes on the `volume` agent at the PR head"',
+        'Add backoff to the retry loop (R1): Verify, live lacks "Ten lanes on `poteto-agent` on the Volume setting at the PR head"',
       );
       expect(result.stderr).toContain(
-        'Show the retry state in the status bar (R2): Verify, live lacks "Ten lanes on the `volume` agent at the PR head"',
+        'Show the retry state in the status bar (R2): Verify, live lacks "Ten lanes on `poteto-agent` on the Volume setting at the PR head"',
       );
     });
   });

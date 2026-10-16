@@ -17,7 +17,7 @@ Claude Code filled in the configured models and efforts when it loaded this skil
 - Judgement: `${user_config.judgement_model}`, effort `${user_config.judgement_effort}`
 - Volume: `${user_config.volume_model}`, effort `${user_config.volume_effort}`
 
-A model that is one of `opus`, `sonnet`, `haiku` or `fable`, or an effort that is one of `low`, `medium`, `high`, `xhigh` or `max`, is configured. Any other value, a literal placeholder or an empty one, means it is unset and takes its default: models Work `opus`, Judgement `opus`, Volume `sonnet`; efforts Work `medium`, Judgement `high`, Volume `high`. Those are also what the setting's agents fall back to.
+A model that is one of `opus`, `sonnet`, `haiku` or `fable`, or an effort that is one of `low`, `medium`, `high`, `xhigh` or `max`, is configured. Any other value, a literal placeholder or an empty one, means it is unset and takes its default: models Work `opus`, Judgement `opus`, Volume `sonnet`; efforts Work `medium`, Judgement `high`, Volume `high`.
 
 ### 2. Show the settings
 

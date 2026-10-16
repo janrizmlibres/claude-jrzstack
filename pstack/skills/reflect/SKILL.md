@@ -28,21 +28,21 @@ When the session ID didn't resolve to a file, check each candidate: find its fir
 
 ### 2. Spawn three reviewers in parallel
 
-One message, three `Agent` calls, `subagent_type: work-reader`, with `model` set as below. Reviewers need MCP access for context lookups (tickets, chat threads, observability traces referenced in the transcript). `work-reader` keeps it.
+One message, three `Agent` calls, `subagent_type: poteto-reader`, with `model` and `effort` set as below. Reviewers need MCP access for context lookups (tickets, chat threads, observability traces referenced in the transcript). `poteto-reader` keeps it.
 
-Each reviewer and the synthesizer name a setting agent and the setting's model. Pass that model as `model:` only when it resolved to one of `opus`, `sonnet`, `haiku`, `fable`. A literal placeholder or an empty value means no `model:`, and the agent's default applies.
+Each reviewer and the synthesizer name an agent and their setting's model and effort. Pass both on every spawn, as `model:` and `effort:`. A literal placeholder or an empty value means the setting's default: Work `opus` at `medium`, Judgement `opus` at `high`.
 
-| Lens | Agent | `model` | Prompt template |
-|---|---|---|---|
-| Judgment | `work-reader` | `${user_config.work_model}` | `references/judgment-reviewer.md` |
-| Tooling | `work-reader` | `${user_config.work_model}` | `references/tooling-reviewer.md` |
-| Divergent | `work-reader` | `${user_config.work_model}` | `references/divergent-reviewer.md` |
+| Lens | Agent | `model` | `effort` | Prompt template |
+|---|---|---|---|---|
+| Judgment | `poteto-reader` | `${user_config.work_model}` | `${user_config.work_effort}` | `references/judgment-reviewer.md` |
+| Tooling | `poteto-reader` | `${user_config.work_model}` | `${user_config.work_effort}` | `references/tooling-reviewer.md` |
+| Divergent | `poteto-reader` | `${user_config.work_model}` | `${user_config.work_effort}` | `references/divergent-reviewer.md` |
 
 Pass each template verbatim, substituting the transcript path or digest where marked. Reviewers return findings in the `Agent` response body.
 
 ### 3. Synthesize
 
-One `Agent` call, `subagent_type: judgement-reader`, with `model` `${user_config.judgement_model}` under the same rule. The synthesizer's quality check includes spot-verifying citations, which can require MCP access. `judgement-reader` keeps it. Use `references/synthesizer.md` verbatim, with each reviewer's full output inlined where marked. The synthesizer returns a structured Accepted / Rejected / Backlog list.
+One `Agent` call, `subagent_type: poteto-reader`, with `model` `${user_config.judgement_model}` and `effort` `${user_config.judgement_effort}` under the same rule. The synthesizer's quality check includes spot-verifying citations, which can require MCP access. `poteto-reader` keeps it. Use `references/synthesizer.md` verbatim, with each reviewer's full output inlined where marked. The synthesizer returns a structured Accepted / Rejected / Backlog list.
 
 ### 4. Structural enforcement check
 

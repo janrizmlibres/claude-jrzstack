@@ -31,34 +31,14 @@
       "why": "after a compaction in a marked poteto-mode session, lists the durable state to re-read before acting: the skill, any store, the transcript, a trail and a resume note"
     },
     {
-      "path": "pstack/agents/work.md",
-      "kind": "port-only",
-      "why": "the Work setting's writer: upstream's poteto-agent body on the Work default model at medium effort, in the background"
+      "path": "pstack/agents/poteto-agent.md",
+      "kind": "override",
+      "why": "upstream's body with the read-by-path line, as the one writer for every setting: each spawn passes its setting's model and effort, and the frontmatter falls back to Work's opus at medium, in the background"
     },
     {
-      "path": "pstack/agents/work-reader.md",
+      "path": "pstack/agents/poteto-reader.md",
       "kind": "port-only",
-      "why": "the Work setting's reader, in place of a readonly generalPurpose spawn: no Edit, Write or NotebookEdit, medium effort"
-    },
-    {
-      "path": "pstack/agents/judgement.md",
-      "kind": "port-only",
-      "why": "the Judgement setting's writer: upstream's poteto-agent body on the Judgement default model at high effort, in the background"
-    },
-    {
-      "path": "pstack/agents/judgement-reader.md",
-      "kind": "port-only",
-      "why": "the Judgement setting's reader, in place of a readonly generalPurpose spawn: no Edit, Write or NotebookEdit, high effort"
-    },
-    {
-      "path": "pstack/agents/volume.md",
-      "kind": "port-only",
-      "why": "the Volume setting's writer: upstream's poteto-agent body on the Volume default model at high effort, in the background"
-    },
-    {
-      "path": "pstack/agents/volume-reader.md",
-      "kind": "port-only",
-      "why": "the Volume setting's reader, in place of a readonly generalPurpose spawn: no Edit, Write or NotebookEdit, high effort"
+      "why": "the one reader for every setting, in place of a readonly generalPurpose spawn: no Edit, Write or NotebookEdit, each spawn passing its setting's model and effort"
     },
     {
       "path": "pstack/skills/setup-pstack/SKILL.md",
@@ -69,19 +49,25 @@
       "path": "pstack/skills/deslop",
       "kind": "translated",
       "why": "vendored from cursor-team-kit, which the port doesn't ship, so poteto-mode can read it by path",
-      "sources": ["upstream/cursor-team-kit/skills/deslop"]
+      "sources": [
+        "upstream/cursor-team-kit/skills/deslop"
+      ]
     },
     {
       "path": "pstack/skills/control-ui",
       "kind": "translated",
       "why": "vendored from cursor-team-kit, which the port doesn't ship, so poteto-mode can read it by path",
-      "sources": ["upstream/cursor-team-kit/skills/control-ui"]
+      "sources": [
+        "upstream/cursor-team-kit/skills/control-ui"
+      ]
     },
     {
       "path": "pstack/skills/control-cli",
       "kind": "translated",
       "why": "vendored from cursor-team-kit, which the port doesn't ship, so poteto-mode can read it by path",
-      "sources": ["upstream/cursor-team-kit/skills/control-cli"]
+      "sources": [
+        "upstream/cursor-team-kit/skills/control-cli"
+      ]
     },
     {
       "path": "pstack/skills/arena/SKILL.md",
@@ -107,7 +93,7 @@
     {
       "path": "pstack/skills/interrogate/SKILL.md",
       "kind": "override",
-      "why": "three lens reviewers on judgement-reader, always all three, with critical-only spillover, the lead's verification gate in place of consensus, and a Coverage Map with Checked and Gaps in place of the Agreement Map",
+      "why": "three lens reviewers on poteto-reader on Judgement, always all three, with critical-only spillover, the lead's verification gate in place of consensus, and a Coverage Map with Checked and Gaps in place of the Agreement Map",
       "depends_on": [
         "upstream/pstack/skills/interrogate/references/rubric.md",
         "upstream/pstack/skills/interrogate/references/code-quality-review.md"
@@ -137,11 +123,6 @@
       "path": "pstack/automations/benny",
       "kind": "dropped",
       "why": "Cursor Slack automations, outside the port's scope"
-    },
-    {
-      "path": "pstack/agents/poteto-agent.md",
-      "kind": "dropped",
-      "why": "replaced by the three writer agents, which carry its body"
     },
     {
       "path": "pstack/skills/poteto-mode/scripts/bootstrap.ts",
@@ -187,7 +168,9 @@
       "path": "pstack/skills/poteto-mode/scripts/orch",
       "kind": "override",
       "why": "frontier set takes the stacker's PR order from the store, PR state and merged heads from gh api REST and open heads from git rev-parse, in place of Graphite, and fails on a drifted base or a stale head; init excludes the store from git and every drain pushes it to its orphan branch by plumbing; commander imported directly and NotFoundError's parameter property a plain field, for Node's type stripping",
-      "sources": ["upstream/pstack/skills/poteto-mode/scripts/orch"]
+      "sources": [
+        "upstream/pstack/skills/poteto-mode/scripts/orch"
+      ]
     },
     {
       "path": "pstack/skills/poteto-mode/scripts/watch-pr/github.ts",
@@ -259,7 +242,7 @@
     {
       "path": "pstack/skills/poteto-mode/scripts/check-plan.mjs",
       "kind": "override",
-      "why": "its markers match the port's plan wording: live lanes on the `volume` agent instead of a named model, and playbooks read from the plugin instead of from trunk with `git show`",
+      "why": "its markers match the port's plan wording: live lanes on `poteto-agent` on Volume instead of a named model, and playbooks read from the plugin instead of from trunk with `git show`",
       "depends_on": [
         "upstream/pstack/skills/poteto-mode/playbooks/multi-phase-plan.md"
       ]

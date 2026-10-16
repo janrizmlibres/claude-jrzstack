@@ -63,7 +63,7 @@ after: Distinct lenses are the point.
 
 ## 4. Roles, not model IDs
 
-Text names a setting (Work, Judgement, Volume), never a model ID or `pstack-models.mdc`. `subagent_type: poteto-agent` and `generalPurpose` (with or without `readonly`) map to the matching setting agent. A spawn passes `model:` only when `${user_config.<setting>_model}` resolved to one of `opus`, `sonnet`, `haiku`, `fable`; a literal placeholder or empty value means no `model:` and the agent's default applies. A spawn upstream leaves untyped gets its role's setting agent, a reader when it only reads: `automate-me`'s transcript miners run on `volume-reader`, `maintain-verification-skill`'s per-feature source readers on `work-reader`.
+Text names a setting (Work, Judgement, Volume), never a model ID or `pstack-models.mdc`. Settings travel with each spawn, as ADR 0002 records. `subagent_type: poteto-agent` stays `poteto-agent`, and `generalPurpose` maps to it, or to `poteto-reader` with `readonly` or when the role only reads. The text names the role's setting beside the agent ("on `poteto-reader` on the Judgement setting"). Every spawn passes its setting's model and effort: `${user_config.<setting>_model}` as `model:` and `${user_config.<setting>_effort}` as `effort:`, or the setting's defaults (Work `opus` at `medium`, Judgement `opus` at `high`, Volume `sonnet` at `high`) for a literal placeholder or an empty value. Both agents' frontmatter falls back to Work's defaults, so a spawn that leaves either out runs on Work's. A spawn upstream leaves untyped gets its role's agent and setting: `automate-me`'s transcript miners run on `poteto-reader` on Volume, `maintain-verification-skill`'s per-feature source readers on `poteto-reader` on Work. The six per-setting agents the port once had (`work`, `judgement`, `volume` and their readers) are gone, and a name of theirs is a leftover.
 
 A reasoning level, a speed, or both picked per spawn become the spawn's `effort:`. Upstream's "Match the model to the job" paragraph becomes poteto-mode's "Match the effort to the job": start from the setting's effort, `${user_config.<setting>_effort}` or its default (Work `medium`, Judgement `high`, Volume `high`), raise one step up to `max` for the hardest or subtlest work, lower one step for routine work and two for mechanical work, never below `low`; swarm verifiers stay at the Volume effort; change only `effort:`, never the agent or the model. Its step down for judgment is dropped, since judgment already runs on Judgement and the step would undercut that setting's default. Fast mode is a session toggle in Claude Code with no per-spawn form, so a fast-or-standard choice is dropped. Upstream's per-skill pointer to the Subagents section keeps its place and names effort alone.
 
@@ -71,7 +71,6 @@ A reasoning level, a speed, or both picked per spawn become the spawn's `effort:
 pattern: \bclaude-(?:opus|sonnet|haiku|fable)-\d
 pattern: \bgrok-\d
 pattern: \bpstack-models\.mdc\b
-pattern: \bpoteto-agent\b
 pattern: \bgeneralPurpose\b
 pattern: \binherit-parent\b
 pattern: \b[Gg]rok\b(?!-\d| [Bb]ot)
@@ -79,20 +78,23 @@ pattern: \b(?:[Oo]pus|[Ss]onnet|[Hh]aiku|[Ff]able) \d
 pattern: \breasoning level\b
 pattern: \b(?:fast or standard|standard) speed\b
 pattern: \bMatch the model to the job\b
+pattern: \b(?:work|judgement|volume)-reader\b
+pattern: `(?:work|judgement|volume)` agent\b
 before: | Reviewer A | `claude-opus-5-5-xhigh` |
 before: | Reviewer B | `grok-4.7-xhigh-fast` |
 before: Use the `interrogate reviewers` line in `~/.cursor/rules/pstack-models.mdc`, one reviewer per entry.
-before: **Use `subagent_type: "poteto-agent"` for any subagent you spawn inside a playbook step**
 before: One message, three calls, `subagent_type: generalPurpose`, and the model left unset for `auto` or `inherit-parent`.
 before: code delegates (feature, refactoring, bug fix, perf, hillclimb) go to grok, while the hardest changes, prose, and judgment go to opus 5.5.
 before: Pick each subagent's reasoning level and fast or standard speed for the job, per the Subagents section of the **poteto-mode** skill.
 before: **Match the model to the job.** Before each spawn, start from the role's line or default and pick the reasoning level and speed the job needs.
 before: Otherwise use standard speed, the same slug without `-fast`.
-after: | Breakage | `judgement-reader` |
-after: | Fit | `judgement-reader` |
-after: Spawn one reviewer per lens on the `judgement-reader` agent.
-after: **Use the `work` agent for any subagent you spawn inside a playbook step**
-after: One message, three calls on the `work-reader` agent, with `model:` passed only when `${user_config.judgement_model}` resolved.
+before: Spawn one reviewer per lens on the `judgement-reader` agent.
+before: **Use the `work` agent for any subagent you spawn inside a playbook step**
+after: | Breakage | `poteto-reader` on Judgement |
+after: | Fit | `poteto-reader` on Judgement |
+after: Spawn one reviewer per lens on `poteto-reader` on the Judgement setting.
+after: **Use `poteto-agent` for any subagent you spawn inside a playbook step**
+after: One message, three calls on `poteto-reader` on the Work setting, each passing the setting's `model:` and `effort:`.
 after: code delegates (feature, refactoring, bug fix, perf, hillclimb) run on Work, while the hardest changes, prose, and judgment run on Judgement.
 after: Pick each subagent's effort for the job, per the Subagents section of the **poteto-mode** skill.
 after: **Match the effort to the job.** Before each spawn, start from the setting's effort, chosen in `/config`.
@@ -111,7 +113,7 @@ before: Before handing back, spawn a subagent on a different model family from t
 before: Routed workflow skills set their own `subagent_type` for diverse-model review.
 before: A second opinion is the same prompt against a different model. Agreement is high-signal.
 before: delegate via the **arena** skill instead so the runners surface the alternatives and the cross-judge guards the pick.
-after: Before handing back, spawn a fresh-context review on `judgement-reader`, given the trail and transcript paths and never your reasoning.
+after: Before handing back, spawn a fresh-context review on `poteto-reader` on the Judgement setting, given the trail and transcript paths and never your reasoning.
 after: Routed workflow skills set their own agents for lens- or source-partitioned review.
 after: A second opinion is the same prompt in a fresh context. Agreement rules out a fluke, not a shared blind spot.
 after: delegate via the **arena** skill instead so the runners surface the alternatives and the blind judge guards the pick.
@@ -378,7 +380,7 @@ These keep `skills/poteto-mode/playbooks/multi-phase-plan.md` translated while i
 - `check-plan.mjs` runs through the runtime launcher, `${CLAUDE_PLUGIN_ROOT}/skills/poteto-mode/scripts/run`; with no runtime (exit 69) the plan is posted as not linted, never linted by hand;
 - the plan is posted beside the input, never in it: as a comment on a spec issue, or for other input on the orphan branch `pstack/plan/<slug>` through git plumbing, with no worktree;
 - the hand-back becomes the go: a spec handed in, "run until done" or a brief's go grant carries on under the execution playbook the plan names; only a request for the plan alone ("plan #42", "plan only"), or a plan the operator asked for, stops after posting; landing stays withheld unless granted, and without a landing grant the execution playbook is always Autopilot-stack;
-- the skeleton reads the playbooks it names from `${CLAUDE_PLUGIN_ROOT}` instead of `git show origin/main:`, adds the brief contract to that list and to each owner's brief, branches from `<base-branch>` instead of `main`, runs its live lanes on the `volume` agent, and its audit tick's prompt reads poteto-mode by path, with rule 10's cloud surface line on the tick;
+- the skeleton reads the playbooks it names from `${CLAUDE_PLUGIN_ROOT}` instead of `git show origin/main:`, adds the brief contract to that list and to each owner's brief, branches from `<base-branch>` instead of `main`, runs its live lanes on `poteto-agent` on the Volume setting, and its audit tick's prompt reads poteto-mode by path, with rule 10's cloud surface line on the tick;
 - `check-plan.mjs` is an override whose markers match this skeleton, so a change to either is carried into the other.
 
 ```detect
@@ -407,7 +409,7 @@ after: More when needed: Xcode `DerivedData` and `iOS DeviceSupport`, package ca
 These keep `swarm` and the Autopilot-stack and Autopilot-full playbooks translated:
 
 - workers are placed as ADR 0001 places them, read from the reminder's surface line: a local lead sends swarm workers (races included) and autopilot owners to cloud workers by default, started with `claude --permission-mode auto --cloud` under a pseudo-terminal after pushing the run's base, with `--settings '{"remote":{"defaultEnvironmentId":"<env_ id>"}}'` when the run names an environment; local-only, asked for or fallen back to and said once, runs them in parallel locally, in a worktree each for one that writes or races; a cloud lead runs them as in-VM `Agent`s, `isolation: "worktree"` for one that writes, and an Auto lead adds `create_session` workers for whole-machine work. Cursor's `cloud_base_branch` becomes the start commit the brief names; a local lead reads each cloud worker's result only from the report commit it pushes, found by its `Pstack-Nonce` trailer as the brief contract describes;
-- every worker is briefed per the brief contract, swarm workers as leaf workers; swarm workers run on the `volume` agent (`volume-reader` when they only read); autopilot owners are sub-leads on `work` that run their own panels and declare their timebox;
+- every worker is briefed per the brief contract, swarm workers as leaf workers; swarm workers run on `poteto-agent` on the Volume setting (`poteto-reader` when they only read); autopilot owners are sub-leads on `poteto-agent` on Work that run their own panels and declare their timebox;
 - where workers are spawned, the text carries the window (at most 10 direct children in flight, refilled as they finish, never in blocking batches; an in-session owner counts at its peak of 4 and keeps at most 3 workers of its own in flight, waited for inside the owner's own turn since an in-session owner is a subagent, a cloud or `create_session` worker counts as one, and a root's verification swarms share its window with its owners; swarm's N stays the total), backpressure (a refused spawn waits for one of the lead's own in-flight agents, whatever the error says, and never drops a slice, arm, owner or lane; with nothing in flight it is `BLOCKED: concurrency cap`) and the timebox (sized per brief, 30 minutes for a reader and 90 for a code writer without an estimate; at 1.5× the worker is `BLOCKED` with no retry, an in-session one stopped with `TaskStop`, its session URL recorded and the user told once);
 - an autopilot owner past 1.5× its timebox is stuck: it is `BLOCKED` and one replacement owner starts from its pushed branch and decision trail; a replacement that also stalls is `BLOCKED` and its item is parked and listed in the Reply, which is how upstream's replace-at-once audit and the no-retry timebox meet;
 - an audit tick re-reads its playbook from `${CLAUDE_PLUGIN_ROOT}` instead of `git show origin/main:`, since the plugin isn't in the user's repo;

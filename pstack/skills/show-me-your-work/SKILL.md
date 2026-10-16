@@ -64,14 +64,14 @@ Correct the log, not the story. The audit never edits or removes a row, even an 
 
 ## Fresh-context review of the trail
 
-Before handing back, spawn a fresh-context review on `judgement-reader`, given the trail and transcript paths and never your reasoning. Pass `${user_config.judgement_model}` as `model:` only when it resolved to one of `opus`, `sonnet`, `haiku`, `fable`; otherwise pass none and the agent's default applies. Self-review is not a substitute. The subagent reads the audit trail and the run's transcript, then flags what the user should pay attention to. Not a redo of the work, a scan for what's suboptimal or risky.
+Before handing back, spawn a fresh-context review on `poteto-reader` on the Judgement setting, given the trail and transcript paths and never your reasoning. Pass `model:` `${user_config.judgement_model}` and `effort:` `${user_config.judgement_effort}`, or the setting's defaults (`opus`, `high`) for a literal placeholder or an empty value. Self-review is not a substitute. The subagent reads the audit trail and the run's transcript, then flags what the user should pay attention to. Not a redo of the work, a scan for what's suboptimal or risky.
 
 - Decisions logged with weak or absent evidence.
 - Verification steps skipped or claimed without proof in the transcript.
 - Choices that look risky in hindsight (premature, scope-creeping, papering over a symptom).
 - Gaps the user would otherwise miss on a casual skim.
 
-Every reply for a run that produced a trail ends with an "Attention" section. Lead with the reviewer on its own line (`reviewed by <model alias>, fresh context`, the alias being the `model:` you passed, or the `judgement-reader` agent's default when you passed none), then list each flag pointing to specific rows or moments. "No flags" is a valid value. The model name is not.
+Every reply for a run that produced a trail ends with an "Attention" section. Lead with the reviewer on its own line (`reviewed by <model alias>, fresh context`, the alias being the `model:` you passed), then list each flag pointing to specific rows or moments. "No flags" is a valid value. The model name is not.
 
 ## Reviewing the trail
 

@@ -201,16 +201,17 @@ In cloud, your user-level `CLAUDE.md` isn't there: rules come from the request a
 <!-- BEGIN generated from port.json — do not edit by hand -->
 | File | Kind | Why |
 |---|---|---|
+| `agents/poteto-agent.md` | override | upstream's body with the read-by-path line, as the one writer for every setting: each spawn passes its setting's model and effort, and the frontmatter falls back to Work's opus at medium, in the background |
 | `skills/architect/SKILL.md` | override | Phase B's two distinct candidates come from arena's directions, the architect runners model line goes, and a spec's Implementation Decisions reach every runner as fixed constraints |
 | `skills/architect/references/runner-prompt.md` | override | arena's directed or fourth-way block replaces the each-on-a-different-model paragraph, and a spec's Implementation Decisions bind every shape |
 | `skills/arena/SKILL.md` | override | runners on Work with two whole-shape directions, a fourth-way seat and their escapes, and a blind judge on every arena, in place of a runner per model family and a cross-family judge |
-| `skills/interrogate/SKILL.md` | override | three lens reviewers on judgement-reader, always all three, with critical-only spillover, the lead's verification gate in place of consensus, and a Coverage Map with Checked and Gaps in place of the Agreement Map |
+| `skills/interrogate/SKILL.md` | override | three lens reviewers on poteto-reader on Judgement, always all three, with critical-only spillover, the lead's verification gate in place of consensus, and a Coverage Map with Checked and Gaps in place of the Agreement Map |
 | `skills/interrogate/references/lead-judgment.md` | override | the verification gate replaces the consensus signal: Act on needs a traced path, and every dismissed critical is re-checked |
 | `skills/interrogate/references/reviewer-prompt.md` | override | a lens brief: one lens's sections, the other lenses named for critical-only spillover, and a required Checked list |
 | `skills/poteto-help/SKILL.md` | override | Cursor-only sections (Custom Mode, Option+Enter, .cursor/rules, /add-plugin) rewritten for Claude Code's install, settings and surfaces, with a row for re-entering the mode after a resume |
 | `skills/poteto-mode/playbooks/eval.md` | override | spawns its own blind samples, 3 per variant on the model the change meets in use, with one blind Judgement judge over all of them and an opt-in cross-model sweep, in place of arena's model fan-out and cross-family judge; a user-invoked skill's samples run on the general-purpose agent, which inherits the lead's model, since a setting agent's pstack body would skew them |
 | `skills/poteto-mode/playbooks/orchestrate.md` | override | a lead and sub-leads place units by surface (cloud workers, local-only worktrees, in-VM worktree subagents, create_session in Auto), retry by failure mode, take the full gate at landing as the ledger verdict, land only under a landing grant with Close listing leftover branches, run orch through the launcher with its store on an orphan branch, and split restart from compaction |
-| `skills/poteto-mode/scripts/check-plan.mjs` | override | its markers match the port's plan wording: live lanes on the `volume` agent instead of a named model, and playbooks read from the plugin instead of from trunk with `git show` |
+| `skills/poteto-mode/scripts/check-plan.mjs` | override | its markers match the port's plan wording: live lanes on `poteto-agent` on Volume instead of a named model, and playbooks read from the plugin instead of from trunk with `git show` |
 | `skills/poteto-mode/scripts/orch/` | override | frontier set takes the stacker's PR order from the store, PR state and merged heads from gh api REST and open heads from git rev-parse, in place of Graphite, and fails on a drifted base or a stale head; init excludes the store from git and every drain pushes it to its orphan branch by plumbing; commander imported directly and NotFoundError's parameter property a plain field, for Node's type stripping |
 | `skills/poteto-mode/scripts/watch-pr/fakes.test-helper.ts` | override | adds a fake of the REST API serving the proxy's /ccr/review_threads shape |
 | `skills/poteto-mode/scripts/watch-pr/github.test.ts` | override | adds tests of the REST reader against a fake of the proxy's routes, its verdicts beside GraphQL's on the same threads, the fallback and the review-bot logins |
@@ -219,12 +220,7 @@ In cloud, your user-level `CLAUDE.md` isn't there: rules come from the request a
 | `skills/poteto-mode/scripts/worktree-audit.sh` | override | attributes each worktree to the newest Claude Code transcript whose cwd is that worktree or lies under it, read only from the project directories of the main checkout and its worktrees, in place of a path search of Cursor's agent-transcripts, and buckets a worktree no transcript claims as a stray; it also runs on Linux and takes paths with spaces |
 | `skills/setup-pstack/SKILL.md` | override | shows the three settings, points to /config, prints the setup line and shows the Read rule, in place of writing a Cursor model rule |
 | `.claude-plugin/plugin.json` | port-only | Claude Code's plugin manifest, with the three model settings as userConfig and no version |
-| `agents/judgement-reader.md` | port-only | the Judgement setting's reader, in place of a readonly generalPurpose spawn: no Edit, Write or NotebookEdit, high effort |
-| `agents/judgement.md` | port-only | the Judgement setting's writer: upstream's poteto-agent body on the Judgement default model at high effort, in the background |
-| `agents/volume-reader.md` | port-only | the Volume setting's reader, in place of a readonly generalPurpose spawn: no Edit, Write or NotebookEdit, high effort |
-| `agents/volume.md` | port-only | the Volume setting's writer: upstream's poteto-agent body on the Volume default model at high effort, in the background |
-| `agents/work-reader.md` | port-only | the Work setting's reader, in place of a readonly generalPurpose spawn: no Edit, Write or NotebookEdit, medium effort |
-| `agents/work.md` | port-only | the Work setting's writer: upstream's poteto-agent body on the Work default model at medium effort, in the background |
+| `agents/poteto-reader.md` | port-only | the one reader for every setting, in place of a readonly generalPurpose spawn: no Edit, Write or NotebookEdit, each spawn passing its setting's model and effort |
 | `hooks/hooks.json` | port-only | registers the compaction hook on SessionStart's compact matcher, which skill frontmatter can't: its SessionStart never fires |
 | `hooks/poteto-mode-compaction.sh` | port-only | after a compaction in a marked poteto-mode session, lists the durable state to re-read before acting: the skill, any store, the transcript, a trail and a resume note |
 | `hooks/poteto-mode-reminder.sh` | port-only | poteto-mode's per-turn reminder hook: upstream's reminder text, the skill path, the surface and mode, precedence and the machine lock, and the session marker the compaction hook reads |
@@ -237,7 +233,6 @@ In cloud, your user-level `CLAUDE.md` isn't there: rules come from the request a
 | `skills/poteto-mode/scripts/run` | port-only | the runtime launcher: runs poteto-mode's scripts with Bun, else Node 22.18+, in place of bootstrap.ts's install |
 | `.cursor-plugin/` | dropped | Cursor's plugin manifest, replaced by Claude Code's in .claude-plugin/plugin.json |
 | `.gitignore` | dropped | upstream's plugin-level ignore list: its node_modules/ line would hide the vendored commander, and the repo's root .gitignore covers the rest |
-| `agents/poteto-agent.md` | dropped | replaced by the three writer agents, which carry its body |
 | `automations/benny/` | dropped | Cursor Slack automations, outside the port's scope |
 | `skills/make-bot-ui/` | dropped | Cursor Grok Bot automations: the session creates its own webhook routine and wakes on it, and a lead creating its own routines is out of the port's scope |
 | `skills/poteto-mode/scripts/bootstrap.ts` | dropped | installs commander at first run; the port vendors commander and runs scripts through its launcher |

@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 Explore the codebase to answer "how does X work?" questions. Produce architectural explanations at the level of a senior engineer onboarding onto a subsystem, enough to build a working mental model, not so much that it reads like annotated source code.
 
-Each spawn below names its setting agent and the setting's model. Pass that model as `model:` only when it resolved to one of `opus`, `sonnet`, `haiku`, `fable`. A literal placeholder or an empty value means no `model:`, and the agent's default applies.
+Each spawn below names its agent and its setting's model and effort. Pass both on every spawn, as `model:` and `effort:`. A literal placeholder or an empty value means the setting's default: Work `opus` at `medium`, Judgement `opus` at `high`, Volume `sonnet` at `high`.
 
 ## Step 1. Assess Complexity
 
@@ -23,8 +23,9 @@ When in doubt, take the simple path.
 
 Decompose the question into 2 to 4 exploration angles, each a distinct slice of the subsystem. Spawn all explorers in a single message:
 
-- `subagent_type`: `work-reader`
+- `subagent_type`: `poteto-reader`
 - `model`: `${user_config.work_model}`
+- `effort`: `${user_config.work_effort}`
 
 Each explorer gets the prompt in `references/explorer-prompt.md` with its angle filled in. Then go to Step 3.
 
@@ -32,8 +33,9 @@ Each explorer gets the prompt in `references/explorer-prompt.md` with its angle 
 
 Spawn one Agent that explores and explains in one pass:
 
-- `subagent_type`: `judgement-reader`
+- `subagent_type`: `poteto-reader`
 - `model`: `${user_config.judgement_model}`
+- `effort`: `${user_config.judgement_effort}`
 
 Build its prompt from `references/explainer-prompt.md` without the explorer-findings section. Go to Step 4.
 
@@ -41,8 +43,9 @@ Build its prompt from `references/explainer-prompt.md` without the explorer-find
 
 Once all explorers have returned, spawn one Agent to synthesize their findings into one explanation:
 
-- `subagent_type`: `judgement-reader`
+- `subagent_type`: `poteto-reader`
 - `model`: `${user_config.judgement_model}`
+- `effort`: `${user_config.judgement_effort}`
 
 Build its prompt from `references/explainer-prompt.md` with every explorer's findings filled in.
 

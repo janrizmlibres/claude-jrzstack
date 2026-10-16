@@ -192,11 +192,11 @@ help:              /pstack:poteto-help which skill should i use to review this b
 
 </details>
 
-## the setting agents and Comment Sicko
+## poteto-agent, poteto-reader and Comment Sicko
 
-pstack also ships agents that run my style end to end, one writer and one reader per setting: [`work`](./agents/work.md), [`work-reader`](./agents/work-reader.md), [`judgement`](./agents/judgement.md), [`judgement-reader`](./agents/judgement-reader.md), [`volume`](./agents/volume.md) and [`volume-reader`](./agents/volume-reader.md). spawn the [`work`](./agents/work.md) agent from a parent agent for code. a writer reads `poteto-mode` in full, including its inline principles index, before doing any work. a general-purpose subagent skips that read and drifts. the playbooks spawn these agents themselves.
+pstack also ships two agents that run my style end to end, a writer and a reader: [`poteto-agent`](./agents/poteto-agent.md) and [`poteto-reader`](./agents/poteto-reader.md). each spawn passes its setting's model and effort. spawn [`poteto-agent`](./agents/poteto-agent.md) from a parent agent for code. a writer reads `poteto-mode` in full, including its inline principles index, before doing any work. a general-purpose subagent skips that read and drifts. the playbooks spawn these agents themselves.
 
-[`/pstack:poteto-mode`](./skills/poteto-mode/SKILL.md) and the [`work`](./agents/work.md) agent route through the same wrapper.
+[`/pstack:poteto-mode`](./skills/poteto-mode/SKILL.md) and [`poteto-agent`](./agents/poteto-agent.md) route through the same wrapper.
 
 pstack also ships [Comment Sicko](./agents/comment-sicko.md), a read-only comment reviewer agent. usually invoke it through [`/pstack:no-comments`](./skills/no-comments/SKILL.md), not directly.
 

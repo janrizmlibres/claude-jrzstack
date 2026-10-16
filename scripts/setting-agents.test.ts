@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { pluginDir } from "./test/harness.ts";
 
@@ -18,48 +18,42 @@ const userConfig = JSON.parse(readFileSync(join(pluginDir, ".claude-plugin", "pl
 >;
 
 const effortLevels = ["low", "medium", "high", "xhigh", "max"];
-
-const settings = [
-  { setting: "work", effort: "medium", model: "opus" },
-  { setting: "judgement", effort: "high", model: "opus" },
-  { setting: "volume", effort: "high", model: "sonnet" },
-];
-
+const settings = ["work", "judgement", "volume"];
 const ending = "Spawned only by pstack playbooks.";
 const readerDenies = ["Edit", "Write", "NotebookEdit"];
 
-describe("setting agents", () => {
-  for (const { setting, effort, model } of settings) {
-    test(`${setting} writes in the background on its setting's default model and effort`, () => {
-      const { meta, body } = readAgent(setting);
+describe("pstack agents", () => {
+  test("one writer and one reader serve every setting, beside Comment Sicko", () => {
+    expect(readdirSync(join(pluginDir, "agents")).sort()).toEqual(["comment-sicko.md", "poteto-agent.md", "poteto-reader.md"]);
+  });
 
-      expect(meta.name).toBe(setting);
-      expect(meta.model).toBe(model);
-      expect(meta.model).toBe(userConfig[`${setting}_model`]!.default);
-      expect(meta.effort).toBe(effort);
-      expect(meta.effort).toBe(userConfig[`${setting}_effort`]!.default);
-      expect(meta.background).toBe(true);
-      expect(meta.disallowedTools).toBeUndefined();
-      expect(meta.tools).toBeUndefined();
-      expect(meta.description as string).toEndWith(ending);
-      expect(body).toContain("read ${CLAUDE_PLUGIN_ROOT}/skills/poteto-mode/SKILL.md");
-      expect(body).toContain("The Skill tool refuses them by design");
-    });
+  test("poteto-agent writes in the background, falling back to Work's defaults", () => {
+    const { meta, body } = readAgent("poteto-agent");
 
-    test(`${setting}-reader reads only, on the same model and effort`, () => {
-      const { meta } = readAgent(`${setting}-reader`);
+    expect(meta.name).toBe("poteto-agent");
+    expect(meta.model).toBe(userConfig.work_model!.default);
+    expect(meta.effort).toBe(userConfig.work_effort!.default);
+    expect(meta.background).toBe(true);
+    expect(meta.disallowedTools).toBeUndefined();
+    expect(meta.tools).toBeUndefined();
+    expect(meta.description as string).toEndWith(ending);
+    expect(body).toContain("read ${CLAUDE_PLUGIN_ROOT}/skills/poteto-mode/SKILL.md");
+    expect(body).toContain("The Skill tool refuses them by design");
+  });
 
-      expect(meta.name).toBe(`${setting}-reader`);
-      expect(meta.model).toBe(model);
-      expect(meta.effort).toBe(effort);
-      expect(String(meta.disallowedTools).split(/,\s*/)).toEqual(readerDenies);
-      expect(meta.tools).toBeUndefined();
-      expect(meta.description as string).toEndWith(ending);
-    });
-  }
+  test("poteto-reader reads only, on the same fallback", () => {
+    const { meta } = readAgent("poteto-reader");
+
+    expect(meta.name).toBe("poteto-reader");
+    expect(meta.model).toBe(userConfig.work_model!.default);
+    expect(meta.effort).toBe(userConfig.work_effort!.default);
+    expect(String(meta.disallowedTools).split(/,\s*/)).toEqual(readerDenies);
+    expect(meta.tools).toBeUndefined();
+    expect(meta.description as string).toEndWith(ending);
+  });
 
   test("each setting's effort offers every level", () => {
-    for (const { setting } of settings) expect(userConfig[`${setting}_effort`]!.options).toEqual(effortLevels);
+    for (const setting of settings) expect(userConfig[`${setting}_effort`]!.options).toEqual(effortLevels);
   });
 
   test("Comment Sicko's description ends with the pstack-only line", () => {

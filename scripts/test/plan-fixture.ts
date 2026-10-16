@@ -35,7 +35,7 @@ export function prSection(title: string, id: string, depends: string, gated: boo
     "",
     "- [ ] `src/net/retry.test.ts` gains the backoff case. Run `bun test src/net/retry.test.ts`.",
     "",
-    `**Verify, live.** ${verificationRule} Ten lanes on the \`volume\` agent at the PR head, per the boot recipe.`,
+    `**Verify, live.** ${verificationRule} Ten lanes on \`poteto-agent\` on the Volume setting at the PR head, per the boot recipe.`,
     "",
     ...lanes,
     "",
