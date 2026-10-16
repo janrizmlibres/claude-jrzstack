@@ -10,7 +10,7 @@ Investigate the motivation and intent behind code.
 
 Companion to the `how` skill (read ${CLAUDE_PLUGIN_ROOT}/skills/how/SKILL.md). `how` answers what the code does and how it works. `why` answers what forces led to its shape.
 
-Each spawn below names its setting agent and the setting's model. Pass that model as `model:` only when it resolved to one of `opus`, `sonnet`, `haiku`, `fable`. A literal placeholder or an empty value means no `model:`, and the agent's default applies.
+Each spawn below names its agent and its setting's model and effort. Pass both on every spawn, as `model:` and `effort:`. A literal placeholder or an empty value means the setting's default: Work `opus` at `medium`, Judgement `opus` at `high`, Volume `sonnet` at `high`.
 
 ## Operating Posture
 
@@ -80,10 +80,11 @@ Aim for a complete **coverage map**, not a minimal one. Document the null, don't
 Launch all matching investigators in a single message so they run concurrently. Don't ask one agent to cover multiple MCPs.
 
 Subagent config (each):
-- `subagent_type`: `volume-reader`
+- `subagent_type`: `poteto-reader`
 - `model`: `${user_config.volume_model}`
+- `effort`: `${user_config.volume_effort}`
 
-`volume-reader` keeps Bash and MCP access and drops only Edit, Write and NotebookEdit, so MCP-backed investigators work. Investigators still shouldn't write anything.
+`poteto-reader` keeps Bash and MCP access and drops only Edit, Write and NotebookEdit, so MCP-backed investigators work. Investigators still shouldn't write anything.
 
 Each investigator gets:
 1. The base prompt from `references/investigator-prompt.md`
@@ -125,10 +126,11 @@ If your scope assessment suggests a single-commit trivial target where the PR de
 
 Spawn one synthesizer subagent:
 
-- `subagent_type`: `judgement-reader`
+- `subagent_type`: `poteto-reader`
 - `model`: `${user_config.judgement_model}`
+- `effort`: `${user_config.judgement_effort}`
 
-The synthesizer's quality check spot-verifies citations, which can require MCP access. `judgement-reader` keeps it.
+The synthesizer's quality check spot-verifies citations, which can require MCP access. `poteto-reader` keeps it.
 
 The synthesizer gets:
 1. The investigator findings, including any null results and any categories skipped with justification

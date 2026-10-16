@@ -60,7 +60,7 @@ How long `/pstack:poteto-mode` stays on:
 - A resumed session (`--resume`) loses the hook. Type `/pstack:poteto-mode` again.
 - The user turns it off by saying so. To have it on in every session, they can say so in their own `CLAUDE.md`.
 
-Mid-session, "new task" makes the mode match a fresh playbook. The user's own instructions, the request and `CLAUDE.md`, outrank pstack's text. `/pstack:poteto-mode` already uses the `work` agent for the subagents its playbook steps spawn. To get the same style from a subagent of your own, spawn it on the `work` agent.
+Mid-session, "new task" makes the mode match a fresh playbook. The user's own instructions, the request and `CLAUDE.md`, outrank pstack's text. `/pstack:poteto-mode` already uses `poteto-agent` for the subagents its playbook steps spawn. To get the same style from a subagent of your own, spawn it on `poteto-agent`.
 
 A spec works as the task: an issue that says what to build. Handing it in is the go to execute it. "plan only" stops after the plan is posted on the issue. Landing is withheld unless the request grants it.
 

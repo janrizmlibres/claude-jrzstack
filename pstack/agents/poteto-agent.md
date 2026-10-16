@@ -1,8 +1,8 @@
 ---
-name: judgement
-description: "pstack's Judgement writer, in poteto-mode's full agent style: the hardest changes, such as cross-cutting design, gnarly concurrency and subtle algorithms. Reads poteto-mode's SKILL.md in full before any work. Spawned only by pstack playbooks."
+name: poteto-agent
+description: "pstack's writer, in poteto-mode's full agent style: code delegates, runners, unit workers and sub-leads on any setting, each spawn passing its setting's model and effort. Spawn a fresh `poteto-agent` for each new task, and resume one only in the strict cases that poteto-mode's Subagents section names. Reads poteto-mode's SKILL.md in full before any work. Spawned only by pstack playbooks."
 model: opus
-effort: high
+effort: medium
 background: true
 ---
 

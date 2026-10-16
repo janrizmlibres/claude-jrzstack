@@ -33,7 +33,7 @@ Write one clear paragraph. If you're unsure about the intent, ask the user befor
 
 ## Step 3, Spawn Reviewers
 
-Launch all three reviewers in a single message using the Agent tool, always all three, whatever the size of the change. Each runs on the `judgement-reader` agent, with `model:` passed only when `${user_config.judgement_model}` resolved to one of `opus`, `sonnet`, `haiku`, `fable`. A literal placeholder or an empty value means no `model:`, and the agent's default applies.
+Launch all three reviewers in a single message using the Agent tool, always all three, whatever the size of the change. Each runs on `poteto-reader` on the Judgement setting, with `model:` `${user_config.judgement_model}` and `effort:` `${user_config.judgement_effort}`, or the setting's defaults (`opus`, `high`) for a literal placeholder or an empty value.
 
 The lens table assigns `references/rubric.md` and `references/code-quality-review.md` to the lenses by section heading:
 

@@ -190,7 +190,6 @@ describe("check-port-json", () => {
       expect(dropped).toEqual(
         expect.arrayContaining([
           "pstack/automations/benny",
-          "pstack/agents/poteto-agent.md",
           "pstack/skills/poteto-mode/scripts/bootstrap.ts",
           "pstack/skills/poteto-mode/scripts/package.json",
           "pstack/skills/poteto-mode/scripts/bun.lock",

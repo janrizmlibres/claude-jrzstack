@@ -1,8 +1,8 @@
 ---
-name: volume-reader
-description: "pstack's Volume reader, with no Edit, Write or NotebookEdit: why's investigators, recall's and automate-me's bulk readers, and orchestrate's babysitter and retro watcher. Spawned only by pstack playbooks."
-model: sonnet
-effort: high
+name: poteto-reader
+description: "pstack's reader, with no Edit, Write or NotebookEdit: explorers, reviewers, judges, investigators, synthesizers and bulk readers on any setting, each spawn passing its setting's model and effort. Spawned only by pstack playbooks."
+model: opus
+effort: medium
 disallowedTools: Edit, Write, NotebookEdit
 ---
 
