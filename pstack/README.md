@@ -254,7 +254,7 @@ pstack has no planning skill. personally, i don't believe in planning. the best 
 
 type [`/pstack:automate-me`](./skills/automate-me/SKILL.md). it mines your recent transcripts, drafts a `<your-name>-mode` skill from how you've actually worked, and routes through pstack underneath. you keep pstack as the base and end up with your own routing skill alongside `poteto-mode`.
 
-models are configurable too. pick a model for each of the three settings in `/config`: Work (code delegates and runners), Judgement (the hardest changes, judges and reviewers) and Volume (swarm and race workers). an unset setting keeps its default, so you override only what you want. the port fixes each setting's effort. type [`/pstack:setup-pstack`](./skills/setup-pstack/SKILL.md) to see the settings and get the setup line that carries them to cloud environments.
+models and effort are configurable too. pick a model and a starting effort for each of the three settings in `/config`: Work (code delegates and runners), Judgement (the hardest changes, judges and reviewers) and Volume (swarm and race workers). an unset setting keeps its default, so you override only what you want. each spawn raises or lowers the effort to fit its job. type [`/pstack:setup-pstack`](./skills/setup-pstack/SKILL.md) to see the settings and get the setup line that carries them to cloud environments.
 
 ## license
 

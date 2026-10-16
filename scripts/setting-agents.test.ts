@@ -14,8 +14,10 @@ function readAgent(name: string): { meta: Record<string, unknown>; body: string 
 
 const userConfig = JSON.parse(readFileSync(join(pluginDir, ".claude-plugin", "plugin.json"), "utf8")).userConfig as Record<
   string,
-  { default: string }
+  { default: string; options: string[] }
 >;
+
+const effortLevels = ["low", "medium", "high", "xhigh", "max"];
 
 const settings = [
   { setting: "work", effort: "medium", model: "opus" },
@@ -28,13 +30,14 @@ const readerDenies = ["Edit", "Write", "NotebookEdit"];
 
 describe("setting agents", () => {
   for (const { setting, effort, model } of settings) {
-    test(`${setting} writes in the background on its setting's default model and fixed effort`, () => {
+    test(`${setting} writes in the background on its setting's default model and effort`, () => {
       const { meta, body } = readAgent(setting);
 
       expect(meta.name).toBe(setting);
       expect(meta.model).toBe(model);
       expect(meta.model).toBe(userConfig[`${setting}_model`]!.default);
       expect(meta.effort).toBe(effort);
+      expect(meta.effort).toBe(userConfig[`${setting}_effort`]!.default);
       expect(meta.background).toBe(true);
       expect(meta.disallowedTools).toBeUndefined();
       expect(meta.tools).toBeUndefined();
@@ -54,6 +57,10 @@ describe("setting agents", () => {
       expect(meta.description as string).toEndWith(ending);
     });
   }
+
+  test("each setting's effort offers every level", () => {
+    for (const { setting } of settings) expect(userConfig[`${setting}_effort`]!.options).toEqual(effortLevels);
+  });
 
   test("Comment Sicko's description ends with the pstack-only line", () => {
     expect(readAgent("comment-sicko").meta.description as string).toEndWith(ending);

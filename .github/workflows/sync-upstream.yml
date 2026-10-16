@@ -53,9 +53,26 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           github_token: ${{ github.token }}
           prompt: "/sync-upstream ${{ steps.gate.outputs.commit }}"
+          # Print the transcript: a denied tool call is otherwise only a count.
+          show_full_output: true
           # The skill's own commands: the repo scripts, git, reading upstream's
           # commits and PRs, opening the PR, and re-copying the vendored
           # commander (npm pack, tar, cp) when upstream moves its pin.
           claude_args: |
             --model opus
             --allowedTools "Read,Write,Edit,Glob,Grep,Agent,Bash(bun scripts/:*),Bash(bun run:*),Bash(git:*),Bash(gh api repos/cursor/plugins/:*),Bash(gh pr create:*),Bash(npm pack:*),Bash(tar:*),Bash(mkdir:*),Bash(cp:*),Bash(rm:*),Bash(ls:*)"
+      # The action reports success even when Claude stopped early, so the run
+      # is only green when a sync PR for this version is open.
+      - name: Check the sync PR
+        if: steps.gate.outputs.sync == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.gate.outputs.version }}
+        run: |
+          pr=$(gh pr list --state open --json headRefName,url \
+            --jq "map(select(.headRefName | startswith(\"sync/$VERSION\")))[0].url // empty")
+          if [ -z "$pr" ]; then
+            echo "::error::Claude finished without opening a sync PR for pstack $VERSION. Read the transcript in the Sync step."
+            exit 1
+          fi
+          echo "Sync PR: $pr"

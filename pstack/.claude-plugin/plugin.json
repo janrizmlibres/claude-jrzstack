@@ -13,23 +13,44 @@
     "work_model": {
       "type": "string",
       "title": "Work model",
-      "description": "Model for the Work setting: code delegates, arena runners, unit workers and sub-leads. Effort is fixed at medium.",
+      "description": "Model for the Work setting: code delegates, arena runners, unit workers and sub-leads.",
       "options": ["opus", "sonnet", "haiku", "fable"],
       "default": "opus"
+    },
+    "work_effort": {
+      "type": "string",
+      "title": "Work effort",
+      "description": "Starting effort for the Work setting. A spawn raises it one step for the hardest work and lowers it for routine work.",
+      "options": ["low", "medium", "high", "xhigh", "max"],
+      "default": "medium"
     },
     "judgement_model": {
       "type": "string",
       "title": "Judgement model",
-      "description": "Model for the Judgement setting: the hardest tasks, judges, reviewers and fresh-context reviews. Effort is fixed at high.",
+      "description": "Model for the Judgement setting: the hardest tasks, judges, reviewers and fresh-context reviews.",
       "options": ["opus", "sonnet", "haiku", "fable"],
       "default": "opus"
+    },
+    "judgement_effort": {
+      "type": "string",
+      "title": "Judgement effort",
+      "description": "Starting effort for the Judgement setting. A spawn raises it one step for the hardest work and lowers it for routine work.",
+      "options": ["low", "medium", "high", "xhigh", "max"],
+      "default": "high"
     },
     "volume_model": {
       "type": "string",
       "title": "Volume model",
-      "description": "Model for the Volume setting: swarm and first-pass race workers, and other Volume roles. Effort is fixed at high.",
+      "description": "Model for the Volume setting: swarm and first-pass race workers, and other Volume roles.",
       "options": ["opus", "sonnet", "haiku", "fable"],
       "default": "sonnet"
+    },
+    "volume_effort": {
+      "type": "string",
+      "title": "Volume effort",
+      "description": "Starting effort for the Volume setting. A spawn raises it one step for the hardest work and lowers it for routine work.",
+      "options": ["low", "medium", "high", "xhigh", "max"],
+      "default": "high"
     }
   }
 }
