@@ -1,5 +1,5 @@
 #!/usr/bin/env bun
-// sync-changes [ref]  what a sync to upstream's <ref> (default main) does, change by change
+// sync-changes [ref] [--out <file>]  what a sync to upstream's <ref> (default main) does, change by change
 //
 // Run from the repo root, before the snapshot advances. Sparse-clones
 // upstream at the ref, diffs it against the snapshot under upstream/ with
@@ -7,18 +7,19 @@
 // upstream change and port file it reaches, with the kind port.json gives
 // that file and the action the sync rules give the change. The Reason column
 // is left for the sync to fill. Changes to dropped files are listed only,
-// collapsed below the table.
+// collapsed below the table. --out writes the table to <file> instead of stdout.
 // Exit 0 when it ran (nothing to sync included), 2 on a malformed port.json,
 // a usage or a git failure.
 import { parseArgs } from "node:util";
 import { syncRows, upstreamChanges, type SyncRow } from "./lib/changes.ts";
 import { readPortRecord } from "./lib/port.ts";
-import { readRecord, readVersion, runCommand, UsageError, withUpstreamClone } from "./lib/upstream.ts";
+import { outputTo, readRecord, readVersion, runCommand, UsageError, withUpstreamClone } from "./lib/upstream.ts";
 
 function main(): number {
-  const { positionals } = parseArgs({ allowPositionals: true });
-  if (positionals.length > 1) throw new UsageError("usage: sync-changes [ref]");
+  const { values, positionals } = parseArgs({ options: { out: { type: "string" } }, allowPositionals: true });
+  if (positionals.length > 1) throw new UsageError("usage: sync-changes [ref] [--out <file>]");
   const ref = positionals[0] ?? "main";
+  const write = outputTo(values.out);
 
   const root = process.cwd();
   const snapshot = readRecord(root);
@@ -28,7 +29,7 @@ function main(): number {
     const changes = upstreamChanges(clone, root, snapshot.paths);
     const target = `${snapshot.repo}@${clone.commit}`;
     if (changes.length === 0) {
-      console.log(`Nothing to sync: ${target} (${ref}) matches the snapshot at ${snapshot.commit}.`);
+      write(`Nothing to sync: ${target} (${ref}) matches the snapshot at ${snapshot.commit}.\n`);
       return 0;
     }
 
@@ -37,14 +38,14 @@ function main(): number {
     const acted = rows.filter((row) => row.listedUnder === undefined);
     const listed = rows.filter((row) => row.listedUnder !== undefined);
 
-    console.log(
+    write(
       `Upstream ${target} (pstack ${version}), since the snapshot at ${snapshot.commit} (pstack ${snapshot.version}): ` +
-        `${changes.length} upstream change${changes.length === 1 ? "" : "s"}.\n`,
+        `${changes.length} upstream change${changes.length === 1 ? "" : "s"}.\n\n`,
     );
-    console.log("| Upstream path | Change | Port file | Kind | Action | Reason |");
-    console.log("|---|---|---|---|---|---|");
-    for (const row of acted) console.log(`| ${row.upstream} | ${row.change} | ${row.port} | ${row.kind} | ${row.action} |  |`);
-    if (listed.length > 0) console.log(`\n${droppedBlock(listed)}`);
+    write("| Upstream path | Change | Port file | Kind | Action | Reason |\n");
+    write("|---|---|---|---|---|---|\n");
+    for (const row of acted) write(`| ${row.upstream} | ${row.change} | ${row.port} | ${row.kind} | ${row.action} |  |\n`);
+    if (listed.length > 0) write(`\n${droppedBlock(listed)}\n`);
     return 0;
   });
 }

@@ -1,9 +1,9 @@
 // The snapshot of upstream under `upstream/` and its machine-written record,
 // `upstream/snapshot.json`, plus the command plumbing (UsageError, runCommand,
 // git) every repo script shares.
-import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join, relative } from "node:path";
+import { dirname, join, relative } from "node:path";
 
 export type SnapshotRecord = {
   /** Clone URL of the upstream repo. */
@@ -90,6 +90,18 @@ export function runCommand(name: string, main: () => number): never {
     console.error(`${name}: ${(error as Error).message}`);
     process.exit(2);
   }
+}
+
+/**
+ * Where a report goes: stdout, or the file at `path`, emptied first and its
+ * directory created. A script writes its own scratch file this way because
+ * Claude Code asks before a shell redirect writes into the working directory.
+ */
+export function outputTo(path: string | undefined): (text: string) => void {
+  if (path === undefined) return (text) => process.stdout.write(text);
+  mkdirSync(dirname(path), { recursive: true });
+  writeFileSync(path, "");
+  return (text) => appendFileSync(path, text);
 }
 
 export type UpstreamClone = { dir: string; commit: string };

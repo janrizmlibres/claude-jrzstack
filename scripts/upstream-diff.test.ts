@@ -60,6 +60,16 @@ describe("upstream-diff", () => {
     expect(onNext.stdout).toContain("+# pstack next");
   });
 
+  test("writes the diff to --out instead of stdout, creating its directory", () => {
+    const { port } = upstreamMovedOn();
+
+    const result = upstreamDiff(port, "main", "--out", ".sync-upstream/upstream.diff");
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toBe("");
+    expect(readFileSync(join(port, ".sync-upstream/upstream.diff"), "utf8")).toContain("+Workflows, now faster.");
+  });
+
   test("says so when upstream has not changed", () => {
     const { upstream, first } = fixtureUpstream();
 

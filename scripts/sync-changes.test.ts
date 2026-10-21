@@ -1,4 +1,6 @@
 import { describe, expect, test } from "bun:test";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { FakeRemote, git, runScript, writeFiles, type Files } from "./test/harness.ts";
 import { portAt } from "./test/upstream-fixture.ts";
 
@@ -324,6 +326,18 @@ describe("sync-changes", () => {
     expect(syncChanges(port, "next").stdout).toContain(
       row("pstack/README.md", "modified", "pstack/README.md", "translated", "patch forward"),
     );
+  });
+
+  test("writes the table to --out instead of stdout, creating its directory", () => {
+    const { port, second } = movedOn();
+
+    const result = syncChanges(port, "--out", ".sync-upstream/changes.md");
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toBe("");
+    const written = readFileSync(join(port, ".sync-upstream/changes.md"), "utf8");
+    expect(written).toContain(second);
+    expect(written).toContain("| Upstream path | Change | Port file | Kind | Action | Reason |");
   });
 
   test("fails on a usage error", () => {
