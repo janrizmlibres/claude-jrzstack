@@ -437,3 +437,21 @@ pattern: \bagent's store\b
 before: Assume the VM dies. Soon after starting, push and start a decision trail in the root agent's store (path in the system prompt) per the **show-me-your-work** skill, then push after every unit worth keeping.
 after: Assume the VM dies. Soon after starting, push and start a decision trail per the **show-me-your-work** skill, then push after every unit worth keeping. Carry the trail's new rows in the body of each pushed commit (an empty commit is fine).
 ```
+
+## 24. Upstream's Claude Code build
+
+Upstream installs pstack in Claude Code too, from its own marketplace (`cursor/plugins`, `pstack@cursor-plugins`), with a runtime adapter, `docs/harness/claude-code.md`, that maps Cursor names while a skill runs. The port maps them at translation time instead, and the adapter's mappings contradict the port's: non-Claude slugs fall to the session model where rules 3 to 5 give distinct prompts, Cursor-only steps are skipped where rule 18 gives routines and cloud workers, and setup writes a model rule where rule 16 gives the three settings. So `pstack/docs/harness` is dropped, with a `dropped` entry added by the sync that first meets it. A sentence about upstream's Claude Code install, its adapter, its `~/.claude/rules/pstack-models.md` model rule or its generated tree (`harness/pstack/`, `generate-pstack-harness-trees.mjs`) goes, with its paragraph or code block when that is only about upstream's build. The port's own install sentence, per rule 16, stays.
+
+```detect
+pattern: \bpstack@cursor-plugins\b
+pattern: \bmarketplace add cursor/plugins\b
+pattern: \bharness/claude-code\b
+pattern: \bpstack-models\.md\b
+pattern: \bgenerate-pstack-harness-trees\b
+before: /plugin marketplace add cursor/plugins
+before: /plugin install pstack@cursor-plugins
+before: claude code prefixes plugin commands and agents, so `/poteto-mode` is `/pstack:poteto-mode`. the [claude code adapter](./docs/harness/claude-code.md) maps every other cursor name. in claude code, `/pstack:setup-pstack` writes your model choices to `~/.claude/rules/pstack-models.md`, and a step that needs a cursor-only feature, such as bugbot or automations, is skipped with a one-line note.
+before: claude code installs a generated copy of pstack, including this readme and the guide, from [`harness/pstack/`](https://github.com/cursor/plugins/tree/main/harness/pstack) at the repository root. after you change pstack, run `node scripts/generate-pstack-harness-trees.mjs` from the repository root and commit the result. ci fails while the generated copy is out of date.
+after: /plugin marketplace add janrizmlibres/claude-pstack
+after: /plugin install pstack@claude-pstack
+```
