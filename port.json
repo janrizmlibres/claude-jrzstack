@@ -150,6 +150,11 @@
       "why": "Cursor Grok Bot automations: the session creates its own webhook routine and wakes on it, and a lead creating its own routines is out of the port's scope"
     },
     {
+      "path": "pstack/docs/harness",
+      "kind": "dropped",
+      "why": "upstream's runtime adapter for its own Claude Code build; the port maps Cursor names at translation time, and the adapter's mappings contradict the port's (rule 24)"
+    },
+    {
       "path": "pstack/scripts/heavy",
       "kind": "port-only",
       "why": "the machine lock: runs one heavy command at a time per machine, released by the kernel when its holder dies"

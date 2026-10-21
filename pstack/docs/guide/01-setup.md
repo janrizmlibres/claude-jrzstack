@@ -41,13 +41,15 @@ To see what's set, run:
 
 [`/pstack:setup-pstack`](../../skills/setup-pstack/SKILL.md) shows the three settings, points you to `/config` to change them, and prints the setup line filled in with your models, ready to paste into a cloud environment's setup script so cloud sessions match your machine. It never writes your settings itself.
 
-## Accept the verification offer, or don't
+## Accept the verification offers, or don't
 
 When you run it, `/pstack:setup-pstack` also looks for a way to prove app behavior in your project, either a `verify-*` skill or an existing harness. If it finds neither, it offers once to generate one with [`/pstack:create-verification-skill`](../../skills/create-verification-skill/SKILL.md).
 
 Say yes and it writes `.claude/skills/verify-<app>/`, a project-local skill that teaches agents to drive your app the way a user does. It proves the skill works once before handing it over. Say no and setup moves on. You can run `/pstack:create-verification-skill` yourself any time. [Verify and ship](./06-verify-and-ship.md#create-a-project-verification-skill) covers it in depth.
 
 If you're new to pstack, say yes. An agent that can check its own work keeps going until the check passes. An agent that can't hands every result back to you to check by hand. Of everything in this guide, the verification skill pays off the most.
+
+Then setup offers once to generate a formal verification skill with [`/pstack:create-formal-verification-skill`](../../skills/create-formal-verification-skill/SKILL.md), unless the project already has one. Tests check the cases someone thought to write. A formal verification skill checks one key property of your code, such as "a job never runs twice at once", in every case within a stated scope. Say yes when your code has concurrency, retries, a state machine, or a parser, where a bug is costly and tests rarely reach the case that breaks. Otherwise say no, and run it later if that changes. [Verify and ship](./06-verify-and-ship.md#prove-a-property-with-a-formal-verification-skill) covers it.
 
 ## Keep the cost in check
 
