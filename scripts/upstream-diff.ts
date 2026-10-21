@@ -1,14 +1,16 @@
 #!/usr/bin/env bun
-// upstream-diff [ref]    what upstream changed at <ref> (default main) since the snapshot
+// upstream-diff [ref] [--out <file>]  what upstream changed at <ref> (default main) since the snapshot
 // upstream-diff --verify fail when upstream/ differs from the commit snapshot.json records
 //
 // Run from the repo root. Sparse-clones upstream's snapshot paths at the ref
 // and diffs the snapshot under upstream/ against them, renames detected.
+// --out writes the report to <file> instead of stdout.
 // Exit 0 when the diff ran (and, with --verify, nothing differs), 1 when
 // --verify found a difference, 2 on a usage or git failure.
 import { parseArgs } from "node:util";
 import {
   gitRun,
+  outputTo,
   readRecord,
   readVersion,
   runCommand,
@@ -19,9 +21,13 @@ import {
 } from "./lib/upstream.ts";
 
 function main(): number {
-  const { values, positionals: refs } = parseArgs({ options: { verify: { type: "boolean" } }, allowPositionals: true });
+  const { values, positionals: refs } = parseArgs({
+    options: { verify: { type: "boolean" }, out: { type: "string" } },
+    allowPositionals: true,
+  });
   const verify = values.verify ?? false;
-  if (refs.length > (verify ? 0 : 1)) throw new UsageError("usage: upstream-diff [ref] | upstream-diff --verify");
+  if (refs.length > (verify ? 0 : 1)) throw new UsageError("usage: upstream-diff [ref] [--out <file>] | upstream-diff --verify");
+  const write = outputTo(values.out);
 
   const root = process.cwd();
   const record = readRecord(root);
@@ -48,19 +54,19 @@ function main(): number {
         problems.push(`upstream/ differs from ${target}, the commit snapshot.json records:\n\n${diff.stdout}`);
       }
       if (problems.length === 0) {
-        console.log(`upstream/ matches ${target}.`);
+        write(`upstream/ matches ${target}.\n`);
         return 0;
       }
-      console.log(`The snapshot was edited by hand.\n\n${problems.join("\n\n")}`);
+      write(`The snapshot was edited by hand.\n\n${problems.join("\n\n")}\n`);
       return 1;
     }
 
     if (!changed) {
-      console.log(`No upstream changes under the snapshot paths: ${record.commit} → ${target} (${ref}).`);
+      write(`No upstream changes under the snapshot paths: ${record.commit} → ${target} (${ref}).\n`);
       return 0;
     }
-    console.log(`Upstream changes since the snapshot: ${record.commit} → ${target} (${ref}).\n`);
-    process.stdout.write(diff.stdout);
+    write(`Upstream changes since the snapshot: ${record.commit} → ${target} (${ref}).\n\n`);
+    write(diff.stdout);
     return 0;
   });
 }
