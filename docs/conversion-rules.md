@@ -22,7 +22,7 @@ Every model-facing reference to a sibling skill (bold name, slash name, relative
 
 ```detect
 pattern: \b(?:[Ii]nvoke|[Rr]un) \$\{CLAUDE_PLUGIN_ROOT\}/skills/
-pattern: (?<!\$\{CLAUDE_PLUGIN_ROOT\}/skills/.*)(?<![\w:/.~$}\]-])/(?:poteto-mode|poteto-help|setup-pstack|architect|arena|automate-me|benchmark-checklist|blast-radius|bro|correct|create-verification-skill|figure-it-out|how|in-your-own-words|interrogate|ketchup|maintain-verification-skill|make-bot-ui|no-comments|recall|reflect|sharpen|show-me-your-work|swarm|tdd|teach|technical-writing|typescript-best-practices|unslop|why|deslop|control-ui|control-cli|principle-[a-z-]+)(?![\w-])(?!.*\$\{CLAUDE_PLUGIN_ROOT\}/skills/)
+pattern: (?<!\$\{CLAUDE_PLUGIN_ROOT\}/skills/.*)(?<![\w:/.~$}\]-])/(?:poteto-mode|poteto-help|setup-pstack|architect|arena|automate-me|benchmark-checklist|blast-radius|bro|correct|create-verification-skill|create-formal-verification-skill|figure-it-out|how|in-your-own-words|interrogate|ketchup|maintain-verification-skill|maintain-formal-verification-skill|make-bot-ui|no-comments|recall|reflect|sharpen|show-me-your-work|swarm|tdd|teach|technical-writing|typescript-best-practices|unslop|why|deslop|control-ui|control-cli|principle-[a-z-]+)(?![\w-])(?!.*\$\{CLAUDE_PLUGIN_ROOT\}/skills/)
 before: Use the **arena** skill: invoke ${CLAUDE_PLUGIN_ROOT}/skills/arena/SKILL.md.
 before: [`/poteto-mode`](./skills/poteto-mode/SKILL.md) and the agents route through the same wrapper.
 before: Run /setup-pstack once, then /principle-fix-root-causes when a bug recurs.
@@ -219,7 +219,7 @@ after: Write done as checks every iteration can run, and give `/goal` that condi
 
 ## 11. Other Cursor built-ins
 
-Cursor's `create-skill` → "a skill-authoring skill if one is installed (such as `skill-creator`); otherwise write the SKILL.md directly". `why`'s `mcps/` scan → list MCP servers from your own tool list. Built-ins with no counterpart (Plan Mode, babysit skill, dashboard) are dropped; "a Cursor restart" → "a Claude Code restart". The terminal shows no pictures: a `/visualize` diagram becomes a Mermaid diagram in a fenced block, a `/visualize` chart for numbers becomes a small Markdown table and stops counting as a visual, and a screenshot or video embedded inline becomes a link to its file.
+Cursor's `create-skill` → "a skill-authoring skill if one is installed (such as `skill-creator`); otherwise write the SKILL.md directly". `why`'s `mcps/` scan → list MCP servers from your own tool list. Built-ins with no counterpart (Plan Mode, babysit skill, the `/autopilot` PR watcher, dashboard) are dropped; "a Cursor restart" → "a Claude Code restart". The terminal shows no pictures: a `/visualize` diagram becomes a Mermaid diagram in a fenced block, a `/visualize` chart for numbers becomes a small Markdown table and stops counting as a visual, and a screenshot or video embedded inline becomes a link to its file.
 
 ```detect
 pattern: \b[Cc]ursor(?:'s| built-in)
@@ -293,7 +293,6 @@ undetectable: a missing ending is an absence in an agent's frontmatter, which no
 These keep `skills/poteto-mode/SKILL.md` translated:
 
 - frontmatter gains the reminder hook;
-- frontmatter's `name` is `poteto-mode`, not upstream's `Poteto Mode`, so the slash menu shows the `/pstack:poteto-mode` every doc names;
 - one line, once: pstack skills are reached by reading their `SKILL.md`; the Skill tool refuses them by design, so a read is the intended route, not a workaround;
 - the router names `playbooks/hand-off.md` in one line, read by path;
 - beside the todolist's `skip: <reason>`, a short passage says a panel step a playbook lists unconditionally, or whose condition holds, is never the agent's to skip and has no size gate, and that only the user can waive it, in the run prompt or `CLAUDE.md`, recorded as `skip: user waived` in the list and the Reply;

@@ -27,6 +27,7 @@ Check the state that changes the answer, and mention it only when it does:
 - The settings now: Work `${user_config.work_model}` at `${user_config.work_effort}`, Judgement `${user_config.judgement_model}` at `${user_config.judgement_effort}`, Volume `${user_config.volume_model}` at `${user_config.volume_effort}`. A literal placeholder or an empty value means that model or effort is unset and takes its default: Work `opus` at `medium`, Judgement `opus` at `high`, Volume `sonnet` at `high`.
 - The `pstack: surface=<cloud|local> mode=<permission_mode>` line the reminder hook prints. On the cloud surface, settings come from the setup line's `--config` values, not `/config`. In the default permission mode, reads of pstack's own files can prompt the user or be denied in subagents until they add the `Read` rule under Get set up.
 - No `verify-*` skill or other app harness in the project means agents have no scripted way to drive the app. Mention `/pstack:create-verification-skill` when the question is about proving a change works.
+- No formal verification skill in the project means no property is checked past what tests reach. Mention `/pstack:create-formal-verification-skill` when the question is about a race, an invariant, or another case tests rarely hit. When one exists and the code it covers changed after the commit it records as last in sync, mention `/pstack:maintain-formal-verification-skill` if the question touches that code.
 
 When every setting is unset and it matters, offer once to pick models now. It matters when the user is new, the question is about setup or cost, or the answer depends on which models run. Ask at most once per session. If the need is also unclear, ask both questions together. Offer two choices:
 
@@ -37,7 +38,7 @@ When every setting is unset and it matters, offer once to pick models now. It ma
 
 1. Install locally with two commands in a Claude Code session: `/plugin marketplace add janrizmlibres/claude-pstack`, then `/plugin install pstack@claude-pstack`. In `/plugin`, turn on auto-update for the `claude-pstack` marketplace so every release reaches them.
 2. In the default permission mode, add `Read(~/.claude/plugins/cache/claude-pstack/**)` to `permissions.allow` in the user settings, so pstack's reads of its own files don't prompt or get denied in subagents.
-3. Optionally pick a model for each setting in `/config` or `/plugin configure`. Run [`/pstack:setup-pstack`](../setup-pstack/SKILL.md) to see the settings. It also prints the setup line filled in with them.
+3. Optionally pick a model for each setting in `/config` or `/plugin configure`. Run [`/pstack:setup-pstack`](../setup-pstack/SKILL.md) to see the settings. It also prints the setup line filled in with them. Then it offers once each to generate a verification skill and a formal verification skill for the project, unless the project already has one.
 4. For cloud sessions, paste that setup line into the setup script of every cloud environment that should carry pstack.
 5. Start a real task with `/pstack:poteto-mode`, a goal, and a check that can pass or fail.
 
@@ -72,12 +73,12 @@ The default answer is `/pstack:poteto-mode`, which runs most of the others when 
 |---|---|
 | Do any non-trivial task with rigor | [`/pstack:poteto-mode`](../poteto-mode/SKILL.md) |
 | Check that the agent understood their goal and the problem before it starts | [`/pstack:in-your-own-words`](../in-your-own-words/SKILL.md) |
-| Aim a task higher before starting: more expert, more outcome-focused, not overspecified | [`/pstack:sharpen`](../sharpen/SKILL.md) |
+| Get a prompt rewritten deeper, not bigger, before sending it: what a top professional would add, their raw material and methods, and an outside check. It returns the prompt and doesn't do the task | [`/pstack:sharpen`](../sharpen/SKILL.md) |
 | Know how code works now, or where new code should live | [`/pstack:how`](../how/SKILL.md) |
 | Know why code is shaped this way, or where a number came from | [`/pstack:why`](../why/SKILL.md) |
 | Understand a change or subsystem, explained plainly | [`/pstack:teach`](../teach/SKILL.md) |
 | Catch up on their own recent work on a topic | [`/pstack:recall`](../recall/SKILL.md) |
-| Catch up on what changed in this session since their last message, in a few plain sentences and small visuals, with enough context to decide each action item | [`/pstack:ketchup`](../ketchup/SKILL.md) |
+| Catch up on what changed in this session since their last message, in plain words and small visuals, with every item waiting on them listed and decidable from the reply alone | [`/pstack:ketchup`](../ketchup/SKILL.md) |
 | Know what a small diff could break outside itself | [`/pstack:blast-radius`](../blast-radius/SKILL.md) |
 | Settle types and module shape before code that crosses a function boundary | [`/pstack:architect`](../architect/SKILL.md) |
 | Get several attempts at one brief, each in its own direction, merged into the best one | [`/pstack:arena`](../arena/SKILL.md) |
@@ -92,6 +93,8 @@ The default answer is `/pstack:poteto-mode`, which runs most of the others when 
 | Hear the last reply again in plain words | [`/pstack:bro`](../bro/SKILL.md) |
 | Give agents a scripted way to drive the app and prove behavior | [`/pstack:create-verification-skill`](../create-verification-skill/SKILL.md) |
 | Bring a verification skill and its feature map back in line with the app | [`/pstack:maintain-verification-skill`](../maintain-verification-skill/SKILL.md) |
+| Formally verify a race, invariant, or other property that tests rarely reach | [`/pstack:create-formal-verification-skill`](../create-formal-verification-skill/SKILL.md) |
+| Bring a formal verification back in line after the code it covers changed, and learn whether a failure is drift or a bug | [`/pstack:maintain-formal-verification-skill`](../maintain-formal-verification-skill/SKILL.md) |
 | Vet a performance number before reporting or acting on it | [`/pstack:benchmark-checklist`](../benchmark-checklist/SKILL.md) |
 | Run a large or cross-cutting change, or one to review after stepping away | [`/pstack:figure-it-out`](../figure-it-out/SKILL.md) |
 | Keep a decision log during a run, and review it afterward | [`/pstack:show-me-your-work`](../show-me-your-work/SKILL.md) |

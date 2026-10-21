@@ -1,7 +1,7 @@
 # pstack for Claude Code
 
 <!-- BEGIN generated from upstream/snapshot.json — do not edit by hand -->
-**Tracks upstream pstack v0.15.25** (`cursor/plugins@f713f14`).
+**Tracks upstream pstack v0.15.29** (`cursor/plugins@190d287`).
 <!-- END generated -->
 pstack is © Lauren Tan, MIT; this port is MIT too (see [License and credit](#license-and-credit)).
 
@@ -250,6 +250,7 @@ In cloud, your user-level `CLAUDE.md` isn't there: rules come from the request a
 | `.cursor-plugin/` | dropped | Cursor's plugin manifest, replaced by Claude Code's in .claude-plugin/plugin.json |
 | `.gitignore` | dropped | upstream's plugin-level ignore list: its node_modules/ line would hide the vendored commander, and the repo's root .gitignore covers the rest |
 | `automations/benny/` | dropped | Cursor Slack automations, outside the port's scope |
+| `docs/harness/` | dropped | upstream's runtime adapter for its own Claude Code build; the port maps Cursor names at translation time, and the adapter's mappings contradict the port's (rule 24) |
 | `plugin.json` | dropped | the Agent Plugins 1.0.0 root manifest, which Claude Code doesn't read; .claude-plugin/plugin.json is the port's manifest |
 | `skills/make-bot-ui/` | dropped | Cursor Grok Bot automations: the session creates its own webhook routine and wakes on it, and a lead creating its own routines is out of the port's scope |
 | `skills/poteto-mode/scripts/bootstrap.ts` | dropped | installs commander at first run; the port vendors commander and runs scripts through its launcher |
