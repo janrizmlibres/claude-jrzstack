@@ -10,5 +10,5 @@
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true
   },
-  "include": ["scripts/**/*.ts", "pstack/skills/poteto-mode/scripts/**/*.ts"]
+  "include": ["scripts/**/*.ts", "jrzstack/skills/savvy-mode/scripts/**/*.ts"]
 }

@@ -19,32 +19,32 @@ const userConfig = JSON.parse(readFileSync(join(pluginDir, ".claude-plugin", "pl
 
 const effortLevels = ["low", "medium", "high", "xhigh", "max"];
 const settings = ["work", "judgement", "volume"];
-const ending = "Spawned only by pstack playbooks.";
+const ending = "Spawned only by jrzstack playbooks.";
 const readerDenies = ["Edit", "Write", "NotebookEdit"];
 
-describe("pstack agents", () => {
+describe("jrzstack agents", () => {
   test("one writer and one reader serve every setting, beside Comment Sicko", () => {
-    expect(readdirSync(join(pluginDir, "agents")).sort()).toEqual(["comment-sicko.md", "poteto-agent.md", "poteto-reader.md"]);
+    expect(readdirSync(join(pluginDir, "agents")).sort()).toEqual(["comment-sicko.md", "savvy-agent.md", "savvy-reader.md"]);
   });
 
-  test("poteto-agent writes in the background, falling back to Work's defaults", () => {
-    const { meta, body } = readAgent("poteto-agent");
+  test("savvy-agent writes in the background, falling back to Work's defaults", () => {
+    const { meta, body } = readAgent("savvy-agent");
 
-    expect(meta.name).toBe("poteto-agent");
+    expect(meta.name).toBe("savvy-agent");
     expect(meta.model).toBe(userConfig.work_model!.default);
     expect(meta.effort).toBe(userConfig.work_effort!.default);
     expect(meta.background).toBe(true);
     expect(meta.disallowedTools).toBeUndefined();
     expect(meta.tools).toBeUndefined();
     expect(meta.description as string).toEndWith(ending);
-    expect(body).toContain("read ${CLAUDE_PLUGIN_ROOT}/skills/poteto-mode/SKILL.md");
+    expect(body).toContain("read ${CLAUDE_PLUGIN_ROOT}/skills/savvy-mode/SKILL.md");
     expect(body).toContain("The Skill tool refuses them by design");
   });
 
-  test("poteto-reader reads only, on the same fallback", () => {
-    const { meta } = readAgent("poteto-reader");
+  test("savvy-reader reads only, on the same fallback", () => {
+    const { meta } = readAgent("savvy-reader");
 
-    expect(meta.name).toBe("poteto-reader");
+    expect(meta.name).toBe("savvy-reader");
     expect(meta.model).toBe(userConfig.work_model!.default);
     expect(meta.effort).toBe(userConfig.work_effort!.default);
     expect(String(meta.disallowedTools).split(/,\s*/)).toEqual(readerDenies);
@@ -56,7 +56,7 @@ describe("pstack agents", () => {
     for (const setting of settings) expect(userConfig[`${setting}_effort`]!.options).toEqual(effortLevels);
   });
 
-  test("Comment Sicko's description ends with the pstack-only line", () => {
+  test("Comment Sicko's description ends with the jrzstack-only line", () => {
     expect(readAgent("comment-sicko").meta.description as string).toEndWith(ending);
   });
 });

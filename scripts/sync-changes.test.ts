@@ -26,33 +26,33 @@ const firstFiles: Files = {
 };
 
 const entries = [
-  { path: "pstack/.claude-plugin/plugin.json", kind: "port-only", why: "the manifest" },
-  { path: "pstack/extra.sh", kind: "port-only", why: "a port-only script" },
+  { path: "jrzstack/.claude-plugin/plugin.json", kind: "port-only", why: "the manifest" },
+  { path: "jrzstack/extra.sh", kind: "port-only", why: "a port-only script" },
   {
-    path: "pstack/skills/hand/SKILL.md",
+    path: "jrzstack/skills/hand/SKILL.md",
     kind: "override",
     why: "hand-written",
     depends_on: ["upstream/pstack/skills/plain/rubric.md"],
   },
-  { path: "pstack/skills/hand-gone/SKILL.md", kind: "override", why: "hand-written" },
-  { path: "pstack/automations/bot", kind: "dropped", why: "Cursor automations" },
-  { path: "pstack/automations/solo", kind: "dropped", why: "Cursor automations" },
-  { path: "pstack/tool.md", kind: "dropped", why: "a Cursor-only tool" },
-  { path: "pstack/skills/keep", kind: "translated", why: "vendored", sources: ["upstream/kit/skills/keep"] },
+  { path: "jrzstack/skills/hand-gone/SKILL.md", kind: "override", why: "hand-written" },
+  { path: "jrzstack/automations/bot", kind: "dropped", why: "Cursor automations" },
+  { path: "jrzstack/automations/solo", kind: "dropped", why: "Cursor automations" },
+  { path: "jrzstack/tool.md", kind: "dropped", why: "a Cursor-only tool" },
+  { path: "jrzstack/skills/keep", kind: "translated", why: "vendored", sources: ["upstream/kit/skills/keep"] },
 ];
 
 /** The port of `firstFiles`: a translated file per upstream file, plus port-only ones. */
 const portFiles: Files = {
-  "pstack/.claude-plugin/plugin.json": "{}\n",
-  "pstack/extra.sh": "echo port\n",
-  "pstack/README.md": "# pstack for Claude Code\n",
-  "pstack/skills/plain/SKILL.md": "Plain skill, translated.\n",
-  "pstack/skills/plain/rubric.md": "The rubric, translated.\n",
-  "pstack/skills/gone/SKILL.md": "Soon deleted, translated.\n",
-  "pstack/skills/moved/SKILL.md": "Moved, translated.\n",
-  "pstack/skills/hand/SKILL.md": "Hand-written.\n",
-  "pstack/skills/hand-gone/SKILL.md": "Hand-written too.\n",
-  "pstack/skills/keep/SKILL.md": "Vendored skill, translated.\n",
+  "jrzstack/.claude-plugin/plugin.json": "{}\n",
+  "jrzstack/extra.sh": "echo port\n",
+  "jrzstack/README.md": "# pstack for Claude Code\n",
+  "jrzstack/skills/plain/SKILL.md": "Plain skill, translated.\n",
+  "jrzstack/skills/plain/rubric.md": "The rubric, translated.\n",
+  "jrzstack/skills/gone/SKILL.md": "Soon deleted, translated.\n",
+  "jrzstack/skills/moved/SKILL.md": "Moved, translated.\n",
+  "jrzstack/skills/hand/SKILL.md": "Hand-written.\n",
+  "jrzstack/skills/hand-gone/SKILL.md": "Hand-written too.\n",
+  "jrzstack/skills/keep/SKILL.md": "Vendored skill, translated.\n",
 };
 
 /** A port checkout of upstream's first commit, with `port.json` and the port files. */
@@ -114,9 +114,26 @@ describe("sync-changes", () => {
 
     const { stdout } = syncChanges(port);
 
-    expect(stdout).toContain(row("pstack/README.md", "modified", "pstack/README.md", "translated", "patch forward"));
+    expect(stdout).toContain(row("pstack/README.md", "modified", "jrzstack/README.md", "translated", "patch forward"));
     expect(stdout).toContain(
-      row("kit/skills/keep/SKILL.md", "modified", "pstack/skills/keep/SKILL.md", "translated", "patch forward"),
+      row("kit/skills/keep/SKILL.md", "modified", "jrzstack/skills/keep/SKILL.md", "translated", "patch forward"),
+    );
+  });
+
+  test("maps upstream's names to the port's", () => {
+    const { upstream, port } = fixture();
+    upstream.commit({ write: { "pstack/skills/poteto-mode/SKILL.md": "The mode.\n" } });
+
+    const { stdout } = syncChanges(port);
+
+    expect(stdout).toContain(
+      row(
+        "pstack/skills/poteto-mode/SKILL.md",
+        "added",
+        "jrzstack/skills/savvy-mode/SKILL.md",
+        "translated",
+        "translate at its path, or propose it as override or dropped",
+      ),
     );
   });
 
@@ -129,7 +146,7 @@ describe("sync-changes", () => {
       row(
         "pstack/.cursor-plugin/plugin.json",
         "modified",
-        "pstack/.cursor-plugin/plugin.json",
+        "jrzstack/.cursor-plugin/plugin.json",
         "translated",
         "translate (not yet ported)",
       ),
@@ -145,19 +162,19 @@ describe("sync-changes", () => {
       row(
         "pstack/skills/hand/SKILL.md",
         "modified",
-        "pstack/skills/hand/SKILL.md",
+        "jrzstack/skills/hand/SKILL.md",
         "override",
         "edit the override: absorbed, partly absorbed or ignored",
       ),
     );
     expect(stdout).toContain(
-      row("pstack/skills/plain/rubric.md", "modified", "pstack/skills/plain/rubric.md", "translated", "patch forward"),
+      row("pstack/skills/plain/rubric.md", "modified", "jrzstack/skills/plain/rubric.md", "translated", "patch forward"),
     );
     expect(stdout).toContain(
       row(
         "pstack/skills/plain/rubric.md",
         "modified",
-        "pstack/skills/hand/SKILL.md",
+        "jrzstack/skills/hand/SKILL.md",
         "override (depends_on)",
         "edit the override: absorbed, partly absorbed or ignored",
       ),
@@ -173,7 +190,7 @@ describe("sync-changes", () => {
       row(
         "pstack/skills/new/SKILL.md",
         "added",
-        "pstack/skills/new/SKILL.md",
+        "jrzstack/skills/new/SKILL.md",
         "translated",
         "translate at its path, or propose it as override or dropped",
       ),
@@ -186,13 +203,13 @@ describe("sync-changes", () => {
     const { stdout } = syncChanges(port);
 
     expect(stdout).toContain(
-      row("pstack/skills/gone/SKILL.md", "deleted", "pstack/skills/gone/SKILL.md", "translated", "delete the port file"),
+      row("pstack/skills/gone/SKILL.md", "deleted", "jrzstack/skills/gone/SKILL.md", "translated", "delete the port file"),
     );
     expect(stdout).toContain(
       row(
         "pstack/skills/hand-gone/SKILL.md",
         "deleted",
-        "pstack/skills/hand-gone/SKILL.md",
+        "jrzstack/skills/hand-gone/SKILL.md",
         "override",
         "propose deleting the override, or keep it as port-only",
       ),
@@ -208,7 +225,7 @@ describe("sync-changes", () => {
       row(
         "pstack/skills/moved-to/SKILL.md",
         "renamed from pstack/skills/moved/SKILL.md",
-        "pstack/skills/moved/SKILL.md → pstack/skills/moved-to/SKILL.md",
+        "jrzstack/skills/moved/SKILL.md → jrzstack/skills/moved-to/SKILL.md",
         "translated",
         "move the port file",
       ),
@@ -227,7 +244,7 @@ describe("sync-changes", () => {
       row(
         "pstack/skills/moved-to/SKILL.md",
         "renamed from pstack/skills/moved/SKILL.md",
-        "pstack/skills/moved/SKILL.md → pstack/skills/moved-to/SKILL.md",
+        "jrzstack/skills/moved/SKILL.md → jrzstack/skills/moved-to/SKILL.md",
         "translated",
         "move the port file, then patch forward",
       ),
@@ -244,7 +261,7 @@ describe("sync-changes", () => {
       row(
         "pstack/skills/hand-moved/SKILL.md",
         "renamed from pstack/skills/hand-gone/SKILL.md",
-        "pstack/skills/hand-gone/SKILL.md → pstack/skills/hand-moved/SKILL.md",
+        "jrzstack/skills/hand-gone/SKILL.md → jrzstack/skills/hand-moved/SKILL.md",
         "override",
         "move the override and its entry, then edit the override: absorbed, partly absorbed or ignored",
       ),
@@ -258,7 +275,7 @@ describe("sync-changes", () => {
     const { stdout } = syncChanges(port);
 
     expect(stdout).toContain(
-      row("pstack/tools/tool.md", "renamed from pstack/tool.md", "pstack/tool.md → pstack/tools/tool.md", "dropped", "move the dropped entry"),
+      row("pstack/tools/tool.md", "renamed from pstack/tool.md", "jrzstack/tool.md → jrzstack/tools/tool.md", "dropped", "move the dropped entry"),
     );
   });
 
@@ -272,7 +289,7 @@ describe("sync-changes", () => {
       row(
         "pstack/automations/bot/plain.md",
         "renamed from pstack/skills/plain/SKILL.md",
-        "pstack/skills/plain/SKILL.md → pstack/automations/bot/plain.md",
+        "jrzstack/skills/plain/SKILL.md → jrzstack/automations/bot/plain.md",
         "translated",
         "⚠️ renamed from a translated path to a dropped path: decide its kind",
       ),
@@ -288,7 +305,7 @@ describe("sync-changes", () => {
       row(
         "pstack/extra.sh",
         "added",
-        "pstack/extra.sh",
+        "jrzstack/extra.sh",
         "port-only",
         "⚠️ upstream added a file at a port-only path: decide which one keeps it",
       ),
@@ -309,9 +326,9 @@ describe("sync-changes", () => {
       row(
         "pstack/automations/solo/run.md",
         "deleted",
-        "pstack/automations/solo/run.md",
+        "jrzstack/automations/solo/run.md",
         "dropped",
-        "remove the dropped entry pstack/automations/solo",
+        "remove the dropped entry jrzstack/automations/solo",
       ),
     );
   });
@@ -324,7 +341,7 @@ describe("sync-changes", () => {
 
     expect(syncChanges(port).stdout).toContain("Nothing to sync");
     expect(syncChanges(port, "next").stdout).toContain(
-      row("pstack/README.md", "modified", "pstack/README.md", "translated", "patch forward"),
+      row("pstack/README.md", "modified", "jrzstack/README.md", "translated", "patch forward"),
     );
   });
 

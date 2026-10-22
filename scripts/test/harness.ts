@@ -7,8 +7,8 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 
 export const scriptsDir = resolve(import.meta.dir, "..");
-/** The plugin a marketplace install copies: `pstack/` at the repo root. */
-export const pluginDir = resolve(scriptsDir, "..", "pstack");
+/** The plugin a marketplace install copies: `jrzstack/` at the repo root. */
+export const pluginDir = resolve(scriptsDir, "..", "jrzstack");
 
 const made: string[] = [];
 
@@ -17,7 +17,7 @@ afterEach(() => {
 });
 
 /** A fresh directory, removed after the current test. */
-export function tempDir(prefix = "pstack-test-"): string {
+export function tempDir(prefix = "jrzstack-test-"): string {
   const dir = realpathSync(mkdtempSync(join(tmpdir(), prefix)));
   made.push(dir);
   return dir;
@@ -55,7 +55,7 @@ export function runShell(command: string, options: RunOptions): RunResult {
 
 /** Run `cmd` to completion; `options.env` may replace PATH. */
 export function runProgram(cmd: string[], options: RunOptions): RunResult {
-  const home = options.home ?? tempDir("pstack-home-");
+  const home = options.home ?? tempDir("jrzstack-home-");
   const proc = Bun.spawnSync({
     cmd,
     cwd: options.cwd,
@@ -114,7 +114,7 @@ export class FakeRemote {
   readonly url: string;
 
   constructor() {
-    this.dir = tempDir("pstack-remote-");
+    this.dir = tempDir("jrzstack-remote-");
     git(this.dir, "init", "-q", "-b", "main");
     git(this.dir, "config", "user.name", "Fixture");
     git(this.dir, "config", "user.email", "fixture@example.com");

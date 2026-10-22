@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+# wait-report <start-sha> <worker-branch> [<timeout-seconds>]
+#
+# Waits for a worker's report: a commit on <worker-branch> past <start-sha>
+# whose tip carries a Jrzstack-Status trailer. Prints the status (PASS, ISSUES
+# or BLOCKED) to stdout once it lands.
+#
+# A sub-lead runs this one plain command to wait on a worker inside its own
+# turn. The git calls happen in here, so the command the sub-lead runs never
+# names git, which a worktree-isolated agent's guard can refuse in a loop or a
+# substitution. Run it from the sub-lead's own worktree: the worker branches
+# live in the same repository.
+#
+# A branch that doesn't exist yet counts as no report. Polls every
+# JRZSTACK_WAIT_REPORT_INTERVAL_SECONDS (20 by default) and gives up after
+# <timeout-seconds> (300 by default), so a Bash call never reaches its
+# 10-minute timeout.
+#
+# Exits:
+#    0  the report landed; its status is on stdout
+#   75  no report yet after the timeout: re-run it, or stop the worker at its timebox
+#   64  wrong arguments, a start commit that doesn't exist, or a malformed interval
+set -u
+
+timed_out_code=75
+usage_code=64
+
+usage() {
+  echo "usage: wait-report <start-sha> <worker-branch> [<timeout-seconds>]${1:+: $1}" >&2
+  exit "$usage_code"
+}
+
+whole_number() {
+  case "$1" in
+    "" | *[!0-9]*) return 1 ;;
+  esac
+}
+
+[ $# -ge 2 ] && [ $# -le 3 ] || usage
+start="$1"
+branch="$2"
+timeout="${3:-300}"
+interval="${JRZSTACK_WAIT_REPORT_INTERVAL_SECONDS:-20}"
+whole_number "$timeout" || usage "the timeout must be a whole number of seconds, not $timeout"
+whole_number "$interval" && [ "$interval" -gt 0 ] ||
+  usage "JRZSTACK_WAIT_REPORT_INTERVAL_SECONDS must be a whole number of seconds above 0, not $interval"
+git rev-parse --quiet --verify "$start^{commit}" >/dev/null || usage "no commit $start in this repository"
+
+# Prints the Jrzstack-Status of the branch tip when the tip is past the start commit.
+report_status() {
+  git log -1 --format='%(trailers:key=Jrzstack-Status,valueonly)' "$start..$branch" -- 2>/dev/null |
+    sed -e 's/[[:space:]]*$//' -e '/^$/d'
+}
+
+SECONDS=0
+while :; do
+  status="$(report_status)"
+  if [ -n "$status" ]; then
+    echo "$status"
+    exit 0
+  fi
+  if [ "$SECONDS" -ge "$timeout" ]; then
+    echo "wait-report: no report on $branch past $start after ${timeout}s; re-run to keep waiting, or stop the worker at its timebox" >&2
+    exit "$timed_out_code"
+  fi
+  sleep "$interval"
+done

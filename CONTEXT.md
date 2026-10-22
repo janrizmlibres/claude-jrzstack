@@ -1,4 +1,4 @@
-# claude-pstack
+# claude-jrzstack
 
 A Claude Code port of pstack, Lauren Tan's Cursor plugin of agent workflows, kept in step with its upstream.
 
@@ -15,7 +15,7 @@ The verbatim copy of upstream, at one recorded upstream commit, that the current
 _Avoid_: vendor copy, mirror, base
 
 **Port**:
-The Claude Code edition of pstack that this repo publishes.
+The Claude Code edition of pstack that this repo publishes, under the name jrzstack.
 _Avoid_: fork, conversion, adaptation
 
 **Translated file**:
@@ -118,10 +118,10 @@ _Avoid_: offline, no-cloud mode
 
 **Heavy command**:
 A command whose cost is bounded by the machine rather than the model: a test runner, a build, a whole-project typecheck or lint, a dev server, a browser session. Scoped to one file it is still heavy; a dev server or browser session stays heavy for as long as it is up.
-_Avoid_: test run, heavy run (a run is a pstack run)
+_Avoid_: test run, heavy run (a run is a jrzstack run)
 
 **Machine lock**:
-The bound that lets one heavy command at a time run on a machine, shared by every pstack session on it. On the cloud surface the machine is the VM.
+The bound that lets one heavy command at a time run on a machine, shared by every jrzstack session on it. On the cloud surface the machine is the VM.
 _Avoid_: test lock, build lock, mutex
 
 **Full gate**:
@@ -163,11 +163,11 @@ _Avoid_: cloud line, install command
 ### Run input
 
 **Spec**:
-The planning output a run is handed: a GitHub issue written by the user's planning tools, saying what to build and why but not how to slice it into PRs. pstack reads a spec and never edits it. Handing pstack a spec is the go to execute it, unless the request asks for a plan only.
+The planning output a run is handed: a GitHub issue written by the user's planning tools, saying what to build and why but not how to slice it into PRs. jrzstack reads a spec and never edits it. Handing jrzstack a spec is the go to execute it, unless the request asks for a plan only.
 _Avoid_: PRD, ticket, plan
 
 **Plan**:
-The checklist pstack writes from a spec when the work spans several PRs: the PR slicing, their dependencies, each PR's evidence and the playbook that executes it. It lives beside the spec, never in it.
+The checklist jrzstack writes from a spec when the work spans several PRs: the PR slicing, their dependencies, each PR's evidence and the playbook that executes it. It lives beside the spec, never in it.
 _Avoid_: spec, roadmap
 
 ### Release and QA
@@ -181,7 +181,7 @@ The branch the release checks install the port from, before the first release.
 _Avoid_: RC build, staging branch, beta
 
 **Release check**:
-A check that must pass on the release candidate before the first release: a failure would break installing or entering pstack on a surface, or let a playbook do the wrong thing without saying so.
+A check that must pass on the release candidate before the first release: a failure would break installing or entering jrzstack on a surface, or let a playbook do the wrong thing without saying so.
 _Avoid_: gate (a **Full gate** is a run's verification), blocker, acceptance test
 
 **Watch check**:

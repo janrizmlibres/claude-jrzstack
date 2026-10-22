@@ -1,86 +1,86 @@
 {
   "entries": [
     {
-      "path": "pstack/.claude-plugin/plugin.json",
+      "path": "jrzstack/.claude-plugin/plugin.json",
       "kind": "port-only",
       "why": "Claude Code's plugin manifest, with the three model settings as userConfig and no version"
     },
     {
-      "path": "pstack/.cursor-plugin",
+      "path": "jrzstack/.cursor-plugin",
       "kind": "dropped",
       "why": "Cursor's plugin manifest, replaced by Claude Code's in .claude-plugin/plugin.json"
     },
     {
-      "path": "pstack/plugin.json",
+      "path": "jrzstack/plugin.json",
       "kind": "dropped",
       "why": "the Agent Plugins 1.0.0 root manifest, which Claude Code doesn't read; .claude-plugin/plugin.json is the port's manifest"
     },
     {
-      "path": "pstack/.gitignore",
+      "path": "jrzstack/.gitignore",
       "kind": "dropped",
       "why": "upstream's plugin-level ignore list: its node_modules/ line would hide the vendored commander, and the repo's root .gitignore covers the rest"
     },
     {
-      "path": "pstack/hooks/poteto-mode-reminder.sh",
+      "path": "jrzstack/hooks/savvy-mode-reminder.sh",
       "kind": "port-only",
-      "why": "poteto-mode's per-turn reminder hook: upstream's reminder text, the skill path, the surface and mode, precedence and the machine lock, and the session marker the compaction hook reads"
+      "why": "savvy-mode's per-turn reminder hook: upstream's reminder text, the skill path, the surface and mode, precedence and the machine lock, and the session marker the compaction hook reads"
     },
     {
-      "path": "pstack/hooks/hooks.json",
+      "path": "jrzstack/hooks/hooks.json",
       "kind": "port-only",
       "why": "registers the compaction hook on SessionStart's compact matcher, which skill frontmatter can't: its SessionStart never fires"
     },
     {
-      "path": "pstack/hooks/poteto-mode-compaction.sh",
+      "path": "jrzstack/hooks/savvy-mode-compaction.sh",
       "kind": "port-only",
-      "why": "after a compaction in a marked poteto-mode session, lists the durable state to re-read before acting: the skill, any store, the transcript, a trail and a resume note"
+      "why": "after a compaction in a marked savvy-mode session, lists the durable state to re-read before acting: the skill, any store, the transcript, a trail and a resume note"
     },
     {
-      "path": "pstack/agents/poteto-agent.md",
+      "path": "jrzstack/agents/savvy-agent.md",
       "kind": "override",
       "why": "upstream's body with the read-by-path line, as the one writer for every setting: each spawn passes its setting's model and effort, and the frontmatter falls back to Work's opus at medium, in the background"
     },
     {
-      "path": "pstack/agents/poteto-reader.md",
+      "path": "jrzstack/agents/savvy-reader.md",
       "kind": "port-only",
       "why": "the one reader for every setting, in place of a readonly generalPurpose spawn: no Edit, Write or NotebookEdit, each spawn passing its setting's model and effort"
     },
     {
-      "path": "pstack/skills/setup-pstack/SKILL.md",
+      "path": "jrzstack/skills/setup-jrzstack/SKILL.md",
       "kind": "override",
       "why": "shows the three settings, points to /config, prints the setup line and shows the Read rule, in place of writing a Cursor model rule"
     },
     {
-      "path": "pstack/skills/deslop",
+      "path": "jrzstack/skills/deslop",
       "kind": "translated",
-      "why": "vendored from cursor-team-kit, which the port doesn't ship, so poteto-mode can read it by path",
+      "why": "vendored from cursor-team-kit, which the port doesn't ship, so savvy-mode can read it by path",
       "sources": [
         "upstream/cursor-team-kit/skills/deslop"
       ]
     },
     {
-      "path": "pstack/skills/control-ui",
+      "path": "jrzstack/skills/control-ui",
       "kind": "translated",
-      "why": "vendored from cursor-team-kit, which the port doesn't ship, so poteto-mode can read it by path",
+      "why": "vendored from cursor-team-kit, which the port doesn't ship, so savvy-mode can read it by path",
       "sources": [
         "upstream/cursor-team-kit/skills/control-ui"
       ]
     },
     {
-      "path": "pstack/skills/control-cli",
+      "path": "jrzstack/skills/control-cli",
       "kind": "translated",
-      "why": "vendored from cursor-team-kit, which the port doesn't ship, so poteto-mode can read it by path",
+      "why": "vendored from cursor-team-kit, which the port doesn't ship, so savvy-mode can read it by path",
       "sources": [
         "upstream/cursor-team-kit/skills/control-cli"
       ]
     },
     {
-      "path": "pstack/skills/arena/SKILL.md",
+      "path": "jrzstack/skills/arena/SKILL.md",
       "kind": "override",
       "why": "runners on Work with two whole-shape directions, a fourth-way seat and their escapes, and a blind judge on every arena, in place of a runner per model family and a cross-family judge"
     },
     {
-      "path": "pstack/skills/architect/SKILL.md",
+      "path": "jrzstack/skills/architect/SKILL.md",
       "kind": "override",
       "why": "Phase B's two distinct candidates come from arena's directions, the architect runners model line goes, and a spec's Implementation Decisions reach every runner as fixed constraints",
       "depends_on": [
@@ -88,7 +88,7 @@
       ]
     },
     {
-      "path": "pstack/skills/architect/references/runner-prompt.md",
+      "path": "jrzstack/skills/architect/references/runner-prompt.md",
       "kind": "override",
       "why": "arena's directed or fourth-way block replaces the each-on-a-different-model paragraph, and a spec's Implementation Decisions bind every shape",
       "depends_on": [
@@ -96,86 +96,86 @@
       ]
     },
     {
-      "path": "pstack/skills/interrogate/SKILL.md",
+      "path": "jrzstack/skills/interrogate/SKILL.md",
       "kind": "override",
-      "why": "three lens reviewers on poteto-reader on Judgement, always all three, with critical-only spillover, the lead's verification gate in place of consensus, and a Coverage Map with Checked and Gaps in place of the Agreement Map",
+      "why": "three lens reviewers on savvy-reader on Judgement, always all three, with critical-only spillover, the lead's verification gate in place of consensus, and a Coverage Map with Checked and Gaps in place of the Agreement Map",
       "depends_on": [
         "upstream/pstack/skills/interrogate/references/rubric.md",
         "upstream/pstack/skills/interrogate/references/code-quality-review.md"
       ]
     },
     {
-      "path": "pstack/skills/interrogate/references/reviewer-prompt.md",
+      "path": "jrzstack/skills/interrogate/references/reviewer-prompt.md",
       "kind": "override",
       "why": "a lens brief: one lens's sections, the other lenses named for critical-only spillover, and a required Checked list"
     },
     {
-      "path": "pstack/skills/interrogate/references/lead-judgment.md",
+      "path": "jrzstack/skills/interrogate/references/lead-judgment.md",
       "kind": "override",
       "why": "the verification gate replaces the consensus signal: Act on needs a traced path, and every dismissed critical is re-checked"
     },
     {
-      "path": "pstack/skills/poteto-mode/playbooks/eval.md",
+      "path": "jrzstack/skills/savvy-mode/playbooks/eval.md",
       "kind": "override",
-      "why": "spawns its own blind samples, 3 per variant on the model the change meets in use, with one blind Judgement judge over all of them and an opt-in cross-model sweep, in place of arena's model fan-out and cross-family judge; a user-invoked skill's samples run on the general-purpose agent, which inherits the lead's model, since `poteto-agent`'s pstack body would skew them"
+      "why": "spawns its own blind samples, 3 per variant on the model the change meets in use, with one blind Judgement judge over all of them and an opt-in cross-model sweep, in place of arena's model fan-out and cross-family judge; a user-invoked skill's samples run on the general-purpose agent, which inherits the lead's model, since `savvy-agent`'s jrzstack body would skew them"
     },
     {
-      "path": "pstack/skills/poteto-mode/playbooks/orchestrate.md",
+      "path": "jrzstack/skills/savvy-mode/playbooks/orchestrate.md",
       "kind": "override",
       "why": "a lead and sub-leads place units by surface (cloud workers, local-only worktrees, in-VM worktree subagents, create_session in Auto), retry by failure mode, take the full gate at landing as the ledger verdict, land only under a landing grant with Close listing leftover branches, run orch through the launcher with its store on an orphan branch, and split restart from compaction"
     },
     {
-      "path": "pstack/automations/benny",
+      "path": "jrzstack/automations/benny",
       "kind": "dropped",
       "why": "Cursor Slack automations, outside the port's scope"
     },
     {
-      "path": "pstack/skills/poteto-mode/scripts/bootstrap.ts",
+      "path": "jrzstack/skills/savvy-mode/scripts/bootstrap.ts",
       "kind": "dropped",
       "why": "installs commander at first run; the port vendors commander and runs scripts through its launcher"
     },
     {
-      "path": "pstack/skills/poteto-mode/scripts/package.json",
+      "path": "jrzstack/skills/savvy-mode/scripts/package.json",
       "kind": "dropped",
       "why": "a runtime manifest for bootstrap.ts's install; kept for development only"
     },
     {
-      "path": "pstack/skills/poteto-mode/scripts/bun.lock",
+      "path": "jrzstack/skills/savvy-mode/scripts/bun.lock",
       "kind": "dropped",
       "why": "a runtime lockfile for bootstrap.ts's install; kept for development only"
     },
     {
-      "path": "pstack/skills/make-bot-ui",
+      "path": "jrzstack/skills/make-bot-ui",
       "kind": "dropped",
       "why": "Cursor Grok Bot automations: the session creates its own webhook routine and wakes on it, and a lead creating its own routines is out of the port's scope"
     },
     {
-      "path": "pstack/docs/harness",
+      "path": "jrzstack/docs/harness",
       "kind": "dropped",
       "why": "upstream's runtime adapter for its own Claude Code build; the port maps Cursor names at translation time, and the adapter's mappings contradict the port's (rule 24)"
     },
     {
-      "path": "pstack/scripts/heavy",
+      "path": "jrzstack/scripts/heavy",
       "kind": "port-only",
       "why": "the machine lock: runs one heavy command at a time per machine, released by the kernel when its holder dies"
     },
     {
-      "path": "pstack/scripts/wait-report",
+      "path": "jrzstack/scripts/wait-report",
       "kind": "port-only",
       "why": "a sub-lead's wait on a worker's report commit, one plain command a worktree-isolated agent's guard accepts"
     },
     {
-      "path": "pstack/scripts/exclude-worktrees",
+      "path": "jrzstack/scripts/exclude-worktrees",
       "kind": "port-only",
       "why": "adds .claude/worktrees/ to the exclude file once, one plain command a worktree-isolated agent's guard accepts"
     },
     {
-      "path": "pstack/skills/poteto-mode/scripts/run",
+      "path": "jrzstack/skills/savvy-mode/scripts/run",
       "kind": "port-only",
-      "why": "the runtime launcher: runs poteto-mode's scripts with Bun, else Node 22.18+, in place of bootstrap.ts's install"
+      "why": "the runtime launcher: runs savvy-mode's scripts with Bun, else Node 22.18+, in place of bootstrap.ts's install"
     },
     {
-      "path": "pstack/skills/poteto-mode/scripts/orch",
+      "path": "jrzstack/skills/savvy-mode/scripts/orch",
       "kind": "override",
       "why": "frontier set takes the stacker's PR order from the store, PR state and merged heads from gh api REST and open heads from git rev-parse, in place of Graphite, and fails on a drifted base or a stale head; init excludes the store from git and every drain pushes it to its orphan branch by plumbing; commander imported directly and NotFoundError's parameter property a plain field, for Node's type stripping",
       "sources": [
@@ -183,7 +183,7 @@
       ]
     },
     {
-      "path": "pstack/skills/poteto-mode/scripts/watch-pr/github.ts",
+      "path": "jrzstack/skills/savvy-mode/scripts/watch-pr/github.ts",
       "kind": "override",
       "why": "adds a REST reader for cloud, where the session proxy refuses GraphQL, reading review threads from the proxy's /ccr/review_threads route, and switches to it at the first refusal; review bots are matched from a list of logins",
       "depends_on": [
@@ -192,22 +192,22 @@
       ]
     },
     {
-      "path": "pstack/skills/poteto-mode/scripts/watch-pr/github.test.ts",
+      "path": "jrzstack/skills/savvy-mode/scripts/watch-pr/github.test.ts",
       "kind": "override",
       "why": "adds tests of the REST reader against a fake of the proxy's routes, its verdicts beside GraphQL's on the same threads, the fallback and the review-bot logins"
     },
     {
-      "path": "pstack/skills/poteto-mode/scripts/watch-pr/fakes.test-helper.ts",
+      "path": "jrzstack/skills/savvy-mode/scripts/watch-pr/fakes.test-helper.ts",
       "kind": "override",
       "why": "adds a fake of the REST API serving the proxy's /ccr/review_threads shape"
     },
     {
-      "path": "pstack/skills/poteto-mode/scripts/watch-pr/watch-pr",
+      "path": "jrzstack/skills/savvy-mode/scripts/watch-pr/watch-pr",
       "kind": "override",
       "why": "drops the bootstrap.ts install: the launcher runs it with the vendored commander"
     },
     {
-      "path": "pstack/skills/poteto-mode/scripts/worktree-audit.sh",
+      "path": "jrzstack/skills/savvy-mode/scripts/worktree-audit.sh",
       "kind": "override",
       "why": "attributes each worktree to the newest Claude Code transcript whose cwd is that worktree or lies under it, read only from the project directories of the main checkout and its worktrees, in place of a path search of Cursor's agent-transcripts, and buckets a worktree no transcript claims as a stray; it also runs on Linux and takes paths with spaces",
       "depends_on": [
@@ -215,55 +215,55 @@
       ]
     },
     {
-      "path": "pstack/skills/poteto-mode/scripts/node_modules/commander",
+      "path": "jrzstack/skills/savvy-mode/scripts/node_modules/commander",
       "kind": "port-only",
       "why": "commander 14.0.0, the version upstream's bun.lock pins, vendored with its MIT licence so upstream's imports resolve without an install"
     },
     {
-      "path": "pstack/skills/poteto-help/SKILL.md",
+      "path": "jrzstack/skills/savvy-help/SKILL.md",
       "kind": "override",
       "why": "Cursor-only sections (Custom Mode, Option+Enter, .cursor/rules, /add-plugin) rewritten for Claude Code's install, settings and surfaces, with a row for re-entering the mode after a resume"
     },
     {
-      "path": "pstack/README.md",
+      "path": "jrzstack/README.md",
       "kind": "translated",
       "why": "adds the port-only Hand-off playbook to the playbook table, points cloud installs to the setup line, and names orchestrate's lead as the orchestrate override does"
     },
     {
-      "path": "pstack/docs/guide/01-setup.md",
+      "path": "jrzstack/docs/guide/01-setup.md",
       "kind": "translated",
       "why": "adds the port's install prerequisites (the Read rule, gh, Bun or Node), the panel waiver and the machine lock to setup and cost"
     },
     {
-      "path": "pstack/docs/guide/02-poteto-mode.md",
+      "path": "jrzstack/docs/guide/02-savvy-mode.md",
       "kind": "translated",
       "why": "counts and names the port-only Hand-off playbook, and says what cloud workers need (Auto, a default environment, \"local only\")"
     },
     {
-      "path": "pstack/docs/guide/07-overnight.md",
+      "path": "jrzstack/docs/guide/07-overnight.md",
       "kind": "translated",
       "why": "names orchestrate's lead as the orchestrate override does, and says what a routine run gets under ADR 0001"
     },
     {
-      "path": "pstack/skills/poteto-mode/references/brief-contract.md",
+      "path": "jrzstack/skills/savvy-mode/references/brief-contract.md",
       "kind": "port-only",
       "why": "the rules every worker brief carries: entry line, no human asks, own-branch pushes, start commit, the machine lock, missing files, leaf workers, the trailered report commit and the nonce trailer a lead finds a cloud report by, a sub-lead's timebox and in-turn wait, and the lead's worker worktrees: the exclude line and removal"
     },
     {
-      "path": "pstack/skills/poteto-mode/scripts/check-plan.mjs",
+      "path": "jrzstack/skills/savvy-mode/scripts/check-plan.mjs",
       "kind": "override",
-      "why": "its markers match the port's plan wording: live lanes on `poteto-agent` on Volume instead of a named model, and playbooks read from the plugin instead of from trunk with `git show`",
+      "why": "its markers match the port's plan wording: live lanes on `savvy-agent` on Volume instead of a named model, and playbooks read from the plugin instead of from trunk with `git show`",
       "depends_on": [
         "upstream/pstack/skills/poteto-mode/playbooks/multi-phase-plan.md"
       ]
     },
     {
-      "path": "pstack/skills/poteto-mode/playbooks/multi-phase-plan.md",
+      "path": "jrzstack/skills/savvy-mode/playbooks/multi-phase-plan.md",
       "kind": "translated",
       "why": "carries rule 20's spec intake: reads the spec through `gh api` REST, writes the plan at a git-excluded path, lints it through the launcher, posts it on the spec issue or an orphan branch, carries on unless asked for a plan only, and only a landing grant picks Autopilot-full; its skeleton is the wording the check-plan.mjs override checks, so a change to either reaches the other"
     },
     {
-      "path": "pstack/skills/poteto-mode/playbooks/hand-off.md",
+      "path": "jrzstack/skills/savvy-mode/playbooks/hand-off.md",
       "kind": "port-only",
       "why": "the Hand-off playbook: on an explicit request only, pushes the input, starts a cloud lead with `claude --permission-mode auto --cloud` and a fixed brief whose first check ends a bundled session with no GitHub remote, then prints the link and ends, or says why once and stays local"
     }

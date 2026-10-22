@@ -85,7 +85,7 @@ function fileTable(root: string, record: PortRecord): string[] {
   const entries = record.entries.toSorted((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0));
   const portPath = (entry: PortEntry) => {
     const directory = isDirectory(root, entry.path) || isDirectory(root, counterpart(entry.path));
-    return shortPath(entry.path, "pstack/", directory);
+    return shortPath(entry.path, "jrzstack/", directory);
   };
   const rows = tableKinds.flatMap((kind) =>
     entries

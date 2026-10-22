@@ -1,0 +1,16 @@
+{
+  "description": "After a compaction in savvy-mode, lists the durable state the session should re-read before acting.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/savvy-mode-compaction.sh\""
+          }
+        ]
+      }
+    ]
+  }
+}

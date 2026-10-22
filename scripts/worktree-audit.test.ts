@@ -3,7 +3,7 @@ import { utimesSync } from "node:fs";
 import { join } from "node:path";
 import { git, runPluginScript, tempDir, writeFiles } from "./test/harness.ts";
 
-const audit = "skills/poteto-mode/scripts/worktree-audit.sh";
+const audit = "skills/savvy-mode/scripts/worktree-audit.sh";
 
 /** Claude Code's project directory name for a path: every character that isn't a letter or digit becomes "-". */
 const slug = (path: string) => path.replace(/[^A-Za-z0-9]/g, "-");
@@ -16,8 +16,8 @@ const line = (cwd: string, text = "ok") =>
 
 /** A repo with an origin, and a `gh` on PATH that knows no PRs. */
 function fixture() {
-  const root = tempDir("pstack-audit-");
-  const home = tempDir("pstack-home-");
+  const root = tempDir("jrzstack-audit-");
+  const home = tempDir("jrzstack-home-");
   const repo = join(root, "repo");
   const origin = join(root, "origin.git");
   git(root, "init", "-q", "--bare", "-b", "main", origin);

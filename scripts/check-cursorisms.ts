@@ -198,8 +198,8 @@ function readKey(rule: Rule, text: string, line: number, fail: (line: number, me
       const first = value.indexOf("|");
       const last = value.lastIndexOf("|");
       const [path, text, reason] = [value.slice(0, first), value.slice(first + 1, last), value.slice(last + 1)].map((s) => s.trim());
-      if (first === last || !path!.startsWith("pstack/") || text === "" || reason === "") {
-        return void fail(line, "an allowance is `allow: <port file under pstack/> | <text on the line> | <reason>`");
+      if (first === last || !path!.startsWith("jrzstack/") || text === "" || reason === "") {
+        return void fail(line, "an allowance is `allow: <port file under jrzstack/> | <text on the line> | <reason>`");
       }
       rule.allowances.push({ path: path!, text: text!, reason: reason!, docLine: line });
       return;

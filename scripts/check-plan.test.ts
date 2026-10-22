@@ -4,11 +4,11 @@ import { join } from "node:path";
 import { pluginDir, runProgram, tempDir, writeFiles } from "./test/harness.ts";
 import { prSection, verificationRule, samplePlan } from "./test/plan-fixture.ts";
 
-const launcher = join(pluginDir, "skills", "poteto-mode", "scripts", "run");
+const launcher = join(pluginDir, "skills", "savvy-mode", "scripts", "run");
 
 /** Lint `plan` with check-plan.mjs through the runtime launcher, as Multi-phase plan does. */
 function checkPlan(plan: string) {
-  const cwd = tempDir("pstack-plan-");
+  const cwd = tempDir("jrzstack-plan-");
   writeFiles(cwd, { "plan.md": plan });
   return runProgram([launcher, "check-plan.mjs", "plan.md"], { cwd });
 }
@@ -36,7 +36,7 @@ describe("check-plan.mjs", () => {
   });
 
   test("passes the skeleton Multi-phase plan tells the lead to copy", () => {
-    const playbook = readFileSync(join(pluginDir, "skills", "poteto-mode", "playbooks", "multi-phase-plan.md"), "utf8");
+    const playbook = readFileSync(join(pluginDir, "skills", "savvy-mode", "playbooks", "multi-phase-plan.md"), "utf8");
     const skeleton = playbook.match(/^````markdown\n([\s\S]*?)^````$/m)?.[1];
     expect(skeleton).toBeDefined();
 
@@ -48,7 +48,7 @@ describe("check-plan.mjs", () => {
   });
 
   test("exits 2 with its usage when no plan is given", () => {
-    const result = runProgram([launcher, "check-plan.mjs"], { cwd: tempDir("pstack-plan-") });
+    const result = runProgram([launcher, "check-plan.mjs"], { cwd: tempDir("jrzstack-plan-") });
 
     expect(result.exitCode).toBe(2);
     expect(result.stderr).toContain("check-plan.mjs <plan.md>");
@@ -56,27 +56,27 @@ describe("check-plan.mjs", () => {
 
   describe("flags upstream's wording where the port's differs", () => {
     test("a Read-at-program-start list taken from trunk with git show", () => {
-      const plan = samplePlan.replaceAll("`${CLAUDE_PLUGIN_ROOT}/skills/", "`git show origin/main:pstack/skills/");
+      const plan = samplePlan.replaceAll("`${CLAUDE_PLUGIN_ROOT}/skills/", "`git show origin/main:jrzstack/skills/");
 
       const result = checkPlan(plan);
 
       expect(result.exitCode).toBe(1);
       expect(result.stderr).toContain(
-        'plan.md:13: Program checklist lacks "${CLAUDE_PLUGIN_ROOT}/skills/poteto-mode/playbooks/"',
+        'plan.md:13: Program checklist lacks "${CLAUDE_PLUGIN_ROOT}/skills/savvy-mode/playbooks/"',
       );
     });
 
     test("live lanes on a model rather than the Volume setting's agent", () => {
-      const plan = samplePlan.replaceAll("Ten lanes on `poteto-agent` on the Volume setting", "Ten lanes on `grok-4.7-xhigh-fast`");
+      const plan = samplePlan.replaceAll("Ten lanes on `savvy-agent` on the Volume setting", "Ten lanes on `grok-4.7-xhigh-fast`");
 
       const result = checkPlan(plan);
 
       expect(result.exitCode).toBe(1);
       expect(result.stderr).toContain(
-        'Add backoff to the retry loop (R1): Verify, live lacks "Ten lanes on `poteto-agent` on the Volume setting at the PR head"',
+        'Add backoff to the retry loop (R1): Verify, live lacks "Ten lanes on `savvy-agent` on the Volume setting at the PR head"',
       );
       expect(result.stderr).toContain(
-        'Show the retry state in the status bar (R2): Verify, live lacks "Ten lanes on `poteto-agent` on the Volume setting at the PR head"',
+        'Show the retry state in the status bar (R2): Verify, live lacks "Ten lanes on `savvy-agent` on the Volume setting at the PR head"',
       );
     });
   });

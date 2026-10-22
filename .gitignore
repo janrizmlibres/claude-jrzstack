@@ -1,5 +1,5 @@
 node_modules/
 # commander, vendored into the plugin so its scripts run without an install
-!pstack/skills/poteto-mode/scripts/node_modules/
+!jrzstack/skills/savvy-mode/scripts/node_modules/
 # the /sync-upstream skill's scratch files
 .sync-upstream/
