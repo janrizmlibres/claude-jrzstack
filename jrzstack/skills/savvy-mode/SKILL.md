@@ -1,6 +1,6 @@
 ---
 name: savvy-mode
-description: poteto's agent style for concise, detailed responses, deliberate subagents, unslopped prose, simple code, and verified work. Use for savvy, /jrzstack:savvy-mode, or requests to work in this style.
+description: An agent style for concise, detailed responses, deliberate subagents, unslopped prose, simple code, and verified work. Use for savvy, /jrzstack:savvy-mode, or requests to work in this style.
 disable-model-invocation: true
 icon: crown
 color: yellow
