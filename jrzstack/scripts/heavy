@@ -1,0 +1,112 @@
+#!/usr/bin/env bash
+# heavy -- <command> [args...]
+#
+# Runs a heavy command (a test runner, a build, a whole-project typecheck or
+# lint, a dev server, a browser session, a fresh worktree's dependency
+# install) once it holds the machine lock: one slot per machine, shared by
+# every jrzstack session on it, in any repo.
+#
+# The lock is a flock(2) on $HOME/.claude/jrzstack/heavy.lock, held through an
+# open file descriptor that the command inherits, so the kernel releases it
+# when the command and every child it spawned are gone, killed or not. Linux
+# takes it with flock(1); macOS has no flock(1), so perl's flock() takes it
+# there.
+#
+# A process the command leaves running, such as a build daemon, keeps the
+# descriptor and so the lock. A heavy command that runs heavy again runs it
+# straight away, under the lock its caller already holds.
+#
+# Prints how long it waited for the lock, to stderr. Waits at most
+# JRZSTACK_HEAVY_WAIT_SECONDS (300 by default), so a Bash call never reaches its
+# 10-minute timeout.
+#
+# Exits with the command's own code, or:
+#   75  the lock was still busy after the wait: backpressure, re-run later
+#   71  taking the lock failed for another reason
+#   69  neither flock(1) nor perl is installed
+#   64  no command given, or a malformed JRZSTACK_HEAVY_WAIT_SECONDS
+set -u
+
+busy_code=75
+lock_error_code=71
+no_lock_tool_code=69
+usage_code=64
+
+[ "${1:-}" = "--" ] && shift
+if [ $# -eq 0 ]; then
+  echo "usage: heavy -- <command> [args...]" >&2
+  exit "$usage_code"
+fi
+
+lock_dir="$HOME/.claude/jrzstack"
+lock_file="$lock_dir/heavy.lock"
+if [ "${JRZSTACK_HEAVY_HELD:-}" = "$lock_file" ]; then
+  exec "$@"
+fi
+
+wait_seconds="${JRZSTACK_HEAVY_WAIT_SECONDS:-300}"
+case "$wait_seconds" in
+  "" | *[!0-9]*)
+    echo "heavy: JRZSTACK_HEAVY_WAIT_SECONDS must be a whole number of seconds, not $wait_seconds" >&2
+    exit "$usage_code"
+    ;;
+esac
+
+if command -v flock >/dev/null 2>&1; then
+  lock_tool=flock
+elif command -v perl >/dev/null 2>&1; then
+  lock_tool=perl
+else
+  echo "heavy: needs flock or perl to take the machine lock" >&2
+  exit "$no_lock_tool_code"
+fi
+
+mkdir -p "$lock_dir" || exit "$lock_error_code"
+exec 9>>"$lock_file" || exit "$lock_error_code"
+
+# Takes the lock on fd 9, waiting at most $1 seconds (0: don't wait).
+# Returns 1 when the lock is still held by another, other codes on errors.
+acquire() {
+  if [ "$lock_tool" = flock ]; then
+    if [ "$1" = 0 ]; then flock -n 9; else flock -w "$1" 9; fi
+  else
+    # The lock belongs to fd 9's open file description, which this shell
+    # keeps open, so it outlives perl.
+    perl -MFcntl=:flock -MTime::HiRes=time,sleep -e '
+      open(my $lock, ">>&=", 9) or do { print STDERR "heavy: fd 9: $!\n"; exit 2 };
+      my $deadline = time + $ARGV[0];
+      until (flock($lock, LOCK_EX | LOCK_NB)) {
+        exit 1 if time >= $deadline;
+        sleep 0.1;
+      }' "$1"
+  fi
+}
+
+# Exits unless acquire's status $1 is 0 (got the lock) or 1 (still held).
+check_acquired() {
+  if [ "$1" -gt 1 ]; then
+    echo "heavy: could not take the machine lock ($lock_tool exited $1)" >&2
+    exit "$lock_error_code"
+  fi
+}
+
+waited=0
+acquire 0
+status=$?
+check_acquired "$status"
+if [ "$status" -eq 1 ]; then
+  echo "heavy: machine lock held, waiting up to ${wait_seconds}s" >&2
+  SECONDS=0
+  acquire "$wait_seconds"
+  status=$?
+  check_acquired "$status"
+  if [ "$status" -eq 1 ]; then
+    echo "heavy: machine lock still busy after ${wait_seconds}s; this is backpressure, not a failure: re-run the command" >&2
+    exit "$busy_code"
+  fi
+  waited=$SECONDS
+fi
+echo "heavy: waited ${waited}s for the machine lock" >&2
+
+export JRZSTACK_HEAVY_HELD="$lock_file"
+exec "$@"

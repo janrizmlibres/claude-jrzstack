@@ -46,7 +46,7 @@ jobs:
         shell: bash
         run: |
           out="$RUNNER_TEMP/validate.json"
-          for target in . pstack; do
+          for target in . jrzstack; do
             claude plugin validate "$target" --json > "$out" || { cat "$out"; exit 1; }
             unexpected=$(jq -r '(.manifest, .contents[]) | .file as $f | .warnings[]
               | "\($f): \(.path): \(.message)" | select(test("(: |→ )version: ") | not)' "$out")

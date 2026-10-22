@@ -33,11 +33,11 @@ function repo(rules: Record<string, string[]>, files: Record<string, string> = {
   return portRepo({ [rulesPath]: rulesDoc(rules), ...upstreamFile, ...files }, entries);
 }
 
-const findings = (result: RunResult) => result.stdout.split("\n").filter((line) => line.startsWith("pstack/"));
+const findings = (result: RunResult) => result.stdout.split("\n").filter((line) => line.startsWith("jrzstack/"));
 
 describe("check-cursorisms", () => {
   test("passes a translated file with no Cursor-isms", () => {
-    const result = check(repo({ "1. Tools": tools, "2. Models": multiModel }, { "pstack/skills/a/SKILL.md": "Clean.\n" }));
+    const result = check(repo({ "1. Tools": tools, "2. Models": multiModel }, { "jrzstack/skills/a/SKILL.md": "Clean.\n" }));
 
     expect(result.stderr).toBe("");
     expect(result.exitCode).toBe(0);
@@ -46,80 +46,80 @@ describe("check-cursorisms", () => {
   test("flags each Cursor-ism in a translated file by line, column and rule", () => {
     const text = "Line one.\nAsk with AskQuestion, then read `~/.cursor/plugins/x`.\n";
 
-    const result = check(repo({ "1. Tools": tools, "2. Models": multiModel }, { "pstack/skills/a/SKILL.md": text }));
+    const result = check(repo({ "1. Tools": tools, "2. Models": multiModel }, { "jrzstack/skills/a/SKILL.md": text }));
 
     expect(result.exitCode).toBe(1);
     expect(findings(result)).toEqual([
-      "pstack/skills/a/SKILL.md:2:10: rule 1 (Tools): AskQuestion",
-      "pstack/skills/a/SKILL.md:2:36: rule 1 (Tools): .cursor/",
+      "jrzstack/skills/a/SKILL.md:2:10: rule 1 (Tools): AskQuestion",
+      "jrzstack/skills/a/SKILL.md:2:36: rule 1 (Tools): .cursor/",
     ]);
   });
 
   test("checks only translated files: overrides, port-only and dropped files are skipped", () => {
     const entries: PortEntry[] = [
-      { path: "pstack/skills/a/SKILL.md", kind: "override", why: "hand-written" },
-      { path: "pstack/hooks", kind: "port-only", why: "the port's hooks" },
-      { path: "pstack/skills/a/package.json", kind: "dropped", why: "kept for development" },
-      { path: "pstack/skills/kit", kind: "translated", why: "vendored", sources: ["upstream/pstack/skills/a"] },
+      { path: "jrzstack/skills/a/SKILL.md", kind: "override", why: "hand-written" },
+      { path: "jrzstack/hooks", kind: "port-only", why: "the port's hooks" },
+      { path: "jrzstack/skills/a/package.json", kind: "dropped", why: "kept for development" },
+      { path: "jrzstack/skills/kit", kind: "translated", why: "vendored", sources: ["upstream/pstack/skills/a"] },
     ];
     const files = {
-      "pstack/skills/a/SKILL.md": "AskQuestion\n",
-      "pstack/hooks/remind.sh": "AskQuestion\n",
-      "pstack/skills/a/package.json": "AskQuestion\n",
-      "pstack/skills/kit/SKILL.md": "AskQuestion\n",
-      "pstack/skills/b/SKILL.md": "AskQuestion\n",
+      "jrzstack/skills/a/SKILL.md": "AskQuestion\n",
+      "jrzstack/hooks/remind.sh": "AskQuestion\n",
+      "jrzstack/skills/a/package.json": "AskQuestion\n",
+      "jrzstack/skills/kit/SKILL.md": "AskQuestion\n",
+      "jrzstack/skills/b/SKILL.md": "AskQuestion\n",
     };
 
     const result = check(repo({ "1. Tools": tools }, files, entries));
 
     expect(findings(result).map((line) => line.split(":")[0])).toEqual([
-      "pstack/skills/b/SKILL.md",
-      "pstack/skills/kit/SKILL.md",
+      "jrzstack/skills/b/SKILL.md",
+      "jrzstack/skills/kit/SKILL.md",
     ]);
   });
 
   test("skips binary files", () => {
-    const result = check(repo({ "1. Tools": tools }, { "pstack/assets/logo.png": "\0AskQuestion\n" }));
+    const result = check(repo({ "1. Tools": tools }, { "jrzstack/assets/logo.png": "\0AskQuestion\n" }));
 
     expect(result.exitCode).toBe(0);
   });
 
   test("an allowance excuses one occurrence in one file, and only for its rule", () => {
-    const allowed = [...tools, "allow: pstack/README.md | quoting AskQuestion | quotes upstream's wording"];
+    const allowed = [...tools, "allow: jrzstack/README.md | quoting AskQuestion | quotes upstream's wording"];
     const files = {
-      "pstack/README.md": "We are quoting AskQuestion here.\nBut AskQuestion here is a leftover.\n",
-      "pstack/skills/b/SKILL.md": "Still quoting AskQuestion here.\n",
+      "jrzstack/README.md": "We are quoting AskQuestion here.\nBut AskQuestion here is a leftover.\n",
+      "jrzstack/skills/b/SKILL.md": "Still quoting AskQuestion here.\n",
     };
 
     const result = check(repo({ "1. Tools": allowed }, files));
 
     expect(result.exitCode).toBe(1);
     expect(findings(result)).toEqual([
-      "pstack/README.md:2:5: rule 1 (Tools): AskQuestion",
-      "pstack/skills/b/SKILL.md:1:15: rule 1 (Tools): AskQuestion",
+      "jrzstack/README.md:2:5: rule 1 (Tools): AskQuestion",
+      "jrzstack/skills/b/SKILL.md:1:15: rule 1 (Tools): AskQuestion",
     ]);
     expect(result.stdout).toContain("1 allowance");
   });
 
   test("fails on an allowance that excuses more than one line, since it must name one occurrence", () => {
-    const allowed = [...tools, "allow: pstack/README.md | AskQuestion | quotes upstream's wording"];
-    const files = { "pstack/README.md": "Quoting AskQuestion here.\nAnd AskQuestion again.\n" };
+    const allowed = [...tools, "allow: jrzstack/README.md | AskQuestion | quotes upstream's wording"];
+    const files = { "jrzstack/README.md": "Quoting AskQuestion here.\nAnd AskQuestion again.\n" };
 
     const result = check(repo({ "1. Tools": allowed }, files));
 
     expect(result.exitCode).toBe(1);
     expect(result.stdout).toContain("allowance excuses 2 lines");
-    expect(result.stdout).toContain("pstack/README.md | AskQuestion");
+    expect(result.stdout).toContain("jrzstack/README.md | AskQuestion");
   });
 
   test("fails on an allowance that excuses nothing", () => {
-    const allowed = [...tools, "allow: pstack/README.md | quoting AskQuestion | quotes upstream's wording"];
+    const allowed = [...tools, "allow: jrzstack/README.md | quoting AskQuestion | quotes upstream's wording"];
 
-    const result = check(repo({ "1. Tools": allowed }, { "pstack/README.md": "Clean.\n" }));
+    const result = check(repo({ "1. Tools": allowed }, { "jrzstack/README.md": "Clean.\n" }));
 
     expect(result.exitCode).toBe(1);
     expect(result.stdout).toContain("stale allowance");
-    expect(result.stdout).toContain("pstack/README.md | quoting AskQuestion");
+    expect(result.stdout).toContain("jrzstack/README.md | quoting AskQuestion");
     expect(result.stdout).toMatch(/docs\/conversion-rules\.md:\d+/);
   });
 
@@ -141,15 +141,15 @@ describe("check-cursorisms", () => {
       "an undetectable rule with no reason": { "1. Tools": ["undetectable:"] },
       "a pattern that doesn't compile": { "1. Tools": [...tools, "pattern: (unclosed"] },
       "an unknown key": { "1. Tools": [...tools, "severity: high"] },
-      "an allowance with no reason": { "1. Tools": [...tools, "allow: pstack/README.md | AskQuestion |"] },
-      "an allowance with no text": { "1. Tools": [...tools, "allow: pstack/README.md | | quotes upstream"] },
+      "an allowance with no reason": { "1. Tools": [...tools, "allow: jrzstack/README.md | AskQuestion |"] },
+      "an allowance with no text": { "1. Tools": [...tools, "allow: jrzstack/README.md | | quotes upstream"] },
       "a heading that isn't a numbered rule": { "Notes": multiModel },
       "two rules with one number": { "1. Tools": tools, "1. Again": multiModel },
     };
 
     for (const [name, rules] of Object.entries(invalid)) {
       test(name, () => {
-        const result = check(repo(rules, { "pstack/skills/a/SKILL.md": "AskQuestion\n" }));
+        const result = check(repo(rules, { "jrzstack/skills/a/SKILL.md": "AskQuestion\n" }));
 
         expect(result.exitCode).toBe(2);
         expect(result.stderr).toContain(rulesPath);
@@ -213,10 +213,10 @@ describe("check-cursorisms", () => {
     const examples = (key: "before" | "after") =>
       [...doc.matchAll(new RegExp(`^${key}:(.*)$`, "gm"))].map((match) => match[1]!.trim());
 
-    test("holds rules 1 to 24", () => {
+    test("holds rules 1 to 25", () => {
       const numbers = [...doc.matchAll(/^## (\d+)\. /gm)].map((match) => Number(match[1]));
 
-      expect(numbers).toEqual(Array.from({ length: 24 }, (_, i) => i + 1));
+      expect(numbers).toEqual(Array.from({ length: 25 }, (_, i) => i + 1));
     });
 
     test("flags every rule's before lines and passes its after lines", () => {
@@ -225,8 +225,8 @@ describe("check-cursorisms", () => {
       const root = portRepo({
         [rulesPath]: doc,
         ...upstreamFile,
-        "pstack/skills/a/SKILL.md": before.join("\n") + "\n",
-        "pstack/skills/a/after.md": after.join("\n") + "\n",
+        "jrzstack/skills/a/SKILL.md": before.join("\n") + "\n",
+        "jrzstack/skills/a/after.md": after.join("\n") + "\n",
         "port.json": JSON.stringify({ entries: [] }),
       });
 
@@ -235,7 +235,7 @@ describe("check-cursorisms", () => {
       expect(result.stderr).toBe("");
       const flagged = new Set(findings(result).map((line) => line.split(":").slice(0, 2).join(":")));
       expect(before.length).toBeGreaterThan(0);
-      expect([...flagged].sort()).toEqual(before.map((_, i) => `pstack/skills/a/SKILL.md:${i + 1}`).sort());
+      expect([...flagged].sort()).toEqual(before.map((_, i) => `jrzstack/skills/a/SKILL.md:${i + 1}`).sort());
     });
 
     test("passes in the repo itself", () => {

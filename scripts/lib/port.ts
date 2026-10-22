@@ -1,9 +1,10 @@
 // `port.json`, the record of every port file that is not a plain translation
 // at its counterpart's path, shared by the port.json and Cursor-ism checks.
 //
-// A port file is a file under `pstack/`; its counterpart is the snapshot file
-// at the same path under `upstream/` (`pstack/x` ↔ `upstream/pstack/x`). A
-// port file port.json doesn't list is a translated file of its counterpart.
+// A port file is a file under `jrzstack/`; its counterpart is the snapshot file
+// at the same path under `upstream/` once the port's names are mapped back to
+// upstream's (`jrzstack/skills/savvy-mode/x` ↔ `upstream/pstack/skills/poteto-mode/x`).
+// A port file port.json doesn't list is a translated file of its counterpart.
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { git, UsageError } from "./upstream.ts";
@@ -16,7 +17,7 @@ export type Kind = (typeof kinds)[number];
  * `path` may name a directory, and then covers every file under it.
  */
 export type PortEntry = {
-  /** The port path, under `pstack/`. A dropped entry names where the file would be. */
+  /** The port path, under `jrzstack/`. A dropped entry names where the file would be. */
   path: string;
   /**
    * `translated`: made by the conversion rules, listed only for a path
@@ -42,8 +43,20 @@ export type PortRecord = { entries: PortEntry[] };
 
 export const portFile = (root: string) => join(root, "port.json");
 
+/** Each name upstream uses in a path, and the port's name for it (rule 25). */
+const names = [
+  ["pstack", "jrzstack"],
+  ["poteto", "savvy"],
+] as const;
+
+const rename = (path: string, from: 0 | 1) =>
+  names.reduce((p, pair) => p.replace(new RegExp(`(?<![A-Za-z])${pair[from]}\\b`, "g"), pair[1 - from]!), path);
+
+/** Where an upstream path (relative to upstream's root) lands in the port. */
+export const portPath = (upstreamPath: string) => rename(upstreamPath, 0);
+
 /** The snapshot path a port path is the counterpart of. */
-export const counterpart = (path: string) => `upstream/${path}`;
+export const counterpart = (path: string) => `upstream/${rename(path, 1)}`;
 
 /** Whether `file` is `path` or lies under it. */
 export const covers = (path: string, file: string) => file === path || file.startsWith(`${path}/`);
@@ -69,7 +82,7 @@ export function readPortRecord(root: string): PortRecord {
       throw new UsageError(`port.json entry ${index} (${String(entry.path)}): ${message}`);
     };
     for (const key of Object.keys(entry)) if (!fields.has(key)) fail(`unknown field \`${key}\``);
-    if (!isPath(entry.path, "pstack/")) fail("`path` must be a path under pstack/");
+    if (!isPath(entry.path, "jrzstack/")) fail("`path` must be a path under jrzstack/");
     if (!kinds.includes(entry.kind as Kind)) fail(`\`kind\` must be one of ${kinds.join(", ")}`);
     if (typeof entry.why !== "string" || entry.why.trim() === "") fail("`why` must say why");
     for (const key of ["sources", "depends_on"] as const) {
@@ -100,9 +113,9 @@ export function entryFor(record: PortRecord, file: string): PortEntry | undefine
     .sort((a, b) => b.path.length - a.path.length)[0];
 }
 
-/** Port files under `pstack/` that git tracks or would track, sorted. */
+/** Port files under `jrzstack/` that git tracks or would track, sorted. */
 export function portFiles(root: string): string[] {
-  return git(root, ["ls-files", "--cached", "--others", "--exclude-standard", "--deduplicate", "-z", "--", "pstack"])
+  return git(root, ["ls-files", "--cached", "--others", "--exclude-standard", "--deduplicate", "-z", "--", "jrzstack"])
     .split("\0")
     .filter((file) => file !== "" && existsSync(join(root, file)))
     .sort();

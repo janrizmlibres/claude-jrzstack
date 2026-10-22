@@ -1,4 +1,4 @@
-# pstack for Claude Code
+# jrzstack
 
 <!-- BEGIN generated from upstream/snapshot.json — do not edit by hand -->
 **Tracks upstream pstack v0.15.29** (`cursor/plugins@190d287`).
@@ -6,10 +6,14 @@
 pstack is © Lauren Tan, MIT; this port is MIT too (see [License and credit](#license-and-credit)).
 
 A Claude Code port of [pstack](https://github.com/cursor/plugins/tree/main/pstack), Lauren Tan's
-Cursor plugin of agent workflows, kept in step with upstream. Type `/pstack:poteto-mode` with a
-task, an issue or a spec: pstack picks a playbook (Feature, Bug fix, Refactoring, Orchestrate…),
+Cursor plugin of agent workflows, kept in step with upstream. Type `/jrzstack:savvy-mode` with a
+task, an issue or a spec: jrzstack picks a playbook (Feature, Bug fix, Refactoring, Orchestrate…),
 runs it with parallel workers and review panels, and opens the PRs. It runs the same way on your
 machine and in a Claude Code cloud session.
+
+Upstream's `pstack` and `poteto-mode` are named for Lauren (poteto is her handle); the port carries
+its maintainer's instead, so `pstack` is `jrzstack` here and `poteto-*` is `savvy-*`. The skills and
+playbooks are otherwise upstream's.
 
 ## Install (local)
 
@@ -17,35 +21,35 @@ machine and in a Claude Code cloud session.
 - Claude Code 2.1.294 or later, the version CI validates the plugin with.
 - `gh`, signed in.
 - **Bun, or Node ≥ 22.18**, for orchestrate, babysitting PRs, shipping and multi-phase plans.
-  Without one, those steps stop and print the install line; the rest of pstack runs.
+  Without one, those steps stop and print the install line; the rest of jrzstack runs.
 
 **Install**
 
 ```
-/plugin marketplace add janrizmlibres/claude-pstack
-/plugin install pstack@claude-pstack
+/plugin marketplace add janrizmlibres/claude-jrzstack
+/plugin install jrzstack@claude-jrzstack
 ```
 
 **Turn on auto-update.** Claude Code leaves it off for third-party marketplaces: `/plugin` →
-Marketplaces → `claude-pstack` → Enable auto-update. Every merge to `main` is a release, so
+Marketplaces → `claude-jrzstack` → Enable auto-update. Every merge to `main` is a release, so
 without auto-update you stay on the commit you installed. `/plugin` shows a commit SHA, not a
 version number; the upstream version you're on is the line at the top of this README.
 
-**The `Read` rule** (default permission mode only). pstack's skills read each other by path from
+**The `Read` rule** (default permission mode only). jrzstack's skills read each other by path from
 the plugin cache. In default mode those reads prompt you, and a subagent's are denied. Add one
 rule to `permissions.allow` in your user settings, `~/.claude/settings.json`:
 
 ```json
 {
   "permissions": {
-    "allow": ["Read(~/.claude/plugins/cache/claude-pstack/**)"]
+    "allow": ["Read(~/.claude/plugins/cache/claude-jrzstack/**)"]
   }
 }
 ```
 
 Auto mode needs nothing, and the cloud setup line adds its own rule.
 
-**Pick models and effort** (optional): `/config` → pstack, or `/plugin configure pstack@claude-pstack`. Each
+**Pick models and effort** (optional): `/config` → jrzstack, or `/plugin configure jrzstack@claude-jrzstack`. Each
 setting takes a model (`opus`, `sonnet`, `haiku` or `fable`) and a starting effort (`low` to `max`),
 which a spawn raises for the hardest work and lowers for routine work; an unconfigured install runs on the defaults.
 
@@ -55,7 +59,7 @@ which a spawn raises for the hardest work and lowers for routine work; an unconf
 | Judgement | judges, reviewers, the hardest tasks | `opus` | high |
 | Volume | swarm and race workers, bulk readers | `sonnet` | high |
 
-`/pstack:setup-pstack` shows your current settings and prints the cloud setup line filled in with
+`/jrzstack:setup-jrzstack` shows your current settings and prints the cloud setup line filled in with
 them.
 
 **Worktrees.** A local run gives each parallel code-writing worker its own git worktree under
@@ -65,7 +69,7 @@ checkout is left alone.
 - Worktrees hold tracked files only. List the gitignored files workers need, such as `.env`, in a
   `.worktreeinclude` at your repo root. A worker missing one stops with `BLOCKED: missing <file>`
   rather than creating it, even from a template such as `.env.example`.
-- `worktree.symlinkDirectories` (for `node_modules`, say) is yours to opt into. pstack never sets
+- `worktree.symlinkDirectories` (for `node_modules`, say) is yours to opt into. jrzstack never sets
   it, since one worktree's install would then change every other's.
 - Worktrees cost disk. The lead removes workers' worktrees once their work is integrated and keeps
   the branches; ask for "worktree cleanup" to reclaim strays.
@@ -85,20 +89,20 @@ and says so once.
 
 ## Install (cloud)
 
-The cloud surface has no `/plugin`, so pstack gets there through the environment's **Setup
-script**. Paste this **setup line** into it, or copy it from `/pstack:setup-pstack`, which fills
+The cloud surface has no `/plugin`, so jrzstack gets there through the environment's **Setup
+script**. Paste this **setup line** into it, or copy it from `/jrzstack:setup-jrzstack`, which fills
 in your model settings:
 
 ```
-git clone --depth 1 https://github.com/janrizmlibres/claude-pstack /opt/claude-pstack && bash /opt/claude-pstack/scripts/cloud-install.sh --config work_model=opus --config judgement_model=opus --config volume_model=sonnet
+git clone --depth 1 https://github.com/janrizmlibres/claude-jrzstack /opt/claude-jrzstack && bash /opt/claude-jrzstack/scripts/cloud-install.sh --config work_model=opus --config judgement_model=opus --config volume_model=sonnet
 ```
 
 It installs the plugin, lets subagents nest three deep, adds the `Read` rule, and installs Chromium
 for browser checks on a best-effort basis (setup still finishes if the download fails). Every
 cloud session starts from the environment's snapshot, so the plugin is installed from a `command`
-source that pulls the latest pstack: Claude Code reruns it shortly after each session starts,
+source that pulls the latest jrzstack: Claude Code reruns it shortly after each session starts,
 installs what changed, and switches the session to it a few minutes in, so cloud sessions stay
-current without your editing the line. Until then the session runs the snapshot's pstack, and
+current without your editing the line. Until then the session runs the snapshot's jrzstack, and
 the agent list it shows the model keeps the snapshot's descriptions. Changing a model means
 editing the line.
 
@@ -107,16 +111,16 @@ rebuilt: when you edit the line or the environment's network hosts, or after abo
 force a rebuild, keep a comment line under the setup line, such as `# rebuild 2026-10-16`, and
 change it.
 
-To check that a session has current pstack, run this in it:
+To check that a session has current jrzstack, run this in it:
 
 ```
-c=$(jq -r '.plugins["pstack@claude-pstack"][0].installPath' ~/.claude/plugins/installed_plugins.json); diff -rq -x .in_use "$c" /opt/claude-pstack/pstack && echo "pstack current: $(git -C /opt/claude-pstack log -1 --format=%h)"
+c=$(jq -r '.plugins["jrzstack@claude-jrzstack"][0].installPath' ~/.claude/plugins/installed_plugins.json); diff -rq -x .in_use "$c" /opt/claude-jrzstack/jrzstack && echo "jrzstack current: $(git -C /opt/claude-jrzstack log -1 --format=%h)"
 ```
 
-It passes when it prints `pstack current: <hash>` and the hash is main's. Compare files, not
+It passes when it prints `jrzstack current: <hash>` and the hash is main's. Compare files, not
 versions: the `version` in `installed_plugins.json` is a hash of the plugin's files, not a commit.
 
-- Put the line in **every environment that should carry pstack.**
+- Put the line in **every environment that should carry jrzstack.**
 - **One environment per repo**, if you keep one for each project: set
   `"remote": { "defaultEnvironmentId": "<env_ id>" }` in that repo's `.claude/settings.local.json`.
   Pick it once with `/remote-env`, then move the key there from `~/.claude/settings.json`; local
@@ -130,18 +134,18 @@ versions: the `version` in `installed_plugins.json` is a hash of the plugin's fi
 ## Running it
 
 ```
-/pstack:poteto-mode fix the flaky retry test in src/net
-/pstack:poteto-mode build #42
+/jrzstack:savvy-mode fix the flaky retry test in src/net
+/jrzstack:savvy-mode build #42
 ```
 
 **Run a spec in the cloud.** Plan locally (with `/to-spec`, for instance), then start a cloud
 session with:
 
 ```
-/pstack:poteto-mode build https://github.com/<you>/<repo>/issues/42
+/jrzstack:savvy-mode build https://github.com/<you>/<repo>/issues/42
 ```
 
-- Handing pstack a spec is the go to **execute** it: it posts its plan on the spec's issue (or an
+- Handing jrzstack a spec is the go to **execute** it: it posts its plan on the spec's issue (or an
   orphan branch, for a spec that isn't an issue) and carries on. Say **"plan only"** to stop once
   the plan is posted.
 - **Landing (merging) stays with you** unless the request grants it ("…and land it").
@@ -150,7 +154,7 @@ session with:
 
 ### From a routine
 
-A routine whose prompt starts with `/pstack:poteto-mode` runs as a full cloud lead.
+A routine whose prompt starts with `/jrzstack:savvy-mode` runs as a full cloud lead.
 - Set the routine up with your repo and an environment that carries the setup line. Its workers
   run as subagents in the routine's own VM; it needs no connector.
 - Set or check the routine's model with `/schedule`: the claude.ai form may not save its pick.
@@ -159,7 +163,7 @@ A routine whose prompt starts with `/pstack:poteto-mode` runs as a full cloud le
   it:
 
   ```
-  /pstack:poteto-mode build the PR in the trigger context. It arrives as the next message: end this turn without acting until it does.
+  /jrzstack:savvy-mode build the PR in the trigger context. It arrives as the next message: end this turn without acting until it does.
   ```
 
 - Label events on draft PRs may not fire.
@@ -180,16 +184,16 @@ A Feature can run up to three panels:
 
 On the default settings that is up to **11 Opus workers** for one Feature, plus the lead. Most bug
 fixes run no panel. To spend less, waive a panel in the request ("skip the arena") or in your
-`CLAUDE.md`; the run records it as `skip: user waived`. pstack never skips one on its own.
+`CLAUDE.md`; the run records it as `skip: user waived`. jrzstack never skips one on its own.
 
 Heavy commands (tests, builds, whole-project typechecks, dev servers, browsers) run **one at a
-time per machine**, across every pstack session on it, so a wide fan-out is bounded by your test
+time per machine**, across every jrzstack session on it, so a wide fan-out is bounded by your test
 and build time, not by the number of workers.
 
 ## Your rules win
 
-Your request and your `CLAUDE.md` outrank pstack's text, its Non-negotiables included: commit
-attribution, TDD, merge method, PR title style, test caps. pstack's defaults (squash merges,
+Your request and your `CLAUDE.md` outrank jrzstack's text, its Non-negotiables included: commit
+attribution, TDD, merge method, PR title style, test caps. jrzstack's defaults (squash merges,
 Conventional Commits, hand-chained stacks) apply only where you say nothing. To use `gh stack` for
 stacked PRs, for example, say so in your `CLAUDE.md`.
 
@@ -217,45 +221,45 @@ In cloud, your user-level `CLAUDE.md` isn't there: rules come from the request a
 <!-- BEGIN generated from port.json — do not edit by hand -->
 | File | Kind | Why |
 |---|---|---|
-| `agents/poteto-agent.md` | override | upstream's body with the read-by-path line, as the one writer for every setting: each spawn passes its setting's model and effort, and the frontmatter falls back to Work's opus at medium, in the background |
+| `agents/savvy-agent.md` | override | upstream's body with the read-by-path line, as the one writer for every setting: each spawn passes its setting's model and effort, and the frontmatter falls back to Work's opus at medium, in the background |
 | `skills/architect/SKILL.md` | override | Phase B's two distinct candidates come from arena's directions, the architect runners model line goes, and a spec's Implementation Decisions reach every runner as fixed constraints |
 | `skills/architect/references/runner-prompt.md` | override | arena's directed or fourth-way block replaces the each-on-a-different-model paragraph, and a spec's Implementation Decisions bind every shape |
 | `skills/arena/SKILL.md` | override | runners on Work with two whole-shape directions, a fourth-way seat and their escapes, and a blind judge on every arena, in place of a runner per model family and a cross-family judge |
-| `skills/interrogate/SKILL.md` | override | three lens reviewers on poteto-reader on Judgement, always all three, with critical-only spillover, the lead's verification gate in place of consensus, and a Coverage Map with Checked and Gaps in place of the Agreement Map |
+| `skills/interrogate/SKILL.md` | override | three lens reviewers on savvy-reader on Judgement, always all three, with critical-only spillover, the lead's verification gate in place of consensus, and a Coverage Map with Checked and Gaps in place of the Agreement Map |
 | `skills/interrogate/references/lead-judgment.md` | override | the verification gate replaces the consensus signal: Act on needs a traced path, and every dismissed critical is re-checked |
 | `skills/interrogate/references/reviewer-prompt.md` | override | a lens brief: one lens's sections, the other lenses named for critical-only spillover, and a required Checked list |
-| `skills/poteto-help/SKILL.md` | override | Cursor-only sections (Custom Mode, Option+Enter, .cursor/rules, /add-plugin) rewritten for Claude Code's install, settings and surfaces, with a row for re-entering the mode after a resume |
-| `skills/poteto-mode/playbooks/eval.md` | override | spawns its own blind samples, 3 per variant on the model the change meets in use, with one blind Judgement judge over all of them and an opt-in cross-model sweep, in place of arena's model fan-out and cross-family judge; a user-invoked skill's samples run on the general-purpose agent, which inherits the lead's model, since `poteto-agent`'s pstack body would skew them |
-| `skills/poteto-mode/playbooks/orchestrate.md` | override | a lead and sub-leads place units by surface (cloud workers, local-only worktrees, in-VM worktree subagents, create_session in Auto), retry by failure mode, take the full gate at landing as the ledger verdict, land only under a landing grant with Close listing leftover branches, run orch through the launcher with its store on an orphan branch, and split restart from compaction |
-| `skills/poteto-mode/scripts/check-plan.mjs` | override | its markers match the port's plan wording: live lanes on `poteto-agent` on Volume instead of a named model, and playbooks read from the plugin instead of from trunk with `git show` |
-| `skills/poteto-mode/scripts/orch/` | override | frontier set takes the stacker's PR order from the store, PR state and merged heads from gh api REST and open heads from git rev-parse, in place of Graphite, and fails on a drifted base or a stale head; init excludes the store from git and every drain pushes it to its orphan branch by plumbing; commander imported directly and NotFoundError's parameter property a plain field, for Node's type stripping |
-| `skills/poteto-mode/scripts/watch-pr/fakes.test-helper.ts` | override | adds a fake of the REST API serving the proxy's /ccr/review_threads shape |
-| `skills/poteto-mode/scripts/watch-pr/github.test.ts` | override | adds tests of the REST reader against a fake of the proxy's routes, its verdicts beside GraphQL's on the same threads, the fallback and the review-bot logins |
-| `skills/poteto-mode/scripts/watch-pr/github.ts` | override | adds a REST reader for cloud, where the session proxy refuses GraphQL, reading review threads from the proxy's /ccr/review_threads route, and switches to it at the first refusal; review bots are matched from a list of logins |
-| `skills/poteto-mode/scripts/watch-pr/watch-pr` | override | drops the bootstrap.ts install: the launcher runs it with the vendored commander |
-| `skills/poteto-mode/scripts/worktree-audit.sh` | override | attributes each worktree to the newest Claude Code transcript whose cwd is that worktree or lies under it, read only from the project directories of the main checkout and its worktrees, in place of a path search of Cursor's agent-transcripts, and buckets a worktree no transcript claims as a stray; it also runs on Linux and takes paths with spaces |
-| `skills/setup-pstack/SKILL.md` | override | shows the three settings, points to /config, prints the setup line and shows the Read rule, in place of writing a Cursor model rule |
+| `skills/savvy-help/SKILL.md` | override | Cursor-only sections (Custom Mode, Option+Enter, .cursor/rules, /add-plugin) rewritten for Claude Code's install, settings and surfaces, with a row for re-entering the mode after a resume |
+| `skills/savvy-mode/playbooks/eval.md` | override | spawns its own blind samples, 3 per variant on the model the change meets in use, with one blind Judgement judge over all of them and an opt-in cross-model sweep, in place of arena's model fan-out and cross-family judge; a user-invoked skill's samples run on the general-purpose agent, which inherits the lead's model, since `savvy-agent`'s jrzstack body would skew them |
+| `skills/savvy-mode/playbooks/orchestrate.md` | override | a lead and sub-leads place units by surface (cloud workers, local-only worktrees, in-VM worktree subagents, create_session in Auto), retry by failure mode, take the full gate at landing as the ledger verdict, land only under a landing grant with Close listing leftover branches, run orch through the launcher with its store on an orphan branch, and split restart from compaction |
+| `skills/savvy-mode/scripts/check-plan.mjs` | override | its markers match the port's plan wording: live lanes on `savvy-agent` on Volume instead of a named model, and playbooks read from the plugin instead of from trunk with `git show` |
+| `skills/savvy-mode/scripts/orch/` | override | frontier set takes the stacker's PR order from the store, PR state and merged heads from gh api REST and open heads from git rev-parse, in place of Graphite, and fails on a drifted base or a stale head; init excludes the store from git and every drain pushes it to its orphan branch by plumbing; commander imported directly and NotFoundError's parameter property a plain field, for Node's type stripping |
+| `skills/savvy-mode/scripts/watch-pr/fakes.test-helper.ts` | override | adds a fake of the REST API serving the proxy's /ccr/review_threads shape |
+| `skills/savvy-mode/scripts/watch-pr/github.test.ts` | override | adds tests of the REST reader against a fake of the proxy's routes, its verdicts beside GraphQL's on the same threads, the fallback and the review-bot logins |
+| `skills/savvy-mode/scripts/watch-pr/github.ts` | override | adds a REST reader for cloud, where the session proxy refuses GraphQL, reading review threads from the proxy's /ccr/review_threads route, and switches to it at the first refusal; review bots are matched from a list of logins |
+| `skills/savvy-mode/scripts/watch-pr/watch-pr` | override | drops the bootstrap.ts install: the launcher runs it with the vendored commander |
+| `skills/savvy-mode/scripts/worktree-audit.sh` | override | attributes each worktree to the newest Claude Code transcript whose cwd is that worktree or lies under it, read only from the project directories of the main checkout and its worktrees, in place of a path search of Cursor's agent-transcripts, and buckets a worktree no transcript claims as a stray; it also runs on Linux and takes paths with spaces |
+| `skills/setup-jrzstack/SKILL.md` | override | shows the three settings, points to /config, prints the setup line and shows the Read rule, in place of writing a Cursor model rule |
 | `.claude-plugin/plugin.json` | port-only | Claude Code's plugin manifest, with the three model settings as userConfig and no version |
-| `agents/poteto-reader.md` | port-only | the one reader for every setting, in place of a readonly generalPurpose spawn: no Edit, Write or NotebookEdit, each spawn passing its setting's model and effort |
+| `agents/savvy-reader.md` | port-only | the one reader for every setting, in place of a readonly generalPurpose spawn: no Edit, Write or NotebookEdit, each spawn passing its setting's model and effort |
 | `hooks/hooks.json` | port-only | registers the compaction hook on SessionStart's compact matcher, which skill frontmatter can't: its SessionStart never fires |
-| `hooks/poteto-mode-compaction.sh` | port-only | after a compaction in a marked poteto-mode session, lists the durable state to re-read before acting: the skill, any store, the transcript, a trail and a resume note |
-| `hooks/poteto-mode-reminder.sh` | port-only | poteto-mode's per-turn reminder hook: upstream's reminder text, the skill path, the surface and mode, precedence and the machine lock, and the session marker the compaction hook reads |
+| `hooks/savvy-mode-compaction.sh` | port-only | after a compaction in a marked savvy-mode session, lists the durable state to re-read before acting: the skill, any store, the transcript, a trail and a resume note |
+| `hooks/savvy-mode-reminder.sh` | port-only | savvy-mode's per-turn reminder hook: upstream's reminder text, the skill path, the surface and mode, precedence and the machine lock, and the session marker the compaction hook reads |
 | `scripts/exclude-worktrees` | port-only | adds .claude/worktrees/ to the exclude file once, one plain command a worktree-isolated agent's guard accepts |
 | `scripts/heavy` | port-only | the machine lock: runs one heavy command at a time per machine, released by the kernel when its holder dies |
 | `scripts/wait-report` | port-only | a sub-lead's wait on a worker's report commit, one plain command a worktree-isolated agent's guard accepts |
-| `skills/poteto-mode/playbooks/hand-off.md` | port-only | the Hand-off playbook: on an explicit request only, pushes the input, starts a cloud lead with `claude --permission-mode auto --cloud` and a fixed brief whose first check ends a bundled session with no GitHub remote, then prints the link and ends, or says why once and stays local |
-| `skills/poteto-mode/references/brief-contract.md` | port-only | the rules every worker brief carries: entry line, no human asks, own-branch pushes, start commit, the machine lock, missing files, leaf workers, the trailered report commit and the nonce trailer a lead finds a cloud report by, a sub-lead's timebox and in-turn wait, and the lead's worker worktrees: the exclude line and removal |
-| `skills/poteto-mode/scripts/node_modules/commander/` | port-only | commander 14.0.0, the version upstream's bun.lock pins, vendored with its MIT licence so upstream's imports resolve without an install |
-| `skills/poteto-mode/scripts/run` | port-only | the runtime launcher: runs poteto-mode's scripts with Bun, else Node 22.18+, in place of bootstrap.ts's install |
+| `skills/savvy-mode/playbooks/hand-off.md` | port-only | the Hand-off playbook: on an explicit request only, pushes the input, starts a cloud lead with `claude --permission-mode auto --cloud` and a fixed brief whose first check ends a bundled session with no GitHub remote, then prints the link and ends, or says why once and stays local |
+| `skills/savvy-mode/references/brief-contract.md` | port-only | the rules every worker brief carries: entry line, no human asks, own-branch pushes, start commit, the machine lock, missing files, leaf workers, the trailered report commit and the nonce trailer a lead finds a cloud report by, a sub-lead's timebox and in-turn wait, and the lead's worker worktrees: the exclude line and removal |
+| `skills/savvy-mode/scripts/node_modules/commander/` | port-only | commander 14.0.0, the version upstream's bun.lock pins, vendored with its MIT licence so upstream's imports resolve without an install |
+| `skills/savvy-mode/scripts/run` | port-only | the runtime launcher: runs savvy-mode's scripts with Bun, else Node 22.18+, in place of bootstrap.ts's install |
 | `.cursor-plugin/` | dropped | Cursor's plugin manifest, replaced by Claude Code's in .claude-plugin/plugin.json |
 | `.gitignore` | dropped | upstream's plugin-level ignore list: its node_modules/ line would hide the vendored commander, and the repo's root .gitignore covers the rest |
 | `automations/benny/` | dropped | Cursor Slack automations, outside the port's scope |
 | `docs/harness/` | dropped | upstream's runtime adapter for its own Claude Code build; the port maps Cursor names at translation time, and the adapter's mappings contradict the port's (rule 24) |
 | `plugin.json` | dropped | the Agent Plugins 1.0.0 root manifest, which Claude Code doesn't read; .claude-plugin/plugin.json is the port's manifest |
 | `skills/make-bot-ui/` | dropped | Cursor Grok Bot automations: the session creates its own webhook routine and wakes on it, and a lead creating its own routines is out of the port's scope |
-| `skills/poteto-mode/scripts/bootstrap.ts` | dropped | installs commander at first run; the port vendors commander and runs scripts through its launcher |
-| `skills/poteto-mode/scripts/bun.lock` | dropped | a runtime lockfile for bootstrap.ts's install; kept for development only |
-| `skills/poteto-mode/scripts/package.json` | dropped | a runtime manifest for bootstrap.ts's install; kept for development only |
+| `skills/savvy-mode/scripts/bootstrap.ts` | dropped | installs commander at first run; the port vendors commander and runs scripts through its launcher |
+| `skills/savvy-mode/scripts/bun.lock` | dropped | a runtime lockfile for bootstrap.ts's install; kept for development only |
+| `skills/savvy-mode/scripts/package.json` | dropped | a runtime manifest for bootstrap.ts's install; kept for development only |
 
 Every other file is translated from upstream at the same path, except `skills/control-cli/` (from `cursor-team-kit/skills/control-cli/`), `skills/control-ui/` (from `cursor-team-kit/skills/control-ui/`) and `skills/deslop/` (from `cursor-team-kit/skills/deslop/`).
 <!-- END generated -->
@@ -278,7 +282,7 @@ version line and file table above. In a checkout of this repo the same sync runs
 
 pstack is the work of **Lauren Tan**, published in [cursor/plugins](https://github.com/cursor/plugins)
 under the MIT License. Its workflows, playbooks and skills are hers; this port translates them to
-Claude Code. Upstream's copyright notice is kept in [`pstack/LICENSE`](pstack/LICENSE), and the
+Claude Code. Upstream's copyright notice is kept in [`jrzstack/LICENSE`](jrzstack/LICENSE), and the
 port is released under the MIT License too.
 
 Not affiliated with Cursor or Anthropic.

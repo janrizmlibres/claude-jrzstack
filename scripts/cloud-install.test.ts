@@ -29,7 +29,7 @@ exit 0
 
 /** A directory standing in for the setup line's clone, holding only the installer. */
 function bareClone(): string {
-  const clone = tempDir("pstack-clone-");
+  const clone = tempDir("jrzstack-clone-");
   mkdirSync(join(clone, "scripts"));
   copyFileSync(join(scriptsDir, "cloud-install.sh"), join(clone, "scripts", "cloud-install.sh"));
   return clone;
@@ -42,11 +42,11 @@ function bareClone(): string {
 function fixture({ settings = vmSettings, clone }: { settings?: object | null; clone?: string } = {}) {
   const stubs = { claude: stub("claude"), npx: stub("npx"), ...(clone ? {} : { git: stub("git") }) };
   clone ??= bareClone();
-  const home = tempDir("pstack-home-");
+  const home = tempDir("jrzstack-home-");
   if (settings) writeFiles(home, { ".claude/settings.json": JSON.stringify(settings, null, 2) });
-  const bin = tempDir("pstack-bin-");
+  const bin = tempDir("jrzstack-bin-");
   writeFiles(bin, stubs);
-  const logs = tempDir("pstack-logs-");
+  const logs = tempDir("jrzstack-logs-");
   const env = { PATH: `${bin}:${process.env.PATH ?? ""}`, STUB_LOG: logs };
   const settingsFile = join(home, ".claude", "settings.json");
 
@@ -70,12 +70,12 @@ function fixture({ settings = vmSettings, clone }: { settings?: object | null; c
   };
 }
 
-/** The command source the installer wrote for pstack, from the marketplace beside the clone. */
+/** The command source the installer wrote for jrzstack, from the marketplace beside the clone. */
 function commandSource(clone: string): { command: string; timeout: number } {
   const market = JSON.parse(readFileSync(join(`${clone}-marketplace`, ".claude-plugin", "marketplace.json"), "utf8"));
-  expect(market.name).toBe("claude-pstack");
+  expect(market.name).toBe("claude-jrzstack");
   expect(market.plugins).toHaveLength(1);
-  expect(market.plugins[0].name).toBe("pstack");
+  expect(market.plugins[0].name).toBe("jrzstack");
   const { source, ...rest } = market.plugins[0].source;
   expect(source).toBe("command");
   return rest;
@@ -93,7 +93,7 @@ describe("cloud-install.sh", () => {
       env: { ...vmSettings.env, CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH: "3" },
       permissions: {
         ...vmSettings.permissions,
-        allow: ["Bash(git status:*)", `Read(/${f.home}/.claude/plugins/cache/claude-pstack/**)`],
+        allow: ["Bash(git status:*)", `Read(/${f.home}/.claude/plugins/cache/claude-jrzstack/**)`],
       },
     });
   });
@@ -104,11 +104,11 @@ describe("cloud-install.sh", () => {
     expect(f.install().exitCode).toBe(0);
     expect(f.settings()).toEqual({
       env: { CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH: "3" },
-      permissions: { allow: [`Read(/${f.home}/.claude/plugins/cache/claude-pstack/**)`] },
+      permissions: { allow: [`Read(/${f.home}/.claude/plugins/cache/claude-jrzstack/**)`] },
     });
   });
 
-  test("the command source fast-forwards the clone on the installed ref and prints only its pstack directory", () => {
+  test("the command source fast-forwards the clone on the installed ref and prints only its jrzstack directory", () => {
     const f = fixture();
     f.install(["release/v1"]);
     const { command, timeout } = commandSource(f.clone);
@@ -117,17 +117,17 @@ describe("cloud-install.sh", () => {
     const result = f.runCommand(command);
 
     expect(timeout).toBe(60);
-    expect(result).toEqual({ exitCode: 0, stdout: `${f.clone}/pstack\n`, stderr: "" });
+    expect(result).toEqual({ exitCode: 0, stdout: `${f.clone}/jrzstack\n`, stderr: "" });
     expect(f.calls("git")).toEqual([`-C ${f.clone} pull --ff-only -q origin release/v1`]);
   });
 
-  test("a failing pull still prints the clone's pstack directory", () => {
+  test("a failing pull still prints the clone's jrzstack directory", () => {
     const f = fixture();
     f.install();
 
     expect(f.runCommand(commandSource(f.clone).command, { STUB_FAIL: "git" })).toEqual({
       exitCode: 0,
-      stdout: `${f.clone}/pstack\n`,
+      stdout: `${f.clone}/jrzstack\n`,
       stderr: "",
     });
   });
@@ -153,7 +153,7 @@ describe("cloud-install.sh", () => {
     ]);
     expect(f.calls("claude")).toEqual([
       `plugin marketplace add ${f.clone}-marketplace --scope user`,
-      "plugin install pstack@claude-pstack --scope user -y --config work_model=sonnet --config volume_model=haiku",
+      "plugin install jrzstack@claude-jrzstack --scope user -y --config work_model=sonnet --config volume_model=haiku",
     ]);
   });
 
@@ -172,15 +172,15 @@ describe("cloud-install.sh", () => {
   test("with real git, checks a depth-1 clone of main out at the ref, and the command fast-forwards it", () => {
     const remote = new FakeRemote();
     remote.commit({
-      write: { "scripts/cloud-install.sh": readFileSync(join(scriptsDir, "cloud-install.sh"), "utf8"), "pstack/v": "main\n" },
+      write: { "scripts/cloud-install.sh": readFileSync(join(scriptsDir, "cloud-install.sh"), "utf8"), "jrzstack/v": "main\n" },
     });
     git(remote.dir, "checkout", "-q", "-b", "release/v1");
     // The ref's installer always fails: the run that checks the ref out finishes
     // the install with the installer it started with.
     const refInstaller = Array(400).fill(`echo "the ref's installer ran" >&2; exit 7`).join("\n");
-    const rc1 = remote.commit({ write: { "scripts/cloud-install.sh": refInstaller, "pstack/v": "rc1\n" } });
+    const rc1 = remote.commit({ write: { "scripts/cloud-install.sh": refInstaller, "jrzstack/v": "rc1\n" } });
     git(remote.dir, "checkout", "-q", "main");
-    const clone = join(tempDir(), "claude-pstack");
+    const clone = join(tempDir(), "claude-jrzstack");
     git(tempDir(), "clone", "-q", "--depth", "1", remote.url, clone);
     const f = fixture({ clone });
 
@@ -191,11 +191,11 @@ describe("cloud-install.sh", () => {
     expect(git(clone, "rev-parse", "HEAD")).toBe(rc1);
 
     git(remote.dir, "checkout", "-q", "release/v1");
-    const rc2 = remote.commit({ write: { "pstack/v": "rc2\n" } });
+    const rc2 = remote.commit({ write: { "jrzstack/v": "rc2\n" } });
 
-    expect(f.runCommand(commandSource(clone).command)).toEqual({ exitCode: 0, stdout: `${clone}/pstack\n`, stderr: "" });
+    expect(f.runCommand(commandSource(clone).command)).toEqual({ exitCode: 0, stdout: `${clone}/jrzstack\n`, stderr: "" });
     expect(git(clone, "rev-parse", "HEAD")).toBe(rc2);
-    expect(readFileSync(join(clone, "pstack", "v"), "utf8")).toBe("rc2\n");
+    expect(readFileSync(join(clone, "jrzstack", "v"), "utf8")).toBe("rc2\n");
   });
 
   test("installs Playwright Chromium", () => {

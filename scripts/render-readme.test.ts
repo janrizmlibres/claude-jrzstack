@@ -10,16 +10,16 @@ const snapshotRecord = {
   repo: "https://github.com/cursor/plugins",
   commit: "df581122cde17e6e27686b5a448bde23e4ad4318",
   version: "0.15.15",
-  paths: ["pstack", "kit/skills/deslop"],
+  paths: ["jrzstack", "kit/skills/deslop"],
   taken: "2026-10-08T07:02:12.180Z",
 };
 
 const entries: PortEntry[] = [
-  { path: "pstack/skills/setup-pstack/SKILL.md", kind: "override", why: "shows the settings" },
-  { path: "pstack/automations/benny", kind: "dropped", why: "Cursor Slack automations" },
-  { path: "pstack/agents/work.md", kind: "port-only", why: "the Work setting's writer" },
+  { path: "jrzstack/skills/setup-jrzstack/SKILL.md", kind: "override", why: "shows the settings" },
+  { path: "jrzstack/automations/benny", kind: "dropped", why: "Cursor Slack automations" },
+  { path: "jrzstack/agents/work.md", kind: "port-only", why: "the Work setting's writer" },
   {
-    path: "pstack/skills/deslop",
+    path: "jrzstack/skills/deslop",
     kind: "translated",
     why: "vendored from the kit",
     sources: ["upstream/kit/skills/deslop"],
@@ -27,7 +27,7 @@ const entries: PortEntry[] = [
 ];
 
 const readme = [
-  "# pstack for Claude Code",
+  "# jrzstack for Claude Code",
   "",
   "<!-- BEGIN generated from upstream/snapshot.json — do not edit by hand -->",
   "stale version line",
@@ -50,14 +50,14 @@ const tree: Files = {
   "upstream/pstack/automations/benny/README.md": "Benny.\n",
   "upstream/pstack/skills/setup-pstack/SKILL.md": "Setup.\n",
   "upstream/kit/skills/deslop/SKILL.md": "Deslop.\n",
-  "pstack/skills/setup-pstack/SKILL.md": "Setup, overridden.\n",
-  "pstack/agents/work.md": "Work.\n",
-  "pstack/skills/deslop/SKILL.md": "Deslop.\n",
+  "jrzstack/skills/setup-jrzstack/SKILL.md": "Setup, overridden.\n",
+  "jrzstack/agents/work.md": "Work.\n",
+  "jrzstack/skills/deslop/SKILL.md": "Deslop.\n",
 };
 
 /** A repo root holding the fixture tree, snapshot.json, port.json and README.md, each overridable. */
 function repo(options: { readme?: string; entries?: PortEntry[]; record?: object } = {}): string {
-  const root = tempDir("pstack-readme-");
+  const root = tempDir("jrzstack-readme-");
   writeFiles(root, {
     ...tree,
     "upstream/snapshot.json": JSON.stringify(options.record ?? snapshotRecord, null, 2) + "\n",
@@ -90,7 +90,7 @@ describe("render-readme", () => {
     ]);
   });
 
-  test("writes a table of overrides, port-only and dropped files with their why, paths relative to pstack/", () => {
+  test("writes a table of overrides, port-only and dropped files with their why, paths relative to jrzstack/", () => {
     const root = repo();
 
     render(root);
@@ -99,7 +99,7 @@ describe("render-readme", () => {
     expect(table.slice(0, 5)).toEqual([
       "| File | Kind | Why |",
       "|---|---|---|",
-      "| `skills/setup-pstack/SKILL.md` | override | shows the settings |",
+      "| `skills/setup-jrzstack/SKILL.md` | override | shows the settings |",
       "| `agents/work.md` | port-only | the Work setting's writer |",
       "| `automations/benny/` | dropped | Cursor Slack automations |",
     ]);
@@ -118,8 +118,8 @@ describe("render-readme", () => {
   test("orders rows by code point, whatever the locale", () => {
     const root = repo({
       entries: [
-        { path: "pstack/agents/apple.md", kind: "port-only", why: "lower" },
-        { path: "pstack/agents/Zebra.md", kind: "port-only", why: "upper" },
+        { path: "jrzstack/agents/apple.md", kind: "port-only", why: "lower" },
+        { path: "jrzstack/agents/Zebra.md", kind: "port-only", why: "upper" },
       ],
     });
 
@@ -133,7 +133,7 @@ describe("render-readme", () => {
 
   test("escapes a pipe in a why so the row keeps its columns", () => {
     const root = repo({
-      entries: [{ path: "pstack/agents/work.md", kind: "port-only", why: "reader | writer" }],
+      entries: [{ path: "jrzstack/agents/work.md", kind: "port-only", why: "reader | writer" }],
     });
 
     render(root);
@@ -194,7 +194,7 @@ describe("render-readme", () => {
       render(root);
       writeFileSync(
         join(root, "port.json"),
-        JSON.stringify({ entries: [...entries, { path: "pstack/x.md", kind: "dropped", why: "gone" }] }) + "\n",
+        JSON.stringify({ entries: [...entries, { path: "jrzstack/x.md", kind: "dropped", why: "gone" }] }) + "\n",
       );
 
       const result = render(root, "--check");
@@ -225,7 +225,7 @@ describe("render-readme", () => {
     });
 
     test("on a malformed port.json", () => {
-      const root = repo({ entries: [{ path: "pstack/x", kind: "patched", why: "?" }] });
+      const root = repo({ entries: [{ path: "jrzstack/x", kind: "patched", why: "?" }] });
 
       const result = render(root);
 

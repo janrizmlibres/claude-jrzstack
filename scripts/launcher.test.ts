@@ -3,14 +3,14 @@ import { copyFileSync, mkdirSync, symlinkSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { git, pluginDir, runProgram, tempDir, writeFiles } from "./test/harness.ts";
 
-const launcherPath = "skills/poteto-mode/scripts/run";
+const launcherPath = "skills/savvy-mode/scripts/run";
 const missingRuntimeCode = 69;
 const usageCode = 64;
 const installLine = "curl -fsSL https://bun.sh/install | bash";
 
 /** A PATH directory holding `bash` plus the given stubs, so no real runtime is found. */
 function binWith(stubs: Record<string, string>): string {
-  const bin = tempDir("pstack-bin-");
+  const bin = tempDir("jrzstack-bin-");
   symlinkSync(Bun.which("bash")!, join(bin, "bash"));
   writeFiles(
     bin,
@@ -24,9 +24,9 @@ const bunStub = 'echo "bun $*"';
 const nodeStub = (version: string) => `if [ "$1" = --version ]; then echo ${version}; else echo "node $*"; fi`;
 
 const launch = (bin: string, args: string[], plugin = pluginDir) =>
-  runProgram([join(plugin, launcherPath), ...args], { cwd: tempDir("pstack-cwd-"), env: { PATH: bin } });
+  runProgram([join(plugin, launcherPath), ...args], { cwd: tempDir("jrzstack-cwd-"), env: { PATH: bin } });
 
-const scripts = join(pluginDir, "skills", "poteto-mode", "scripts");
+const scripts = join(pluginDir, "skills", "savvy-mode", "scripts");
 
 describe("runtime launcher", () => {
   test("runs the script with Bun when Bun is present, resolving it beside the launcher", () => {
@@ -45,11 +45,11 @@ describe("runtime launcher", () => {
   });
 
   test("resolves the script beside the launcher when called by a relative path with CDPATH set", () => {
-    const cdpath = tempDir("pstack-cdpath-");
+    const cdpath = tempDir("jrzstack-cdpath-");
     mkdirSync(join(cdpath, "scripts"));
 
     const result = runProgram([Bun.which("bash")!, "scripts/run", "orch/orch.ts"], {
-      cwd: join(pluginDir, "skills", "poteto-mode"),
+      cwd: join(pluginDir, "skills", "savvy-mode"),
       env: { PATH: binWith({ bun: bunStub }), CDPATH: cdpath },
     });
 
@@ -100,9 +100,9 @@ describe("runtime launcher", () => {
 describe("vendored commander", () => {
   /** The plugin's files as git would ship them, copied to a fresh directory like a marketplace install. */
   function installedPlugin(options: { withoutVendored?: boolean } = {}): string {
-    const root = tempDir("pstack-install-");
+    const root = tempDir("jrzstack-install-");
     const repo = dirname(pluginDir);
-    const files = git(repo, "ls-files", "--cached", "--others", "--exclude-standard", "-z", "--", "pstack")
+    const files = git(repo, "ls-files", "--cached", "--others", "--exclude-standard", "-z", "--", "jrzstack")
       .split("\0")
       .filter(Boolean)
       .filter((file) => !(options.withoutVendored && file.includes("/node_modules/")));
@@ -111,7 +111,7 @@ describe("vendored commander", () => {
       copyFileSync(join(repo, file), join(root, file));
     }
     // copyFileSync keeps the mode bits, so the launcher stays executable.
-    writeFiles(join(root, "pstack", "skills", "poteto-mode", "scripts"), {
+    writeFiles(join(root, "jrzstack", "skills", "savvy-mode", "scripts"), {
       "probe/probe.ts": [
         'import { Command } from "commander";',
         "const program: Command = new Command();",
@@ -119,7 +119,7 @@ describe("vendored commander", () => {
         "",
       ].join("\n"),
     });
-    return join(root, "pstack");
+    return join(root, "jrzstack");
   }
 
   const runtimes = { bun: process.execPath, node: Bun.which("node") };
@@ -136,7 +136,7 @@ describe("vendored commander", () => {
     expect(result.stderr).toBe("");
     expect(result.exitCode).toBe(0);
     expect(result.stdout).toStartWith("probe file://");
-    expect(result.stdout).toContain(`${plugin}/skills/poteto-mode/scripts/node_modules/commander/`);
+    expect(result.stdout).toContain(`${plugin}/skills/savvy-mode/scripts/node_modules/commander/`);
   });
 
   test.each(Object.keys(runtimes))("runs watch-pr from a plugin install under %s", (name) => {

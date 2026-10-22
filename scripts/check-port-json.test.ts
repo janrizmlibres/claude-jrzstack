@@ -7,7 +7,7 @@ import { portRepo, type PortEntry } from "./test/port-fixture.ts";
 const check = (cwd: string, ...args: string[]) => runScript("check-port-json.ts", args, { cwd });
 
 const snapshot = {
-  "upstream/pstack/README.md": "# pstack\n",
+  "upstream/pstack/README.md": "# jrzstack\n",
   "upstream/pstack/skills/a/SKILL.md": "Skill a.\n",
   "upstream/pstack/skills/arena/SKILL.md": "Arena.\n",
   "upstream/pstack/skills/arena/references/rubric.md": "Rubric.\n",
@@ -18,16 +18,16 @@ const snapshot = {
 };
 
 const entries: PortEntry[] = [
-  { path: "pstack/automations/benny", kind: "dropped", why: "Cursor Slack automations" },
+  { path: "jrzstack/automations/benny", kind: "dropped", why: "Cursor Slack automations" },
   {
-    path: "pstack/skills/arena/SKILL.md",
+    path: "jrzstack/skills/arena/SKILL.md",
     kind: "override",
     why: "directions and a blind judge",
     depends_on: ["upstream/pstack/skills/arena/references/rubric.md"],
   },
-  { path: "pstack/hooks/hooks.json", kind: "port-only", why: "the compaction hook" },
+  { path: "jrzstack/hooks/hooks.json", kind: "port-only", why: "the compaction hook" },
   {
-    path: "pstack/skills/deslop",
+    path: "jrzstack/skills/deslop",
     kind: "translated",
     why: "vendored from the kit",
     sources: ["upstream/kit/skills/deslop"],
@@ -35,13 +35,13 @@ const entries: PortEntry[] = [
 ];
 
 const port = {
-  "pstack/README.md": "# pstack\n",
-  "pstack/skills/a/SKILL.md": "Skill a.\n",
-  "pstack/skills/arena/SKILL.md": "Arena, overridden.\n",
-  "pstack/skills/arena/references/rubric.md": "Rubric.\n",
-  "pstack/hooks/hooks.json": "{}\n",
-  "pstack/skills/deslop/SKILL.md": "Deslop.\n",
-  "pstack/skills/deslop/references/x.md": "X.\n",
+  "jrzstack/README.md": "# jrzstack\n",
+  "jrzstack/skills/a/SKILL.md": "Skill a.\n",
+  "jrzstack/skills/arena/SKILL.md": "Arena, overridden.\n",
+  "jrzstack/skills/arena/references/rubric.md": "Rubric.\n",
+  "jrzstack/hooks/hooks.json": "{}\n",
+  "jrzstack/skills/deslop/SKILL.md": "Deslop.\n",
+  "jrzstack/skills/deslop/references/x.md": "X.\n",
 };
 
 /** The fixture with `entries` changed by `edit`. */
@@ -57,18 +57,18 @@ describe("check-port-json", () => {
   });
 
   test("fails on a listed port path that doesn't exist", () => {
-    const { "pstack/hooks/hooks.json": _, ...rest } = port;
+    const { "jrzstack/hooks/hooks.json": _, ...rest } = port;
 
     const result = check(portRepo({ ...snapshot, ...rest }, entries));
 
     expect(result.exitCode).toBe(1);
-    expect(result.stdout).toContain("pstack/hooks/hooks.json");
+    expect(result.stdout).toContain("jrzstack/hooks/hooks.json");
   });
 
   test("accepts a dropped entry whose port path doesn't exist", () => {
     const result = check(portRepo({ ...snapshot, ...port }, entries));
 
-    expect(result.stdout).not.toContain("pstack/automations/benny");
+    expect(result.stdout).not.toContain("jrzstack/automations/benny");
   });
 
   test("fails on a listed upstream path missing from the snapshot", () => {
@@ -88,11 +88,11 @@ describe("check-port-json", () => {
   test("fails on a dropped or overridden path whose upstream counterpart is missing", () => {
     const listed = withEntries((e) => [
       ...e,
-      { path: "pstack/automations/gone", kind: "dropped", why: "never existed" },
-      { path: "pstack/skills/new/SKILL.md", kind: "override", why: "no counterpart" },
+      { path: "jrzstack/automations/gone", kind: "dropped", why: "never existed" },
+      { path: "jrzstack/skills/new/SKILL.md", kind: "override", why: "no counterpart" },
     ]);
 
-    const result = check(portRepo({ ...snapshot, ...port, "pstack/skills/new/SKILL.md": "New.\n" }, listed));
+    const result = check(portRepo({ ...snapshot, ...port, "jrzstack/skills/new/SKILL.md": "New.\n" }, listed));
 
     expect(result.exitCode).toBe(1);
     expect(result.stdout).toContain("upstream/pstack/automations/gone");
@@ -100,14 +100,14 @@ describe("check-port-json", () => {
   });
 
   test("fails on an unlisted port file with no counterpart", () => {
-    const result = check(portRepo({ ...snapshot, ...port, "pstack/skills/a/extra.md": "Extra.\n" }, entries));
+    const result = check(portRepo({ ...snapshot, ...port, "jrzstack/skills/a/extra.md": "Extra.\n" }, entries));
 
     expect(result.exitCode).toBe(1);
-    expect(result.stdout).toContain("pstack/skills/a/extra.md");
+    expect(result.stdout).toContain("jrzstack/skills/a/extra.md");
   });
 
   test("ignores port files git ignores", () => {
-    const ignored = { ".gitignore": "node_modules/\n", "pstack/node_modules/x/index.js": "x\n" };
+    const ignored = { ".gitignore": "node_modules/\n", "jrzstack/node_modules/x/index.js": "x\n" };
 
     const result = check(portRepo({ ...snapshot, ...port, ...ignored }, entries));
 
@@ -116,11 +116,11 @@ describe("check-port-json", () => {
 
   describe("rejects a malformed port.json with exit 2", () => {
     const malformed: Record<string, (e: PortEntry[]) => PortEntry[]> = {
-      "an unknown kind": (e) => [...e, { path: "pstack/x", kind: "patched", why: "?" }],
-      "a missing why": (e) => [...e, { path: "pstack/x", kind: "port-only", why: "" }],
-      "a port path outside pstack/": (e) => [...e, { path: "docs/x.md", kind: "port-only", why: "?" }],
+      "an unknown kind": (e) => [...e, { path: "jrzstack/x", kind: "patched", why: "?" }],
+      "a missing why": (e) => [...e, { path: "jrzstack/x", kind: "port-only", why: "" }],
+      "a port path outside jrzstack/": (e) => [...e, { path: "docs/x.md", kind: "port-only", why: "?" }],
       "an upstream path outside upstream/": (e) => {
-        e[1]!.depends_on = ["pstack/skills/arena/references/rubric.md"];
+        e[1]!.depends_on = ["jrzstack/skills/arena/references/rubric.md"];
         return e;
       },
       "sources on a port-only file": (e) => {
@@ -132,7 +132,7 @@ describe("check-port-json", () => {
         return e;
       },
       "a path listed twice": (e) => [...e, { ...e[0]! }],
-      "an unknown field": (e) => [...e, { path: "pstack/x", kind: "port-only", why: "?", note: "?" } as PortEntry],
+      "an unknown field": (e) => [...e, { path: "jrzstack/x", kind: "port-only", why: "?", note: "?" } as PortEntry],
     };
 
     for (const [name, edit] of Object.entries(malformed)) {
@@ -154,7 +154,7 @@ describe("check-port-json", () => {
 
   describe("--coverage", () => {
     test("lists each upstream file not yet translated, overridden or dropped", () => {
-      const { "pstack/skills/a/SKILL.md": _, "pstack/skills/deslop/references/x.md": __, ...rest } = port;
+      const { "jrzstack/skills/a/SKILL.md": _, "jrzstack/skills/deslop/references/x.md": __, ...rest } = port;
 
       const result = check(portRepo({ ...snapshot, ...rest }, entries), "--coverage");
 
@@ -189,10 +189,10 @@ describe("check-port-json", () => {
 
       expect(dropped).toEqual(
         expect.arrayContaining([
-          "pstack/automations/benny",
-          "pstack/skills/poteto-mode/scripts/bootstrap.ts",
-          "pstack/skills/poteto-mode/scripts/package.json",
-          "pstack/skills/poteto-mode/scripts/bun.lock",
+          "jrzstack/automations/benny",
+          "jrzstack/skills/savvy-mode/scripts/bootstrap.ts",
+          "jrzstack/skills/savvy-mode/scripts/package.json",
+          "jrzstack/skills/savvy-mode/scripts/bun.lock",
         ]),
       );
     });

@@ -8,7 +8,7 @@ const usageCode = 64;
 
 /** A repo whose `main` is the start commit, with a worker branch `worker` checked out in a worktree. */
 function workerRepo() {
-  const root = tempDir("pstack-wait-");
+  const root = tempDir("jrzstack-wait-");
   const repo = join(root, "repo");
   git(root, "init", "-q", "-b", "main", repo);
   git(repo, "config", "user.name", "Lead");
@@ -20,15 +20,15 @@ function workerRepo() {
   return { repo, worktree, start };
 }
 
-/** Commit on the worker's branch, with a `Pstack-Status` trailer when `status` is given. */
+/** Commit on the worker's branch, with a `Jrzstack-Status` trailer when `status` is given. */
 function commit(worktree: string, subject: string, status?: string) {
-  const trailer = status ? ["--trailer", `Pstack-Status: ${status}`] : [];
+  const trailer = status ? ["--trailer", `Jrzstack-Status: ${status}`] : [];
   git(worktree, "commit", "-q", "--allow-empty", "-m", subject, ...trailer);
 }
 
 /** Run wait-report from `cwd`, polling every second. */
 function run(cwd: string, args: string[]) {
-  return runProgram([waitReport, ...args], { cwd, env: { PSTACK_WAIT_REPORT_INTERVAL_SECONDS: "1" } });
+  return runProgram([waitReport, ...args], { cwd, env: { JRZSTACK_WAIT_REPORT_INTERVAL_SECONDS: "1" } });
 }
 
 describe("wait-report", () => {
@@ -49,7 +49,7 @@ describe("wait-report", () => {
     const proc = Bun.spawn({
       cmd: [waitReport, start, "worker", "20"],
       cwd: repo,
-      env: { PATH: process.env.PATH ?? "", HOME: tempDir("pstack-home-"), PSTACK_WAIT_REPORT_INTERVAL_SECONDS: "1" },
+      env: { PATH: process.env.PATH ?? "", HOME: tempDir("jrzstack-home-"), JRZSTACK_WAIT_REPORT_INTERVAL_SECONDS: "1" },
       stdout: "pipe",
       stderr: "pipe",
     });

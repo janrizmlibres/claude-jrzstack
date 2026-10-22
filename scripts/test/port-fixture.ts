@@ -1,5 +1,5 @@
 // A port checkout in a temp git repo: `upstream/` standing in for the
-// snapshot, `pstack/` for the port, plus `port.json` and the conversion rules
+// snapshot, `jrzstack/` for the port, plus `port.json` and the conversion rules
 // document, shared by the port.json and Cursor-ism check tests.
 import { git, tempDir, writeFiles, type Files } from "./harness.ts";
 
@@ -13,7 +13,7 @@ export type PortEntry = {
 
 /** A git repo holding `files` and, when given, a `port.json` of `entries`. */
 export function portRepo(files: Files, entries?: PortEntry[]): string {
-  const root = tempDir("pstack-port-");
+  const root = tempDir("jrzstack-port-");
   git(root, "init", "-q");
   writeFiles(root, files);
   if (entries) writeFiles(root, { "port.json": JSON.stringify({ entries }, null, 2) + "\n" });

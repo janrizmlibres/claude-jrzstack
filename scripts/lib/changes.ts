@@ -2,7 +2,7 @@
 // does with each change given port.json: the per-change rules of a sync.
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { counterpart, covers, entryFor, type PortEntry, type PortRecord } from "./port.ts";
+import { counterpart, covers, entryFor, portPath, type PortEntry, type PortRecord } from "./port.ts";
 import { git, snapshotTree, type UpstreamClone } from "./upstream.ts";
 
 export type ChangeStatus = "added" | "modified" | "deleted" | "renamed";
@@ -62,7 +62,7 @@ function portTarget(record: PortRecord, snapshotPath: string): { port: string; e
     const source = entry.sources?.find((s) => covers(s, snapshotPath));
     if (source) return { port: entry.path + snapshotPath.slice(source.length), entry };
   }
-  const port = fromSnapshot(snapshotPath);
+  const port = portPath(fromSnapshot(snapshotPath));
   return { port, entry: entryFor(record, port) };
 }
 

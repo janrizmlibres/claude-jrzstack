@@ -8,7 +8,7 @@ const line = ".claude/worktrees/";
 
 /** A repo with one commit, and the path of its shared exclude file. */
 function repo() {
-  const root = tempDir("pstack-exclude-");
+  const root = tempDir("jrzstack-exclude-");
   const path = join(root, "repo");
   git(root, "init", "-q", "-b", "main", path);
   git(path, "config", "user.name", "Lead");
@@ -72,7 +72,7 @@ describe("exclude-worktrees", () => {
   });
 
   test("outside a git repository it fails and writes nothing", () => {
-    const dir = tempDir("pstack-not-a-repo-");
+    const dir = tempDir("jrzstack-not-a-repo-");
 
     const result = run(dir);
 

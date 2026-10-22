@@ -22,7 +22,7 @@ function start(
     env: {
       PATH: options.path ?? process.env.PATH ?? "",
       HOME: home,
-      PSTACK_HEAVY_WAIT_SECONDS: String(options.waitSeconds ?? 30),
+      JRZSTACK_HEAVY_WAIT_SECONDS: String(options.waitSeconds ?? 30),
     },
     stdout: "pipe",
     stderr: "pipe",
@@ -49,7 +49,7 @@ const holdAfterTouching = (marker: string) => ["sh", "-c", 'touch "$1"; exec sle
 
 describe("heavy", () => {
   test("runs the command with its own output and exit code, and prints the wait", async () => {
-    const home = tempDir("pstack-home-");
+    const home = tempDir("jrzstack-home-");
 
     const result = await start(home, ["sh", "-c", "echo out; echo err >&2; exit 3"]).finished;
 
@@ -60,13 +60,13 @@ describe("heavy", () => {
   });
 
   test("two concurrent calls never overlap: the second waits for the first, from any directory", async () => {
-    const home = tempDir("pstack-home-");
+    const home = tempDir("jrzstack-home-");
     const log = join(home, "log");
     const first = start(home, ["sh", "-c", 'echo first-start >> "$1"; sleep 2; echo first-end >> "$1"', "sh", log]);
     await until(() => existsSync(log));
 
     const second = start(home, ["sh", "-c", 'echo second-start >> "$1"; echo second-end >> "$1"', "sh", log], {
-      cwd: tempDir("pstack-elsewhere-"),
+      cwd: tempDir("jrzstack-elsewhere-"),
     });
     const [one, two] = await Promise.all([first.finished, second.finished]);
 
@@ -77,7 +77,7 @@ describe("heavy", () => {
   });
 
   test("past the wait cap it exits with the busy code without running the command", async () => {
-    const home = tempDir("pstack-home-");
+    const home = tempDir("jrzstack-home-");
     const holder = start(home, holdAfterTouching(join(home, "holding")));
     await until(() => existsSync(join(home, "holding")));
 
@@ -95,7 +95,7 @@ describe("heavy", () => {
   });
 
   test("SIGKILL of the holder frees the lock", async () => {
-    const home = tempDir("pstack-home-");
+    const home = tempDir("jrzstack-home-");
     const holder = start(home, holdAfterTouching(join(home, "holding")));
     await until(() => existsSync(join(home, "holding")));
 
@@ -108,14 +108,14 @@ describe("heavy", () => {
   });
 
   test("exits with a usage error when no command is given", async () => {
-    const result = await start(tempDir("pstack-home-"), []).finished;
+    const result = await start(tempDir("jrzstack-home-"), []).finished;
 
     expect(result.exitCode).toBe(usageCode);
     expect(result.stderr).toContain("usage: heavy -- <command> [args...]");
   });
 
   test("a heavy command that runs heavy again runs it under the lock it already holds", async () => {
-    const home = tempDir("pstack-home-");
+    const home = tempDir("jrzstack-home-");
 
     const result = await start(home, ["sh", "-c", `"$1" -- echo inner; echo "inner exit $?"`, "sh", heavy], {
       waitSeconds: 1,
@@ -126,18 +126,18 @@ describe("heavy", () => {
   });
 
   test("refuses a wait that isn't a whole number of seconds rather than calling it busy", async () => {
-    const home = tempDir("pstack-home-");
+    const home = tempDir("jrzstack-home-");
 
     const result = await start(home, ["touch", join(home, "ran")], { waitSeconds: "soon" }).finished;
 
     expect(result.exitCode).toBe(usageCode);
-    expect(result.stderr).toContain("heavy: PSTACK_HEAVY_WAIT_SECONDS must be a whole number of seconds, not soon");
+    expect(result.stderr).toContain("heavy: JRZSTACK_HEAVY_WAIT_SECONDS must be a whole number of seconds, not soon");
     expect(existsSync(join(home, "ran"))).toBe(false);
   });
 
   test("exits with its own code when the machine has neither flock nor perl", async () => {
-    const home = tempDir("pstack-home-");
-    const bin = tempDir("pstack-bin-");
+    const home = tempDir("jrzstack-home-");
+    const bin = tempDir("jrzstack-bin-");
     for (const tool of ["bash", "mkdir", "touch"]) symlinkSync(Bun.which(tool)!, join(bin, tool));
 
     const result = await start(home, ["touch", join(home, "ran")], { path: bin }).finished;

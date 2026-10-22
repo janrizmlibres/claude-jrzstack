@@ -1,14 +1,14 @@
 {
-  "name": "claude-pstack",
+  "name": "claude-jrzstack",
   "owner": {
     "name": "Janriz Libres"
   },
-  "description": "pstack for Claude Code, a port of Lauren Tan's Cursor plugin kept in step with its upstream.",
+  "description": "jrzstack: Lauren Tan's pstack for Claude Code, kept in step with its upstream.",
   "plugins": [
     {
-      "name": "pstack",
-      "source": "./pstack",
-      "description": "Lauren Tan's pstack agent workflows, ported to Claude Code. Enter with /pstack:poteto-mode <task>."
+      "name": "jrzstack",
+      "source": "./jrzstack",
+      "description": "Lauren Tan's pstack agent workflows, ported to Claude Code. Enter with /jrzstack:savvy-mode <task>."
     }
   ]
 }

@@ -1,9 +1,9 @@
 {
-  "name": "claude-pstack",
+  "name": "claude-jrzstack",
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "bun test --parallel=2 ./scripts ./pstack/skills/poteto-mode/scripts",
+    "test": "bun test --parallel=2 ./scripts ./jrzstack/skills/savvy-mode/scripts",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

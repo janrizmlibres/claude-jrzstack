@@ -18,28 +18,28 @@ To add a rule, copy the nearest rule, write its prose, paste the upstream line y
 
 ## 1. Sibling routing
 
-Every model-facing reference to a sibling skill (bold name, slash name, relative link, repo path) keeps upstream's prose and adds `read ${CLAUDE_PLUGIN_ROOT}/skills/<name>/SKILL.md`, in skill and agent bodies. The verb is always "read", never "invoke" or "run". User-facing slash references become `/pstack:<name>`.
+Every model-facing reference to a sibling skill (bold name, slash name, relative link, repo path) keeps upstream's prose and adds `read ${CLAUDE_PLUGIN_ROOT}/skills/<name>/SKILL.md`, in skill and agent bodies. The verb is always "read", never "invoke" or "run". User-facing slash references become `/jrzstack:<name>`.
 
 ```detect
 pattern: \b(?:[Ii]nvoke|[Rr]un) \$\{CLAUDE_PLUGIN_ROOT\}/skills/
-pattern: (?<!\$\{CLAUDE_PLUGIN_ROOT\}/skills/.*)(?<![\w:/.~$}\]-])/(?:poteto-mode|poteto-help|setup-pstack|architect|arena|automate-me|benchmark-checklist|blast-radius|bro|correct|create-verification-skill|create-formal-verification-skill|figure-it-out|how|in-your-own-words|interrogate|ketchup|maintain-verification-skill|maintain-formal-verification-skill|make-bot-ui|no-comments|recall|reflect|sharpen|show-me-your-work|swarm|tdd|teach|technical-writing|typescript-best-practices|unslop|why|deslop|control-ui|control-cli|principle-[a-z-]+)(?![\w-])(?!.*\$\{CLAUDE_PLUGIN_ROOT\}/skills/)
+pattern: (?<!\$\{CLAUDE_PLUGIN_ROOT\}/skills/.*)(?<![\w:/.~$}\]-])/(?:poteto-mode|poteto-help|setup-pstack|savvy-mode|savvy-help|setup-jrzstack|architect|arena|automate-me|benchmark-checklist|blast-radius|bro|correct|create-verification-skill|create-formal-verification-skill|figure-it-out|how|in-your-own-words|interrogate|ketchup|maintain-verification-skill|maintain-formal-verification-skill|make-bot-ui|no-comments|recall|reflect|sharpen|show-me-your-work|swarm|tdd|teach|technical-writing|typescript-best-practices|unslop|why|deslop|control-ui|control-cli|principle-[a-z-]+)(?![\w-])(?!.*\$\{CLAUDE_PLUGIN_ROOT\}/skills/)
 before: Use the **arena** skill: invoke ${CLAUDE_PLUGIN_ROOT}/skills/arena/SKILL.md.
 before: [`/poteto-mode`](./skills/poteto-mode/SKILL.md) and the agents route through the same wrapper.
 before: Run /setup-pstack once, then /principle-fix-root-causes when a bug recurs.
 before: Seed the hypotheses with /how over the affected subsystem.
 after: Use the **arena** skill: read ${CLAUDE_PLUGIN_ROOT}/skills/arena/SKILL.md.
-after: [`/pstack:poteto-mode`](./skills/poteto-mode/SKILL.md) and the agents route through the same wrapper.
-after: Run /pstack:setup-pstack once, then /pstack:principle-fix-root-causes when a bug recurs.
+after: [`/jrzstack:savvy-mode`](./skills/savvy-mode/SKILL.md) and the agents route through the same wrapper.
+after: Run /jrzstack:setup-jrzstack once, then /jrzstack:principle-fix-root-causes when a bug recurs.
 after: Seed the hypotheses with /how over the affected subsystem (read ${CLAUDE_PLUGIN_ROOT}/skills/how/SKILL.md).
-allow: pstack/docs/guide/02-poteto-mode.md | departure board listing | the image's alt text quotes the lettering in the picture
-allow: pstack/docs/guide/03-understand.md | links clues under | the image's alt text quotes the lettering in the picture
-allow: pstack/docs/guide/04-design.md | interrogate panels | the image's alt text quotes the lettering in the picture
-allow: pstack/docs/guide/10-recipes-and-pitfalls.md | pinned cards reading | the image's alt text quotes the lettering in the picture
+allow: jrzstack/docs/guide/02-savvy-mode.md | departure board listing | the image's alt text quotes the lettering in the picture
+allow: jrzstack/docs/guide/03-understand.md | links clues under | the image's alt text quotes the lettering in the picture
+allow: jrzstack/docs/guide/04-design.md | interrogate panels | the image's alt text quotes the lettering in the picture
+allow: jrzstack/docs/guide/10-recipes-and-pitfalls.md | pinned cards reading | the image's alt text quotes the lettering in the picture
 ```
 
 ## 2. Frontmatter flags stay
 
-Frontmatter flags stay as upstream sets them (`disable-model-invocation` on every skill but `setup-pstack`). Vendored `deslop`, `control-ui` and `control-cli` gain `disable-model-invocation: true`.
+Frontmatter flags stay as upstream sets them (`disable-model-invocation` on every skill but `setup-jrzstack`). Vendored `deslop`, `control-ui` and `control-cli` gain `disable-model-invocation: true`.
 
 ```detect
 undetectable: a flag's presence is a property of a file's frontmatter, not of any one line
@@ -63,9 +63,9 @@ after: Distinct lenses are the point.
 
 ## 4. Roles, not model IDs
 
-Text names a setting (Work, Judgement, Volume), never a model ID or `pstack-models.mdc`. Settings travel with each spawn, as ADR 0002 records. `subagent_type: poteto-agent` stays `poteto-agent`, and `generalPurpose` maps to it, or to `poteto-reader` with `readonly` or when the role only reads. The text names the role's setting beside the agent ("on `poteto-reader` on the Judgement setting"). Every spawn passes its setting's model and effort: `${user_config.<setting>_model}` as `model:` and `${user_config.<setting>_effort}` as `effort:`, or the setting's defaults (Work `opus` at `medium`, Judgement `opus` at `high`, Volume `sonnet` at `high`) for a literal placeholder or an empty value. Both agents' frontmatter falls back to Work's defaults, so a spawn that leaves either out runs on Work's. A spawn upstream leaves untyped gets its role's agent and setting: `automate-me`'s transcript miners run on `poteto-reader` on Volume, `maintain-verification-skill`'s per-feature source readers on `poteto-reader` on Work. The six per-setting agents the port once had (`work`, `judgement`, `volume` and their readers) are gone, and a name of theirs is a leftover.
+Text names a setting (Work, Judgement, Volume), never a model ID or `pstack-models.mdc`. Settings travel with each spawn, as ADR 0002 records. `subagent_type: savvy-agent` stays `savvy-agent`, and `generalPurpose` maps to it, or to `savvy-reader` with `readonly` or when the role only reads. The text names the role's setting beside the agent ("on `savvy-reader` on the Judgement setting"). Every spawn passes its setting's model and effort: `${user_config.<setting>_model}` as `model:` and `${user_config.<setting>_effort}` as `effort:`, or the setting's defaults (Work `opus` at `medium`, Judgement `opus` at `high`, Volume `sonnet` at `high`) for a literal placeholder or an empty value. Both agents' frontmatter falls back to Work's defaults, so a spawn that leaves either out runs on Work's. A spawn upstream leaves untyped gets its role's agent and setting: `automate-me`'s transcript miners run on `savvy-reader` on Volume, `maintain-verification-skill`'s per-feature source readers on `savvy-reader` on Work. The six per-setting agents the port once had (`work`, `judgement`, `volume` and their readers) are gone, and a name of theirs is a leftover.
 
-A reasoning level, a speed, or both picked per spawn become the spawn's `effort:`. Upstream's "Match the model to the job" paragraph becomes poteto-mode's "Match the effort to the job": start from the setting's effort, `${user_config.<setting>_effort}` or its default (Work `medium`, Judgement `high`, Volume `high`), raise one step up to `max` for the hardest or subtlest work, lower one step for routine work and two for mechanical work, never below `low`; swarm verifiers stay at the Volume effort; change only `effort:`, never the agent or the model. Its step down for judgment is dropped, since judgment already runs on Judgement and the step would undercut that setting's default. Fast mode is a session toggle in Claude Code with no per-spawn form, so a fast-or-standard choice is dropped. Upstream's per-skill pointer to the Subagents section keeps its place and names effort alone.
+A reasoning level, a speed, or both picked per spawn become the spawn's `effort:`. Upstream's "Match the model to the job" paragraph becomes savvy-mode's "Match the effort to the job": start from the setting's effort, `${user_config.<setting>_effort}` or its default (Work `medium`, Judgement `high`, Volume `high`), raise one step up to `max` for the hardest or subtlest work, lower one step for routine work and two for mechanical work, never below `low`; swarm verifiers stay at the Volume effort; change only `effort:`, never the agent or the model. Its step down for judgment is dropped, since judgment already runs on Judgement and the step would undercut that setting's default. Fast mode is a session toggle in Claude Code with no per-spawn form, so a fast-or-standard choice is dropped. Upstream's per-skill pointer to the Subagents section keeps its place and names effort alone.
 
 ```detect
 pattern: \bclaude-(?:opus|sonnet|haiku|fable)-\d
@@ -90,19 +90,19 @@ before: **Match the model to the job.** Before each spawn, start from the role's
 before: Otherwise use standard speed, the same slug without `-fast`.
 before: Spawn one reviewer per lens on the `judgement-reader` agent.
 before: **Use the `work` agent for any subagent you spawn inside a playbook step**
-after: | Breakage | `poteto-reader` on Judgement |
-after: | Fit | `poteto-reader` on Judgement |
-after: Spawn one reviewer per lens on `poteto-reader` on the Judgement setting.
-after: **Use `poteto-agent` for any subagent you spawn inside a playbook step**
-after: One message, three calls on `poteto-reader` on the Work setting, each passing the setting's `model:` and `effort:`.
+after: | Breakage | `savvy-reader` on Judgement |
+after: | Fit | `savvy-reader` on Judgement |
+after: Spawn one reviewer per lens on `savvy-reader` on the Judgement setting.
+after: **Use `savvy-agent` for any subagent you spawn inside a playbook step**
+after: One message, three calls on `savvy-reader` on the Work setting, each passing the setting's `model:` and `effort:`.
 after: code delegates (feature, refactoring, bug fix, perf, hillclimb) run on Work, while the hardest changes, prose, and judgment run on Judgement.
-after: Pick each subagent's effort for the job, per the Subagents section of the **poteto-mode** skill.
+after: Pick each subagent's effort for the job, per the Subagents section of the **savvy-mode** skill.
 after: **Match the effort to the job.** Before each spawn, start from the setting's effort, chosen in `/config`.
 ```
 
 ## 5. Cross-family review becomes a fresh-context review
 
-Cross-family review becomes a fresh-context review in the Judgement role (or the step's own role), briefed with the artifacts and never the reasoning that produced them. poteto-mode's "diverse-model review" becomes "lens- or source-partitioned review"; its second opinion stays, recast: agreement rules out a fluke, not a shared blind spot.
+Cross-family review becomes a fresh-context review in the Judgement role (or the step's own role), briefed with the artifacts and never the reasoning that produced them. savvy-mode's "diverse-model review" becomes "lens- or source-partitioned review"; its second opinion stays, recast: agreement rules out a fluke, not a shared blind spot.
 
 ```detect
 pattern: \bdifferent model famil(?:y|ies)\b
@@ -113,7 +113,7 @@ before: Before handing back, spawn a subagent on a different model family from t
 before: Routed workflow skills set their own `subagent_type` for diverse-model review.
 before: A second opinion is the same prompt against a different model. Agreement is high-signal.
 before: delegate via the **arena** skill instead so the runners surface the alternatives and the cross-judge guards the pick.
-after: Before handing back, spawn a fresh-context review on `poteto-reader` on the Judgement setting, given the trail and transcript paths and never your reasoning.
+after: Before handing back, spawn a fresh-context review on `savvy-reader` on the Judgement setting, given the trail and transcript paths and never your reasoning.
 after: Routed workflow skills set their own agents for lens- or source-partitioned review.
 after: A second opinion is the same prompt in a fresh context. Agreement rules out a fluke, not a shared blind spot.
 after: delegate via the **arena** skill instead so the runners surface the alternatives and the blind judge guards the pick.
@@ -155,7 +155,7 @@ after: - Tool calls (Bash, Grep, MCP, etc.) that match a skill's documented comm
 
 ## 7. Transcripts
 
-`agent-transcripts/` → `~/.claude/projects/<slug>/${CLAUDE_SESSION_ID}.jsonl`, subagents under `<id>/subagents/`; upstream's "never glob across projects" guard stays; `recall`'s slug rule becomes Claude Code's: the absolute path with every character that isn't a letter or digit turned into "-". A check of a transcript's opening prompt reads its first user line (`"type":"user"`), since Claude Code's first line may be metadata. `session-pickup`'s sources become a local transcript, a cloud session's URL, a pushed branch or a program's store branch (`pstack/orchestrate/<program-slug>`). Surface line in `recall` and `session-pickup`: in cloud (`pstack: surface=cloud`, or `$CLAUDE_CODE_REMOTE` set when no reminder line is in context), earlier sessions' transcripts aren't available, so fall back to the git trail and pushed branches.
+`agent-transcripts/` → `~/.claude/projects/<slug>/${CLAUDE_SESSION_ID}.jsonl`, subagents under `<id>/subagents/`; upstream's "never glob across projects" guard stays; `recall`'s slug rule becomes Claude Code's: the absolute path with every character that isn't a letter or digit turned into "-". A check of a transcript's opening prompt reads its first user line (`"type":"user"`), since Claude Code's first line may be metadata. `session-pickup`'s sources become a local transcript, a cloud session's URL, a pushed branch or a program's store branch (`jrzstack/orchestrate/<program-slug>`). Surface line in `recall` and `session-pickup`: in cloud (`jrzstack: surface=cloud`, or `$CLAUDE_CODE_REMOTE` set when no reminder line is in context), earlier sessions' transcripts aren't available, so fall back to the git trail and pushed branches.
 
 ```detect
 pattern: \bagent-transcripts\b
@@ -168,7 +168,7 @@ after: Check each candidate: find its first user line (`"type":"user"`) and chec
 
 ## 8. Forge
 
-`gh` is the only forge: every Origin branch and Origin-only flag is deleted, as is the "built-in PR tool" branch. `gh pr`/`gh issue` stay as written, with a surface line in poteto-mode: in cloud they fail (GraphQL blocked), so do the same operation with `gh api` REST; draft toggles use the proxy's `…/pulls/{n}/ccr/ready_for_review` and `…/ccr/convert_to_draft`. A refused draft toggle is reported once, like a refused merge, and never retried. Stacks stay upstream's hand-chained base branches; the port never names `gh stack`.
+`gh` is the only forge: every Origin branch and Origin-only flag is deleted, as is the "built-in PR tool" branch. `gh pr`/`gh issue` stay as written, with a surface line in savvy-mode: in cloud they fail (GraphQL blocked), so do the same operation with `gh api` REST; draft toggles use the proxy's `…/pulls/{n}/ccr/ready_for_review` and `…/ccr/convert_to_draft`. A refused draft toggle is reported once, like a refused merge, and never retried. Stacks stay upstream's hand-chained base branches; the port never names `gh stack`.
 
 ```detect
 pattern: \bcommand -v origin\b
@@ -203,7 +203,7 @@ after: Review bots (e.g. Claude Code Review, Bugbot, Copilot) or security-review
 
 ## 10. Loops
 
-User-facing "/loop until X" → "type `/goal X`" (trigger phrases accept both), and a user-facing "give `/loop` a predicate" → "give `/goal` a condition". A lead's wake becomes a watcher subagent or Monitor for events, and `/loop <interval> <prompt>` through the Skill tool for cadence; a loop prompt reads poteto-mode by path, since a scheduled fire can't run a hidden skill. visual-parity's "`/loop` per component" → "repeat until the diff is zero". Surface line in autonomous-run and autopilot: in cloud, cadence runs from a background wait, since a pending loop won't wake a paused VM.
+User-facing "/loop until X" → "type `/goal X`" (trigger phrases accept both), and a user-facing "give `/loop` a predicate" → "give `/goal` a condition". A lead's wake becomes a watcher subagent or Monitor for events, and `/loop <interval> <prompt>` through the Skill tool for cadence; a loop prompt reads savvy-mode by path, since a scheduled fire can't run a hidden skill. visual-parity's "`/loop` per component" → "repeat until the diff is zero". Surface line in autonomous-run and autopilot: in cloud, cadence runs from a background wait, since a pending loop won't wake a paused VM.
 
 ```detect
 pattern: /loop until\b
@@ -241,18 +241,18 @@ before: Draw diagrams and charts from facts you have: a Mermaid diagram for how 
 before: Embed screenshots and videos inline when the change is visible, not only as links.
 after: Use a skill-authoring skill if one is installed (such as `skill-creator`); otherwise write the SKILL.md directly.
 after: Suspending in-flight work cleanly on an explicit pause, going offline, or a Claude Code restart.
-after: pstack has no planning skill.
-after: If you want a plan, ask `/pstack:poteto-mode` for one.
+after: jrzstack has no planning skill.
+after: If you want a plan, ask `/jrzstack:savvy-mode` for one.
 after: Tell the agent you're about to go offline or restart Claude Code.
 after: List the MCP servers from your own tool list.
-after: `/loop` is a Claude Code built-in, not a pstack skill.
+after: `/loop` is a Claude Code built-in, not a jrzstack skill.
 after: Draw diagrams from facts you have: a Mermaid diagram for how things connect, and a small table for numbers.
 after: Link the screenshots and videos the work produced when the change is visible.
 ```
 
 ## 12. Compaction
 
-Drop "imminent context compaction" from poteto-mode's Pause safely triggers and the "For the compaction trigger…" sentence from Pause safely step 4. Pause safely writes the resume note into the `wip:` commit's body (`--allow-empty` on a clean tree) instead of `/tmp`, and in cloud pushes that commit to the session's own branch, the one push step 2's no-push rule excepts. Session pickup reads a resume note first, from the body of a `wip:` commit at a branch's tip.
+Drop "imminent context compaction" from savvy-mode's Pause safely triggers and the "For the compaction trigger…" sentence from Pause safely step 4. Pause safely writes the resume note into the `wip:` commit's body (`--allow-empty` on a clean tree) instead of `/tmp`, and in cloud pushes that commit to the session's own branch, the one push step 2's no-push rule excepts. Session pickup reads a resume note first, from the body of a `wip:` commit at a branch's tip.
 
 ```detect
 pattern: \bimminent context compaction\b
@@ -266,7 +266,7 @@ after: Write it into the `wip:` commit's body (`--allow-empty` on a clean tree).
 
 ## 13. Landing and leftover branches
 
-In cloud, `gh pr merge <pr> --squash` → `gh api -X PUT repos/{owner}/{repo}/pulls/<n>/merge -f merge_method=squash`; `--auto` (merge-when-ready) → watch-then-merge from a background wait, never `/ccr/auto_merge`. At every merge step, the first refused merge stops that PR at merge-ready, with the refusal recorded as a gate; no retry, no workaround. Every landing playbook's Reply (Shipping, Autopilot-full, Orchestrate's Close) lists the leftover branches the run pushed (merged heads still present, closed or abandoned unit branches; open-PR heads left out; a store branch listed as kept) and one `git push origin --delete …` line for the user to run locally. No lead deletes a remote branch on either surface. A landing playbook lands only under a landing grant; without one it stops at merge-ready. Babysit and Shipping run `watch-pr` through the runtime launcher, `${CLAUDE_PLUGIN_ROOT}/skills/poteto-mode/scripts/run watch-pr/watch-pr`, and hold its watch from a background wait in place of upstream's `/loop`; with no runtime (exit 69) they say so once with the install line and stop before calling a PR ready, never reading the forge by hand in the watcher's place.
+In cloud, `gh pr merge <pr> --squash` → `gh api -X PUT repos/{owner}/{repo}/pulls/<n>/merge -f merge_method=squash`; `--auto` (merge-when-ready) → watch-then-merge from a background wait, never `/ccr/auto_merge`. At every merge step, the first refused merge stops that PR at merge-ready, with the refusal recorded as a gate; no retry, no workaround. Every landing playbook's Reply (Shipping, Autopilot-full, Orchestrate's Close) lists the leftover branches the run pushed (merged heads still present, closed or abandoned unit branches; open-PR heads left out; a store branch listed as kept) and one `git push origin --delete …` line for the user to run locally. No lead deletes a remote branch on either surface. A landing playbook lands only under a landing grant; without one it stops at merge-ready. Babysit and Shipping run `watch-pr` through the runtime launcher, `${CLAUDE_PLUGIN_ROOT}/skills/savvy-mode/scripts/run watch-pr/watch-pr`, and hold its watch from a background wait in place of upstream's `/loop`; with no runtime (exit 69) they say so once with the install line and stop before calling a PR ready, never reading the forge by hand in the watcher's place.
 
 ```detect
 pattern: /ccr/auto_merge\b
@@ -276,24 +276,24 @@ before: In cloud, arm merge-when-ready with `gh api -X PUT repos/{owner}/{repo}/
 before: On GitHub, status comes from `scripts/watch-pr/watch-pr`. Run it directly.
 before: Run `drive` and `background` under `/loop` in dynamic mode.
 after: In cloud, for merge-when-ready, watch the checks from a background wait, then merge.
-after: Status comes from the watcher, run through the runtime launcher: `${CLAUDE_PLUGIN_ROOT}/skills/poteto-mode/scripts/run watch-pr/watch-pr`.
+after: Status comes from the watcher, run through the runtime launcher: `${CLAUDE_PLUGIN_ROOT}/skills/savvy-mode/scripts/run watch-pr/watch-pr`.
 after: Run `drive` and `background` from a background wait: run the watcher with `run_in_background: true` or under Monitor.
 ```
 
 ## 14. Agent descriptions
 
-Agent descriptions of translated agents (Comment Sicko) end with "Spawned only by pstack playbooks."
+Agent descriptions of translated agents (Comment Sicko) end with "Spawned only by jrzstack playbooks."
 
 ```detect
 undetectable: a missing ending is an absence in an agent's frontmatter, which no line pattern can see
 ```
 
-## 15. poteto-mode-scoped rules
+## 15. savvy-mode-scoped rules
 
-These keep `skills/poteto-mode/SKILL.md` translated:
+These keep `skills/savvy-mode/SKILL.md` translated:
 
 - frontmatter gains the reminder hook;
-- one line, once: pstack skills are reached by reading their `SKILL.md`; the Skill tool refuses them by design, so a read is the intended route, not a workaround;
+- one line, once: jrzstack skills are reached by reading their `SKILL.md`; the Skill tool refuses them by design, so a read is the intended route, not a workaround;
 - the router names `playbooks/hand-off.md` in one line, read by path;
 - beside the todolist's `skip: <reason>`, a short passage says a panel step a playbook lists unconditionally, or whose condition holds, is never the agent's to skip and has no size gate, and that only the user can waive it, in the run prompt or `CLAUDE.md`, recorded as `skip: user waived` in the list and the Reply;
 - the router sends a spec handed in (`build <issue URL>`, an issue number, a spec file) or a request for a plan ("plan only", "plan #42") to the multi-phase-plan playbook first, whatever its size and ahead of figure-it-out and Orchestrate, in one entry that also says it carries on unless only the plan was asked for;
@@ -304,25 +304,25 @@ These keep `skills/poteto-mode/SKILL.md` translated:
 - beside "Always pause", a short passage holds the lead to the brief contract's missing-files rule for its own setup: a missing gitignored file stops the step and is never created, from a template or otherwise.
 
 ```detect
-undetectable: each asks for a line to be present in poteto-mode's SKILL.md, and an absence is not a line a pattern can match
+undetectable: each asks for a line to be present in savvy-mode's SKILL.md, and an absence is not a line a pattern can match
 ```
 
 ## 16. Install and settings
 
-`/add-plugin pstack` becomes the two `/plugin` commands, `/plugin marketplace add janrizmlibres/claude-pstack` then `/plugin install pstack@claude-pstack`, with the marketplace's auto-update on. `setup-pstack`'s model rule, its reasoning budgets and the `auto` and `inherit-parent` values become the three settings: the user picks each setting's model and starting effort in `/config` or `/plugin configure` (in cloud, with the setup line's `--config`), and `/pstack:setup-pstack` shows them. Rule 4 adjusts that effort per spawn.
+`/add-plugin pstack` becomes the two `/plugin` commands, `/plugin marketplace add janrizmlibres/claude-jrzstack` then `/plugin install jrzstack@claude-jrzstack`, with the marketplace's auto-update on. `setup-jrzstack`'s model rule, its reasoning budgets and the `auto` and `inherit-parent` values become the three settings: the user picks each setting's model and starting effort in `/config` or `/plugin configure` (in cloud, with the setup line's `--config`), and `/jrzstack:setup-jrzstack` shows them. Rule 4 adjusts that effort per spawn.
 
 ```detect
 pattern: (?<![\w-])/add-plugin\b
 pattern: \breasoning budgets?\b
 before: Install with `/add-plugin pstack` in chat, or from Customize in the sidebar.
 before: run /setup-pstack, pick a reasoning budget, and choose which models you want.
-after: Install with `/plugin marketplace add janrizmlibres/claude-pstack`, then `/plugin install pstack@claude-pstack`.
-after: Pick a model for each of the three settings in `/config`, and run /pstack:setup-pstack to see them.
+after: Install with `/plugin marketplace add janrizmlibres/claude-jrzstack`, then `/plugin install jrzstack@claude-jrzstack`.
+after: Pick a model for each of the three settings in `/config`, and run /jrzstack:setup-jrzstack to see them.
 ```
 
 ## 17. Staying in the mode
 
-A Custom Mode (Option+Enter or Alt+Enter on the slash menu, or Use as Mode) has no counterpart and needs none: a typed `/pstack:poteto-mode` keeps itself on for the rest of the session through its reminder hook, worker results and loop fires included, and stays out of casual turns. The user opts out by saying so. `--resume` drops the hook, so after a resume the user types `/pstack:poteto-mode` again. A mention of the Agents Window goes with its Custom Mode sentence.
+A Custom Mode (Option+Enter or Alt+Enter on the slash menu, or Use as Mode) has no counterpart and needs none: a typed `/jrzstack:savvy-mode` keeps itself on for the rest of the session through its reminder hook, worker results and loop fires included, and stays out of casual turns. The user opts out by saying so. `--resume` drops the hook, so after a resume the user types `/jrzstack:savvy-mode` again. A mention of the Agents Window goes with its Custom Mode sentence.
 
 ```detect
 pattern: \b[Cc]ustom [Mm]odes?\b
@@ -330,8 +330,8 @@ pattern: \b(?:[Oo]ption|[Aa]lt)\+[Ee]nter\b
 pattern: \bAgents Window\b
 before: To keep `/poteto-mode` on for the whole chat, pick it from the `/` menu with Option+Enter (Mac) or Alt+Enter (Windows) instead of Enter.
 before: That makes it a Custom Mode, which stays in context on every turn until you exit it. Custom Modes are available in the Agents Window and the CLI.
-after: `/pstack:poteto-mode` stays on for the rest of the session: its reminder hook brings it back on every turn.
-after: After `--resume`, type `/pstack:poteto-mode` again, because a resume drops the hook.
+after: `/jrzstack:savvy-mode` stays on for the rest of the session: its reminder hook brings it back on every turn.
+after: After `--resume`, type `/jrzstack:savvy-mode` again, because a resume drops the hook.
 ```
 
 ## 18. Cloud workers and other Cursor products
@@ -356,7 +356,7 @@ after: One cloud worker per PR owns build, the first verification round, and mer
 
 ## 19. Vendored and dropped files
 
-`deslop`, `control-ui` and `control-cli` ship inside the port, vendored from `cursor-team-kit` and hidden by rule 2, so a line saying they ship in that plugin, or telling the user to install it, says they ship with pstack instead. A reference to a dropped file (`automations/benny`) goes with its sentence, or with its section when the section is about that file.
+`deslop`, `control-ui` and `control-cli` ship inside the port, vendored from `cursor-team-kit` and hidden by rule 2, so a line saying they ship in that plugin, or telling the user to install it, says they ship with jrzstack instead. A reference to a dropped file (`automations/benny`) goes with its sentence, or with its section when the section is about that file.
 
 ```detect
 pattern: \bships? in (?:the )?`cursor-team-kit`
@@ -365,21 +365,21 @@ pattern: \b[Bb]enny\b
 before: `/deslop` ships in the `cursor-team-kit` plugin, not in pstack.
 before: install `cursor-team-kit` alongside pstack if you want the full set.
 before: pstack also ships a dormant [benny automation pack](./automations/benny/).
-after: `/pstack:deslop` ships with pstack, vendored from the `cursor-team-kit` plugin and hidden until you type it.
-after: `control-cli` and `control-ui` ship with pstack too.
+after: `/jrzstack:deslop` ships with jrzstack, vendored from the `cursor-team-kit` plugin and hidden until you type it.
+after: `control-cli` and `control-ui` ship with jrzstack too.
 ```
 
 ## 20. Spec intake
 
-These keep `skills/poteto-mode/playbooks/multi-phase-plan.md` translated while it takes a spec to a plan and on to execution:
+These keep `skills/savvy-mode/playbooks/multi-phase-plan.md` translated while it takes a spec to a plan and on to execution:
 
 - a first step reads the input: a spec is read and never edited, and an issue (a URL or a number) is read with `gh api` REST on both surfaces, comments included;
 - step 2's one-or-two-file skip never applies to a spec handed in or a request for the plan;
-- the plan file goes to `.claude/pstack/plans/<slug>.md` unless the operator names a path, listed in the exclude file `git rev-parse --git-path info/exclude` names, and is never committed on the run branch; the plan keeps `${CLAUDE_PLUGIN_ROOT}` literal;
-- `check-plan.mjs` runs through the runtime launcher, `${CLAUDE_PLUGIN_ROOT}/skills/poteto-mode/scripts/run`; with no runtime (exit 69) the plan is posted as not linted, never linted by hand;
-- the plan is posted beside the input, never in it: as a comment on a spec issue, or for other input on the orphan branch `pstack/plan/<slug>` through git plumbing, with no worktree;
+- the plan file goes to `.claude/jrzstack/plans/<slug>.md` unless the operator names a path, listed in the exclude file `git rev-parse --git-path info/exclude` names, and is never committed on the run branch; the plan keeps `${CLAUDE_PLUGIN_ROOT}` literal;
+- `check-plan.mjs` runs through the runtime launcher, `${CLAUDE_PLUGIN_ROOT}/skills/savvy-mode/scripts/run`; with no runtime (exit 69) the plan is posted as not linted, never linted by hand;
+- the plan is posted beside the input, never in it: as a comment on a spec issue, or for other input on the orphan branch `jrzstack/plan/<slug>` through git plumbing, with no worktree;
 - the hand-back becomes the go: a spec handed in, "run until done" or a brief's go grant carries on under the execution playbook the plan names; only a request for the plan alone ("plan #42", "plan only"), or a plan the operator asked for, stops after posting; landing stays withheld unless granted, and without a landing grant the execution playbook is always Autopilot-stack;
-- the skeleton reads the playbooks it names from `${CLAUDE_PLUGIN_ROOT}` instead of `git show origin/main:`, adds the brief contract to that list and to each owner's brief, branches from `<base-branch>` instead of `main`, runs its live lanes on `poteto-agent` on the Volume setting, and its audit tick's prompt reads poteto-mode by path, with rule 10's cloud surface line on the tick;
+- the skeleton reads the playbooks it names from `${CLAUDE_PLUGIN_ROOT}` instead of `git show origin/main:`, adds the brief contract to that list and to each owner's brief, branches from `<base-branch>` instead of `main`, runs its live lanes on `savvy-agent` on the Volume setting, and its audit tick's prompt reads savvy-mode by path, with rule 10's cloud surface line on the tick;
 - `check-plan.mjs` is an override whose markers match this skeleton, so a change to either is carried into the other.
 
 ```detect
@@ -391,7 +391,7 @@ undetectable: each asks for a step or a skeleton line to be present in multi-pha
 Worktrees Cursor makes under `~/.cursor/worktrees/<repo>/` become Claude Code's, under the repo's `.claude/worktrees/`, and workers get them where ADR 0001 places them.
 
 - Opening a PR works from a worktree off the PR's base, not off main. Locally that is `git worktree add .claude/worktrees/<name> -b <branch> <base>`, then the `EnterWorktree` tool called with that path before any other step (a `cd` in Bash moves only one shell, not the session or its subagents), so a base other than the default branch works whatever `worktree.baseRef` says; `.claude/worktrees/` goes into the exclude file `git rev-parse --git-path info/exclude` names, and the worktree stays until the PR merges. On the cloud surface the lead works from its own checkout.
-- Every step in poteto-mode's playbooks and in `figure-it-out` that hands work to a worker (a delegate, an owner, a parallel attempt) briefs it per the brief contract (read ${CLAUDE_PLUGIN_ROOT}/skills/poteto-mode/references/brief-contract.md). A worker that gets its own worktree is an `Agent` with `isolation: "worktree"` whose brief names its start commit; the lead removes that worktree once the result is integrated or discarded and keeps the branch.
+- Every step in savvy-mode's playbooks and in `figure-it-out` that hands work to a worker (a delegate, an owner, a parallel attempt) briefs it per the brief contract (read ${CLAUDE_PLUGIN_ROOT}/skills/savvy-mode/references/brief-contract.md). A worker that gets its own worktree is an `Agent` with `isolation: "worktree"` whose brief names its start commit; the lead removes that worktree once the result is integrated or discarded and keeps the branch.
 - Worktree cleanup's chats become Claude Code sessions, read from the transcripts `worktree-audit.sh` names, and its audit step names the script's `stray` bucket. Its reclaimers drop Cursor's app data. Its simulator step runs only on the local surface, and on the cloud surface, where earlier sessions' transcripts aren't available, a `stray` is unverified rather than abandoned.
 
 ```detect
@@ -407,8 +407,8 @@ after: More when needed: Xcode `DerivedData` and `iOS DeviceSupport`, package ca
 
 These keep `swarm` and the Autopilot-stack and Autopilot-full playbooks translated:
 
-- workers are placed as ADR 0001 places them, read from the reminder's surface line: a local lead sends swarm workers (races included) and autopilot owners to cloud workers by default, started with `claude --permission-mode auto --cloud` under a pseudo-terminal after pushing the run's base, with `--settings '{"remote":{"defaultEnvironmentId":"<env_ id>"}}'` when the run names an environment; local-only, asked for or fallen back to and said once, runs them in parallel locally, in a worktree each for one that writes or races; a cloud lead runs them as in-VM `Agent`s, `isolation: "worktree"` for one that writes, and an Auto lead adds `create_session` workers for whole-machine work. Cursor's `cloud_base_branch` becomes the start commit the brief names; a local lead reads each cloud worker's result only from the report commit it pushes, found by its `Pstack-Nonce` trailer as the brief contract describes;
-- every worker is briefed per the brief contract, swarm workers as leaf workers; swarm workers run on `poteto-agent` on the Volume setting (`poteto-reader` when they only read); autopilot owners are sub-leads on `poteto-agent` on Work that run their own panels and declare their timebox;
+- workers are placed as ADR 0001 places them, read from the reminder's surface line: a local lead sends swarm workers (races included) and autopilot owners to cloud workers by default, started with `claude --permission-mode auto --cloud` under a pseudo-terminal after pushing the run's base, with `--settings '{"remote":{"defaultEnvironmentId":"<env_ id>"}}'` when the run names an environment; local-only, asked for or fallen back to and said once, runs them in parallel locally, in a worktree each for one that writes or races; a cloud lead runs them as in-VM `Agent`s, `isolation: "worktree"` for one that writes, and an Auto lead adds `create_session` workers for whole-machine work. Cursor's `cloud_base_branch` becomes the start commit the brief names; a local lead reads each cloud worker's result only from the report commit it pushes, found by its `Jrzstack-Nonce` trailer as the brief contract describes;
+- every worker is briefed per the brief contract, swarm workers as leaf workers; swarm workers run on `savvy-agent` on the Volume setting (`savvy-reader` when they only read); autopilot owners are sub-leads on `savvy-agent` on Work that run their own panels and declare their timebox;
 - where workers are spawned, the text carries the window (at most 10 direct children in flight, refilled as they finish, never in blocking batches; an in-session owner counts at its peak of 4 and keeps at most 3 workers of its own in flight, waited for inside the owner's own turn since an in-session owner is a subagent, a cloud or `create_session` worker counts as one, and a root's verification swarms share its window with its owners; swarm's N stays the total), backpressure (a refused spawn waits for one of the lead's own in-flight agents, whatever the error says, and never drops a slice, arm, owner or lane; with nothing in flight it is `BLOCKED: concurrency cap`) and the timebox (sized per brief, 30 minutes for a reader and 90 for a code writer without an estimate; at 1.5× the worker is `BLOCKED` with no retry, an in-session one stopped with `TaskStop`, its session URL recorded and the user told once);
 - an autopilot owner past 1.5× its timebox is stuck: it is `BLOCKED` and one replacement owner starts from its pushed branch and decision trail; a replacement that also stalls is `BLOCKED` and its item is parked and listed in the Reply, which is how upstream's replace-at-once audit and the no-retry timebox meet;
 - an audit tick re-reads its playbook from `${CLAUDE_PLUGIN_ROOT}` instead of `git show origin/main:`, since the plugin isn't in the user's repo;
@@ -422,7 +422,7 @@ pattern: \$\(git merge-base HEAD origin/main\)
 before: At each tick, re-read this playbook from trunk with `git show origin/main:pstack/skills/poteto-mode/playbooks/autopilot-stack.md` and audit the operation against it.
 before: When a worker must start from a non-default pushed branch, pass `cloud_base_branch`.
 before: Also check that no path in `git diff --name-only $(git merge-base HEAD origin/main) origin/main` is a path the PR changes.
-after: At each tick, re-read this playbook at `${CLAUDE_PLUGIN_ROOT}/skills/poteto-mode/playbooks/autopilot-stack.md` and audit the operation against it.
+after: At each tick, re-read this playbook at `${CLAUDE_PLUGIN_ROOT}/skills/savvy-mode/playbooks/autopilot-stack.md` and audit the operation against it.
 after: Every worker starts from a commit its brief names.
 after: Also check that no path in `git diff --name-only HEAD...origin/main` is a path the PR changes.
 ```
@@ -439,7 +439,7 @@ after: Assume the VM dies. Soon after starting, push and start a decision trail 
 
 ## 24. Upstream's Claude Code build
 
-Upstream installs pstack in Claude Code too, from its own marketplace (`cursor/plugins`, `pstack@cursor-plugins`), with a runtime adapter, `docs/harness/claude-code.md`, that maps Cursor names while a skill runs. The port maps them at translation time instead, and the adapter's mappings contradict the port's: non-Claude slugs fall to the session model where rules 3 to 5 give distinct prompts, Cursor-only steps are skipped where rule 18 gives routines and cloud workers, and setup writes a model rule where rule 16 gives the three settings. So `pstack/docs/harness` is dropped, with a `dropped` entry added by the sync that first meets it. A sentence about upstream's Claude Code install, its adapter, its `~/.claude/rules/pstack-models.md` model rule or its generated tree (`harness/pstack/`, `generate-pstack-harness-trees.mjs`) goes, with its paragraph or code block when that is only about upstream's build. The port's own install sentence, per rule 16, stays.
+Upstream installs pstack in Claude Code too, from its own marketplace (`cursor/plugins`, `pstack@cursor-plugins`), with a runtime adapter, `docs/harness/claude-code.md`, that maps Cursor names while a skill runs. The port maps them at translation time instead, and the adapter's mappings contradict the port's: non-Claude slugs fall to the session model where rules 3 to 5 give distinct prompts, Cursor-only steps are skipped where rule 18 gives routines and cloud workers, and setup writes a model rule where rule 16 gives the three settings. So `jrzstack/docs/harness` is dropped, with a `dropped` entry added by the sync that first meets it. A sentence about upstream's Claude Code install, its adapter, its `~/.claude/rules/pstack-models.md` model rule or its generated tree (`harness/pstack/`, `generate-pstack-harness-trees.mjs`) goes, with its paragraph or code block when that is only about upstream's build. The port's own install sentence, per rule 16, stays.
 
 ```detect
 pattern: \bpstack@cursor-plugins\b
@@ -451,6 +451,27 @@ before: /plugin marketplace add cursor/plugins
 before: /plugin install pstack@cursor-plugins
 before: claude code prefixes plugin commands and agents, so `/poteto-mode` is `/pstack:poteto-mode`. the [claude code adapter](./docs/harness/claude-code.md) maps every other cursor name. in claude code, `/pstack:setup-pstack` writes your model choices to `~/.claude/rules/pstack-models.md`, and a step that needs a cursor-only feature, such as bugbot or automations, is skipped with a one-line note.
 before: claude code installs a generated copy of pstack, including this readme and the guide, from [`harness/pstack/`](https://github.com/cursor/plugins/tree/main/harness/pstack) at the repository root. after you change pstack, run `node scripts/generate-pstack-harness-trees.mjs` from the repository root and commit the result. ci fails while the generated copy is out of date.
-after: /plugin marketplace add janrizmlibres/claude-pstack
-after: /plugin install pstack@claude-pstack
+after: /plugin marketplace add janrizmlibres/claude-jrzstack
+after: /plugin install jrzstack@claude-jrzstack
+```
+
+## 25. Names
+
+The port publishes pstack as jrzstack, with poteto-mode as savvy-mode, as ADR 0003 records. In every port file, each name upstream gives the plugin, its skills, agents, hooks, files, paths, branches, trailers and environment variables changes: `pstack` becomes `jrzstack` (`/pstack:` → `/jrzstack:`, `setup-pstack` → `setup-jrzstack`, `pstack/plan/<slug>` → `jrzstack/plan/<slug>`, `PSTACK_` → `JRZSTACK_`, `Pstack-` → `Jrzstack-`) and `poteto` becomes `savvy` (`poteto-mode`, `poteto-help`, `poteto-agent`, `poteto-reader` and their headings, `# Poteto mode` → `# Savvy mode`). Prose naming the plugin the user installed says jrzstack.
+
+Credit stays with Lauren Tan. `poteto` naming her (`[poteto](https://x.com/poteto)`, "poteto's agent style") stays, and so does `pstack` naming her project: credit lines, "upstream pstack", her own first-person sentences about it in the plugin README, and upstream's paths and identifiers (`upstream/pstack/…`, `cursor/plugins/tree/main/pstack`, rule 24's names). The scripts map paths the same way, so `upstream/pstack/skills/poteto-mode/x` is the counterpart of `jrzstack/skills/savvy-mode/x`.
+
+```detect
+pattern: (?<![\w-])poteto-(?:mode|help|agent|reader)\b
+pattern: \bsetup-pstack\b
+pattern: (?<![\w-])pstack:
+pattern: ^# Poteto\b
+before: twenty-four short skills, one principle each. `poteto-mode` indexes them inline and reads that index at task start.
+before: The panel comes from your [`/setup-pstack`](../../skills/setup-pstack/SKILL.md) configuration, and you can adjust it per task.
+before: | `poteto-agent`, `comment-sicko` | `pstack:poteto-agent`, `pstack:comment-sicko` |
+before: # Poteto subagent
+after: twenty-four short skills, one principle each. `savvy-mode` indexes them inline and reads that index at task start.
+after: The panel comes from your [`/jrzstack:setup-jrzstack`](../../skills/setup-jrzstack/SKILL.md) configuration, and you can adjust it per task.
+after: | `savvy-agent`, `comment-sicko` | `jrzstack:savvy-agent`, `jrzstack:comment-sicko` |
+after: # Savvy subagent
 ```
