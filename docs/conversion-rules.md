@@ -459,17 +459,20 @@ after: /plugin install jrzstack@claude-jrzstack
 
 The port publishes pstack as jrzstack, with poteto-mode as savvy-mode, as ADR 0003 records. In every port file, each name upstream gives the plugin, its skills, agents, hooks, files, paths, branches, trailers and environment variables changes: `pstack` becomes `jrzstack` (`/pstack:` → `/jrzstack:`, `setup-pstack` → `setup-jrzstack`, `pstack/plan/<slug>` → `jrzstack/plan/<slug>`, `PSTACK_` → `JRZSTACK_`, `Pstack-` → `Jrzstack-`) and `poteto` becomes `savvy` (`poteto-mode`, `poteto-help`, `poteto-agent`, `poteto-reader` and their headings, `# Poteto mode` → `# Savvy mode`). Prose naming the plugin the user installed says jrzstack.
 
-Credit stays with Lauren Tan. `poteto` naming her (`[poteto](https://x.com/poteto)`, "poteto's agent style") stays, and so does `pstack` naming her project: credit lines, "upstream pstack", her own first-person sentences about it in the plugin README, and upstream's paths and identifiers (`upstream/pstack/…`, `cursor/plugins/tree/main/pstack`, rule 24's names). The scripts map paths the same way, so `upstream/pstack/skills/poteto-mode/x` is the counterpart of `jrzstack/skills/savvy-mode/x`.
+Credit stays with Lauren Tan. `poteto` naming her (`[poteto](https://x.com/poteto)`, "poteto's agent style") stays, except in savvy-mode's own `description:`, which the skill menu shows as the skill's summary: there "poteto's agent style" becomes "An agent style". So does `pstack` naming her project: credit lines, "upstream pstack", her own first-person sentences about it in the plugin README, and upstream's paths and identifiers (`upstream/pstack/…`, `cursor/plugins/tree/main/pstack`, rule 24's names). The scripts map paths the same way, so `upstream/pstack/skills/poteto-mode/x` is the counterpart of `jrzstack/skills/savvy-mode/x`.
 
 ```detect
 pattern: (?<![\w-])poteto-(?:mode|help|agent|reader)\b
 pattern: \bsetup-pstack\b
 pattern: (?<![\w-])pstack:
 pattern: ^# Poteto\b
+pattern: ^description: poteto's agent style\b
+before: description: poteto's agent style for concise, detailed responses, deliberate subagents, unslopped prose, simple code, and verified work. Use for poteto, /poteto-mode, or requests to work in this style.
 before: twenty-four short skills, one principle each. `poteto-mode` indexes them inline and reads that index at task start.
 before: The panel comes from your [`/setup-pstack`](../../skills/setup-pstack/SKILL.md) configuration, and you can adjust it per task.
 before: | `poteto-agent`, `comment-sicko` | `pstack:poteto-agent`, `pstack:comment-sicko` |
 before: # Poteto subagent
+after: description: An agent style for concise, detailed responses, deliberate subagents, unslopped prose, simple code, and verified work. Use for savvy, /jrzstack:savvy-mode, or requests to work in this style.
 after: twenty-four short skills, one principle each. `savvy-mode` indexes them inline and reads that index at task start.
 after: The panel comes from your [`/jrzstack:setup-jrzstack`](../../skills/setup-jrzstack/SKILL.md) configuration, and you can adjust it per task.
 after: | `savvy-agent`, `comment-sicko` | `jrzstack:savvy-agent`, `jrzstack:comment-sicko` |
