@@ -98,11 +98,7 @@
     {
       "path": "jrzstack/skills/interrogate/SKILL.md",
       "kind": "override",
-      "why": "three lens reviewers on savvy-reader on Judgement, always all three, with critical-only spillover, the lead's verification gate in place of consensus, and a Coverage Map with Checked and Gaps in place of the Agreement Map",
-      "depends_on": [
-        "upstream/pstack/skills/interrogate/references/rubric.md",
-        "upstream/pstack/skills/interrogate/references/code-quality-review.md"
-      ]
+      "why": "three lens adversaries (Breakage, Fit, Stress) on savvy-agent on Judgement in worktrees, always all three, each proving findings with a run, in place of one adversary per model with arena's fan-out"
     },
     {
       "path": "jrzstack/skills/interrogate/references/reviewer-prompt.md",
@@ -122,7 +118,7 @@
     {
       "path": "jrzstack/skills/savvy-mode/playbooks/orchestrate.md",
       "kind": "override",
-      "why": "a lead and sub-leads place units by surface (cloud workers, local-only worktrees, in-VM worktree subagents, create_session in Auto), retry by failure mode, take the full gate at landing as the ledger verdict, land only under a landing grant with Close listing leftover branches, run orch through the launcher with its store on an orphan branch, and split restart from compaction"
+      "why": "a lead and sub-leads place units by surface (cloud workers, local-only worktrees, in-VM worktree subagents, create_session in Auto), retry by failure mode, take the full gate at landing as the ledger verdict, land only under a landing grant with Close listing leftover branches, run orch through the launcher with its store on an orphan branch, and split restart from compaction; keeps orch's store where upstream moved to Cursor's Project tracker, and takes upstream's supervision habits as a Supervision section"
     },
     {
       "path": "jrzstack/automations/benny",
@@ -176,11 +172,8 @@
     },
     {
       "path": "jrzstack/skills/savvy-mode/scripts/orch",
-      "kind": "override",
-      "why": "frontier set takes the stacker's PR order from the store, PR state and merged heads from gh api REST and open heads from git rev-parse, in place of Graphite, and fails on a drifted base or a stale head; init excludes the store from git and every drain pushes it to its orphan branch by plumbing; commander imported directly and NotFoundError's parameter property a plain field, for Node's type stripping",
-      "sources": [
-        "upstream/pstack/skills/poteto-mode/scripts/orch"
-      ]
+      "kind": "port-only",
+      "why": "the bookkeeping CLI Orchestrate's lead keeps its store with, kept after upstream deleted it for Cursor's Project tracker and event subscriptions, which Claude Code lacks: frontier set takes the stacker's PR order from the store, PR state and merged heads from gh api REST and open heads from git rev-parse, in place of Graphite, and fails on a drifted base or a stale head; init excludes the store from git and every drain pushes it to its orphan branch by plumbing; commander imported directly and NotFoundError's parameter property a plain field, for Node's type stripping"
     },
     {
       "path": "jrzstack/skills/savvy-mode/scripts/watch-pr/github.ts",
