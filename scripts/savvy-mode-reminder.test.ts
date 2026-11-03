@@ -33,12 +33,15 @@ const expectedLines = (surface: string, mode: string) => [
     "unless CLAUDE.md or the request names it.",
   `Run every heavy command (test runner, build, whole-project typecheck or lint, dev server, browser session, ` +
     `a fresh worktree's dependency install), even one scoped to a single file, through ${pluginDir}/scripts/heavy -- <cmd>.`,
+  "Write every file (a brief, a scratch note, a handoff) with the Write tool, one call per file at a literal path. " +
+    "Never make a file's contents in Bash: no heredoc, shell function, or printf or echo redirect, " +
+    "and no `$` or `$(…)` in a write. Auto mode stops on a command it can't check.",
 ];
 
 const marker = (home: string, id = sessionId) => join(home, ".claude", "jrzstack", "sessions", id);
 
 describe("savvy-mode reminder hook", () => {
-  test("locally, prints the reminder, skill path, local surface, precedence and lock lines, and marks the session", () => {
+  test("locally, prints the reminder, skill path, local surface, precedence, lock and Write tool lines, and marks the session", () => {
     const result = reminder(hookInput({ permission_mode: "default" }));
 
     expect(result.exitCode).toBe(0);

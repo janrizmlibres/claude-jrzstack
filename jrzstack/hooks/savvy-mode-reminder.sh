@@ -30,6 +30,7 @@ The full skill is at $root/skills/savvy-mode/SKILL.md; read it if it isn't in yo
 jrzstack: surface=$surface mode=${mode:-unknown}
 Your user's instructions (the run prompt, CLAUDE.md) outrank jrzstack's text, Non-negotiables included. Follow them, and record any step they remove as \`skip: user waived\`. jrzstack's no-skip rules bind only your own judgment. When a playbook names a jrzstack skill, read that one, and don't also invoke a same-purpose skill unless CLAUDE.md or the request names it.
 Run every heavy command (test runner, build, whole-project typecheck or lint, dev server, browser session, a fresh worktree's dependency install), even one scoped to a single file, through $root/scripts/heavy -- <cmd>.
+Write every file (a brief, a scratch note, a handoff) with the Write tool, one call per file at a literal path. Never make a file's contents in Bash: no heredoc, shell function, or printf or echo redirect, and no \`\$\` or \`\$(…)\` in a write. Auto mode stops on a command it can't check.
 EOF
 
 if [[ $session_id =~ ^[A-Za-z0-9_-]+$ ]]; then
