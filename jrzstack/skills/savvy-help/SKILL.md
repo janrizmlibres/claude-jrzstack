@@ -79,6 +79,7 @@ The default answer is `/jrzstack:savvy-mode`, which runs most of the others when
 | Understand a change or subsystem, explained plainly | [`/jrzstack:teach`](../teach/SKILL.md) |
 | Catch up on their own recent work on a topic | [`/jrzstack:recall`](../recall/SKILL.md) |
 | Catch up on what changed in this session since their last message, in plain words and small visuals, with every item waiting on them listed and decidable from the reply alone | [`/jrzstack:ketchup`](../ketchup/SKILL.md) |
+| Catch up like `/jrzstack:ketchup`, in a short subtitled video of slides, with the waiting calls as text under it | [`/jrzstack:ketchup-video`](../ketchup-video/SKILL.md) |
 | Know what a small diff could break outside itself | [`/jrzstack:blast-radius`](../blast-radius/SKILL.md) |
 | Settle types and module shape before code that crosses a function boundary | [`/jrzstack:architect`](../architect/SKILL.md) |
 | Get several attempts at one brief, each in its own direction, merged into the best one | [`/jrzstack:arena`](../arena/SKILL.md) |
@@ -95,6 +96,7 @@ The default answer is `/jrzstack:savvy-mode`, which runs most of the others when
 | Bring a verification skill and its feature map back in line with the app | [`/jrzstack:maintain-verification-skill`](../maintain-verification-skill/SKILL.md) |
 | Formally verify a race, invariant, or other property that tests rarely reach | [`/jrzstack:create-formal-verification-skill`](../create-formal-verification-skill/SKILL.md) |
 | Bring a formal verification back in line after the code it covers changed, and learn whether a failure is drift or a bug | [`/jrzstack:maintain-formal-verification-skill`](../maintain-formal-verification-skill/SKILL.md) |
+| Show a PM or designer what the user sees as a chart checked by a TLA+ model, with the shortest path to each state that breaks a rule | [`/jrzstack:statechart`](../statechart/SKILL.md) |
 | Vet a performance number before reporting or acting on it | [`/jrzstack:benchmark-checklist`](../benchmark-checklist/SKILL.md) |
 | Run a large or cross-cutting change, or one to review after stepping away | [`/jrzstack:figure-it-out`](../figure-it-out/SKILL.md) |
 | Keep a decision log during a run, and review it afterward | [`/jrzstack:show-me-your-work`](../show-me-your-work/SKILL.md) |
@@ -131,7 +133,7 @@ Playbooks are step lists inside `/jrzstack:savvy-mode`, not skills, so they have
 - "take over this branch" runs Session pickup.
 - "pause safely" runs Pause safely.
 - "hand this off" or "run it in the cloud" runs Hand-off, which passes the run to a cloud lead and prints the session link.
-- "full autopilot on this queue" runs Autopilot-full. "stack them, don't ship" runs Autopilot-stack.
+- "full autopilot on this queue" runs Autopilot-full. "autopilot, don't merge" runs Autopilot-stack.
 - "run the eval playbook" runs Eval.
 
 Without `/jrzstack:savvy-mode`, a phrase such as "babysit this pr" can start another installed skill whose description matches the same words. The Playbooks section of [`savvy-mode`](../savvy-mode/SKILL.md) lists every playbook and when it applies. [Guide page 6](../../docs/guide/06-verify-and-ship.md) covers opening, babysitting, and landing a PR.

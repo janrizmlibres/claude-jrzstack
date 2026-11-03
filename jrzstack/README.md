@@ -19,7 +19,7 @@ fork it. improve it. make it yours. PRs are welcome!
 /plugin install jrzstack@claude-jrzstack
 ```
 
-turn on auto-update for the `claude-jrzstack` marketplace in `/plugin`, so every release reaches you. for cloud sessions, paste the setup line from the [claude-jrzstack readme](https://github.com/janrizmlibres/claude-jrzstack) into the environment's setup script.
+claude code leaves auto-update off for third-party marketplaces, so turn it on to get every release: run `/plugin`, open the **marketplaces** tab, select `claude-jrzstack`, and choose **enable auto-update**. to update once by hand, run `claude plugin update jrzstack@claude-jrzstack`. for cloud sessions, paste the setup line from the [claude-jrzstack readme](https://github.com/janrizmlibres/claude-jrzstack) into the environment's setup script.
 
 ## get started
 
@@ -74,7 +74,7 @@ morning.
 | [autonomous run](./skills/savvy-mode/playbooks/autonomous-run.md) | drive a long task to completion without stopping. |
 | [orchestrate](./skills/savvy-mode/playbooks/orchestrate.md) | a standing program handed to one lead session: multi-day, many stacked prs, fleets of workers. |
 | [autopilot-full](./skills/savvy-mode/playbooks/autopilot-full.md) | run independent prs to merged with one owner per pr. a swarm verifies each code-ready head, and every later change to the patch gets a fresh check. |
-| [autopilot-stack](./skills/savvy-mode/playbooks/autopilot-stack.md) | build and verify one linear base-branch stack for the operator to review and land. |
+| [autopilot-stack](./skills/savvy-mode/playbooks/autopilot-stack.md) | autopilot-full without the merge. build and verify prs for the operator to review and land, stacking a pr only on a pr it builds on. |
 | [session pickup](./skills/savvy-mode/playbooks/session-pickup.md) | resume or take over a prior agent's in-flight work. |
 | [pause safely](./skills/savvy-mode/playbooks/pause-safely.md) | suspend in-flight work cleanly so it can be resumed later. |
 | [hand-off](./skills/savvy-mode/playbooks/hand-off.md) | pass the run to a lead on the other surface, local to cloud, only when you ask. |
@@ -123,11 +123,12 @@ the full rules and playbooks live in [`skills/savvy-mode/SKILL.md`](./skills/sav
 | [`/jrzstack:why`](./skills/why/SKILL.md) | you want to know why something was built this way. discovers available MCPs at run time and queries each evidence category in parallel (source control, issue tracker, long-form docs, real-time chat, infra observability, error tracking, analytics warehouse). |
 | [`/jrzstack:recall`](./skills/recall/SKILL.md) | you're starting or resuming work and want your recent context on a topic rebuilt from your own chat history and the shared record, handed back as a tight current-state brief. |
 | [`/jrzstack:ketchup`](./skills/ketchup/SKILL.md) | you want what changed in this chat since your last message, in plain words and small visuals, with every item waiting on you listed and decidable from the reply alone, even when that makes the reply long. |
+| [`/jrzstack:ketchup-video`](./skills/ketchup-video/SKILL.md) | you want the `/jrzstack:ketchup` catch-up as a short subtitled video of slides, with the calls waiting on you as text under it. |
 | [`/jrzstack:blast-radius`](./skills/blast-radius/SKILL.md) | you have a small-looking change and want to know what else it could break, with the one fact it's safe because of proven by running code, not asserted. |
 | [`/jrzstack:architect`](./skills/architect/SKILL.md) | you're about to write code that crosses a function boundary and want the caller's usage, types, and module shape settled first. |
 | [`/jrzstack:arena`](./skills/arena/SKILL.md) | you want parallel attempts at the same thing, each in its own direction, then to grab the best parts of each. |
 | [`/jrzstack:swarm`](./skills/swarm/SKILL.md) | you want N parallel workers across different slices or races, then one aggregated report. |
-| [`/jrzstack:interrogate`](./skills/interrogate/SKILL.md) | you have a diff and want three reviewers, one lens each, to try to break it, including a strict code-quality lens. |
+| [`/jrzstack:interrogate`](./skills/interrogate/SKILL.md) | you have a diff and want three adversaries, one lens each, to try to break it, keeping only findings a run proves. |
 | [`/jrzstack:automate-me`](./skills/automate-me/SKILL.md) | you want your own `-mode` skill, drafted from how you've actually worked. |
 | [`/jrzstack:make-bot-ui`](./skills/make-bot-ui/SKILL.md) | you want a page or dashboard whose buttons wake a Grok Bot over a webhook, including the sender-key handoff and Tailscale. |
 | [`/jrzstack:setup-jrzstack`](./skills/setup-jrzstack/SKILL.md) | you want to see which models jrzstack's three settings use, and get the setup line for cloud environments. |
@@ -144,6 +145,7 @@ the full rules and playbooks live in [`skills/savvy-mode/SKILL.md`](./skills/sav
 | [`/jrzstack:maintain-verification-skill`](./skills/maintain-verification-skill/SKILL.md) | your verify skill's feature map has drifted from the app. source wave + one live pass, at most one PR of proven corrections. |
 | [`/jrzstack:create-formal-verification-skill`](./skills/create-formal-verification-skill/SKILL.md) | tests can't reach the case that breaks a race, retry, state machine, parser, or unsafe code. verifies one property with the tool that fits and generates a project-local skill to recheck it on every change. |
 | [`/jrzstack:maintain-formal-verification-skill`](./skills/maintain-formal-verification-skill/SKILL.md) | code your formal verification covers has changed since it was last checked. updates the model, harness, or properties to match the code, reruns, and says whether each failure is drift in the verification or a bug in the code. |
+| [`/jrzstack:statechart`](./skills/statechart/SKILL.md) | someone who owns the behavior needs to see it, not read a spec. checks a tla+ model, draws what the user sees as a mermaid statechart, marks each state that breaks a rule, and gives the shortest path to each one. |
 | [`/jrzstack:unslop`](./skills/unslop/SKILL.md) | you're cleaning up writing. removes AI tells. |
 | [`/jrzstack:bro`](./skills/bro/SKILL.md) | you want the last message restated in plain human language, no jargon. |
 | [`/jrzstack:technical-writing`](./skills/technical-writing/SKILL.md) | layered doc standard (Diátaxis + Google developer style + STE + Global English) for docs, RFCs, readmes, PR descriptions, commit messages. |

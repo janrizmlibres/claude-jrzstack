@@ -22,7 +22,7 @@ Every model-facing reference to a sibling skill (bold name, slash name, relative
 
 ```detect
 pattern: \b(?:[Ii]nvoke|[Rr]un) \$\{CLAUDE_PLUGIN_ROOT\}/skills/
-pattern: (?<!\$\{CLAUDE_PLUGIN_ROOT\}/skills/.*)(?<![\w:/.~$}\]-])/(?:poteto-mode|poteto-help|setup-pstack|savvy-mode|savvy-help|setup-jrzstack|architect|arena|automate-me|benchmark-checklist|blast-radius|bro|correct|create-verification-skill|create-formal-verification-skill|figure-it-out|how|in-your-own-words|interrogate|ketchup|maintain-verification-skill|maintain-formal-verification-skill|make-bot-ui|no-comments|recall|reflect|sharpen|show-me-your-work|swarm|tdd|teach|technical-writing|typescript-best-practices|unslop|why|deslop|control-ui|control-cli|principle-[a-z-]+)(?![\w-])(?!.*\$\{CLAUDE_PLUGIN_ROOT\}/skills/)
+pattern: /(?<![\w:/.~$}\]-]/)(?:poteto-mode|poteto-help|setup-pstack|savvy-mode|savvy-help|setup-jrzstack|architect|arena|automate-me|benchmark-checklist|blast-radius|bro|correct|create-verification-skill|create-formal-verification-skill|figure-it-out|how|in-your-own-words|interrogate|ketchup|ketchup-video|maintain-verification-skill|maintain-formal-verification-skill|make-bot-ui|no-comments|recall|reflect|sharpen|show-me-your-work|statechart|swarm|tdd|teach|technical-writing|typescript-best-practices|unslop|why|deslop|control-ui|control-cli|principle-[a-z-]+)(?![\w-])(?<!\$\{CLAUDE_PLUGIN_ROOT\}/skills/.*/[\w-]+)(?!.*\$\{CLAUDE_PLUGIN_ROOT\}/skills/)
 before: Use the **arena** skill: invoke ${CLAUDE_PLUGIN_ROOT}/skills/arena/SKILL.md.
 before: [`/poteto-mode`](./skills/poteto-mode/SKILL.md) and the agents route through the same wrapper.
 before: Run /setup-pstack once, then /principle-fix-root-causes when a bug recurs.
@@ -35,6 +35,7 @@ allow: jrzstack/docs/guide/02-savvy-mode.md | departure board listing | the imag
 allow: jrzstack/docs/guide/03-understand.md | links clues under | the image's alt text quotes the lettering in the picture
 allow: jrzstack/docs/guide/04-design.md | interrogate panels | the image's alt text quotes the lettering in the picture
 allow: jrzstack/docs/guide/10-recipes-and-pitfalls.md | pinned cards reading | the image's alt text quotes the lettering in the picture
+allow: jrzstack/skills/statechart/scripts/statechart | /statechart.ts | the launcher's path to its entry script, not a skill reference
 ```
 
 ## 2. Frontmatter flags stay

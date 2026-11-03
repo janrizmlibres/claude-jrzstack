@@ -48,6 +48,8 @@ Present the synthesizer's full Accepted / Rejected / Backlog output and wait for
 
 File each Backlog item to your team's devex or backlog tracker without waiting. Only the Accepted list waits for approval.
 
+Never edit a skill under `plugins/cache/`. Before approval, show its destination: for a jrzstack skill, the patch file `~/.claude/jrzstack/reflect/<skill>.patch`, and for another plugin's skill, `.claude/skills/<skill>/` or `~/.claude/skills/<skill>/`. After approval, write a jrzstack skill's edit to its patch file as a unified diff against the plugin's file, for the user to apply to the port's repo, or copy another plugin's skill folder to its destination and edit it there. Never open a PR or push.
+
 Follow each approved row's Routing exactly:
 
 - Trivial existing-skill edit (a one-line bullet, a tightened sentence, a stale fact corrected): the parent does it directly.
