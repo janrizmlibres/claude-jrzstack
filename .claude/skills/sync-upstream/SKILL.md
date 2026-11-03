@@ -40,6 +40,8 @@ In Sync and Re-translation, the sync workflow runs this skill with no one in the
    - `bun scripts/check-cursorisms.ts`
    - `bun scripts/check-port-json.ts`
    - `bun scripts/render-readme.ts`, then `bun scripts/render-readme.ts --check`
+   - `bun run typecheck`
+   - `bun run test`
 9. **Open the PR.** Commit `upstream/`, `jrzstack/`, `port.json`, the README and any rules edit together, with a plain message (`Sync upstream pstack v<version>`) and no attribution lines. Push the branch, then `gh pr create --base <base> --title "Sync upstream pstack v<version>" --body-file <scratch>/body.md`. The body:
    - the script's first line (upstream's commit and version, since the snapshot's);
    - a few lines of upstream's intent, from step 3;

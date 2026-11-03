@@ -213,10 +213,13 @@ describe("check-cursorisms", () => {
     const examples = (key: "before" | "after") =>
       [...doc.matchAll(new RegExp(`^${key}:(.*)$`, "gm"))].map((match) => match[1]!.trim());
 
-    test("holds rules 1 to 26", () => {
+    // A sync may add a rule, so the count only has a floor: the 26 rules the
+    // port had when this test last changed, numbered from 1 with no gaps.
+    test("holds rules 1 to n, n at least 26", () => {
       const numbers = [...doc.matchAll(/^## (\d+)\. /gm)].map((match) => Number(match[1]));
 
-      expect(numbers).toEqual(Array.from({ length: 26 }, (_, i) => i + 1));
+      expect(numbers.length).toBeGreaterThanOrEqual(26);
+      expect(numbers).toEqual(Array.from({ length: numbers.length }, (_, i) => i + 1));
     });
 
     test("flags every rule's before lines and passes its after lines", () => {

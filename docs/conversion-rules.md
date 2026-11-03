@@ -18,7 +18,7 @@ To add a rule, copy the nearest rule, write its prose, paste the upstream line y
 
 ## 1. Sibling routing
 
-Every model-facing reference to a sibling skill (bold name, slash name, relative link, repo path) keeps upstream's prose and adds `read ${CLAUDE_PLUGIN_ROOT}/skills/<name>/SKILL.md`, in skill and agent bodies. The verb is always "read", never "invoke" or "run". User-facing slash references become `/jrzstack:<name>`.
+Every model-facing reference to a sibling skill (bold name, slash name, relative link, repo path) keeps upstream's prose and adds `read ${CLAUDE_PLUGIN_ROOT}/skills/<name>/SKILL.md`, in skill and agent bodies. The verb is always "read", never "invoke" or "run". User-facing slash references become `/jrzstack:<name>`. Text a skill writes into the user's repo, such as a generated project skill, runs where `${CLAUDE_PLUGIN_ROOT}` isn't set, so it names the sibling's `skills/<name>/SKILL.md` in the installed jrzstack plugin instead.
 
 ```detect
 pattern: \b(?:[Ii]nvoke|[Rr]un) \$\{CLAUDE_PLUGIN_ROOT\}/skills/
