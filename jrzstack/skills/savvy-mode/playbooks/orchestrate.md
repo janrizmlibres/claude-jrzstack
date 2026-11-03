@@ -107,6 +107,14 @@ Write ledger rows with `orch ledger record`. Check the current PR and head SHA w
 
 A unit is not done until its output is externalized the moment it lands, never batched to the end of the run. A worker commits its report to its own branch (a separate-session worker pushes it), a verifier's verdict reaches the ledger, receipts land in the store. Work that exists only on one VM when that VM dies was never done.
 
+#### Supervision
+
+- **Every PR gets a verdict from someone other than its author before it lands.** For a unit whose `VERIFY` is one cheap command, your spot-check of its receipts and the full gate at landing are that verdict. Every other unit gets the fresh-context verifier above.
+- **Read the diff or the artifact, not only the worker's report,** before you record a verdict or land. Do it as its own step or in the verifier unit, never inside a drain.
+- **Send back work that drifts from scope or grows past what was asked.** Keep only the fixes that block the frontier, and park the rest as follow-ups.
+- **Check a PR's live state before you report on it,** with `gh pr view` and `gh pr checks` (`gh api` REST in cloud), never from the worker's last report.
+- **Message a worker only for a follow-up on the same work.** New work gets a fresh worker with its own brief.
+
 #### Liveness and failure
 
 - Never resume a worker to check on it. A message to an idle worker wakes it. Probe read-only: the ledger, `units.tsv`, `gh` (`gh api` REST in cloud), pushed branches (`git ls-remote`), a `create_session` worker's `get_session`. Transcript mtime is not liveness.

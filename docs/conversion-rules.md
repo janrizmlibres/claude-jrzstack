@@ -429,7 +429,7 @@ after: Also check that no path in `git diff --name-only HEAD...origin/main` is a
 
 ## 23. Agent stores
 
-Cursor gives each agent a store whose path the system prompt names; Claude Code has none. A decision trail upstream keeps in the agent's store rides in the bodies of the commits its writer pushes (an empty commit is fine), so a replacement reads it from the branch's log and a squash merge, which takes the PR body, never lands it. Orchestrate's store is the orch override's, checkpointed to its orphan branch.
+Cursor gives each agent a store whose path the system prompt names; Claude Code has none. A decision trail upstream keeps in the agent's store rides in the bodies of the commits its writer pushes (an empty commit is fine), so a replacement reads it from the branch's log and a squash merge, which takes the PR body, never lands it. Orchestrate's store is kept by `orch`, a port-only CLI since upstream deleted it, and checkpointed to its orphan branch.
 
 ```detect
 pattern: \bagent's store\b
@@ -477,4 +477,14 @@ after: twenty-four short skills, one principle each. `savvy-mode` indexes them i
 after: The panel comes from your [`/jrzstack:setup-jrzstack`](../../skills/setup-jrzstack/SKILL.md) configuration, and you can adjust it per task.
 after: | `savvy-agent`, `comment-sicko` | `jrzstack:savvy-agent`, `jrzstack:comment-sicko` |
 after: # Savvy subagent
+```
+
+## 26. Skill edits outside the plugin cache
+
+`reflect`'s rule against editing a skill in the plugin cache keeps its local copy, at rule 6's paths, for another plugin's skill. A jrzstack skill is always read at `${CLAUDE_PLUGIN_ROOT}/skills/<name>/SKILL.md`, never from a local copy, so an edit to a copy would never be read. For one of jrzstack's own skills, the destination shown before approval is a patch file, `~/.claude/jrzstack/reflect/<skill>.patch`, and after approval reflect writes the edit there as a unified diff against the plugin's file for the user to apply to the port's repo. It still never opens a PR or pushes.
+
+```detect
+pattern: \bedit the copy\. Never open a PR or push\b
+before: Never edit a skill under `plugins/cache/`. Before approval, show its destination, `.cursor/skills/<skill>/` or `~/.cursor/skills/<skill>/`. After approval, copy the skill folder there and edit the copy. Never open a PR or push.
+after: Never edit a skill under `plugins/cache/`. Before approval, show its destination: for a jrzstack skill, the patch file `~/.claude/jrzstack/reflect/<skill>.patch`, and for another plugin's skill, `.claude/skills/<skill>/` or `~/.claude/skills/<skill>/`. After approval, write a jrzstack skill's edit to its patch file as a unified diff against the plugin's file, for the user to apply to the port's repo, or copy another plugin's skill folder to its destination and edit it there. Never open a PR or push.
 ```
