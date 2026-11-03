@@ -108,7 +108,7 @@
     {
       "path": "jrzstack/skills/savvy-mode/playbooks/orchestrate.md",
       "kind": "override",
-      "why": "a lead and sub-leads place units by surface (cloud workers, local-only worktrees, in-VM worktree subagents, create_session in Auto), retry by failure mode, take the full gate at landing as the ledger verdict, land only under a landing grant with Close listing leftover branches, run orch through the launcher with its store on an orphan branch, and split restart from compaction; keeps orch's store where upstream moved to Cursor's Project tracker, and takes upstream's supervision habits as a Supervision section"
+      "why": "a lead and sub-leads place units by surface (cloud workers, local-only worktrees, in-VM worktree subagents, create_session in Auto), retry by failure mode, take the full gate at landing as the ledger verdict, land only under a landing grant with Close listing leftover branches, run orch through the launcher with its store on an orphan branch and its briefs written by the Write tool and published with `orch brief publish`, and split restart from compaction; keeps orch's store where upstream moved to Cursor's Project tracker, and takes upstream's supervision habits as a Supervision section"
     },
     {
       "path": "jrzstack/automations/benny",
@@ -163,7 +163,7 @@
     {
       "path": "jrzstack/skills/savvy-mode/scripts/orch",
       "kind": "port-only",
-      "why": "the bookkeeping CLI Orchestrate's lead keeps its store with, kept after upstream deleted it for Cursor's Project tracker and event subscriptions, which Claude Code lacks: frontier set takes the stacker's PR order from the store, PR state and merged heads from gh api REST and open heads from git rev-parse, in place of Graphite, and fails on a drifted base or a stale head; init excludes the store from git and every drain pushes it to its orphan branch by plumbing; commander imported directly and NotFoundError's parameter property a plain field, for Node's type stripping"
+      "why": "the bookkeeping CLI Orchestrate's lead keeps its store with, kept after upstream deleted it for Cursor's Project tracker and event subscriptions, which Claude Code lacks: frontier set takes the stacker's PR order from the store, PR state and merged heads from gh api REST and open heads from git rev-parse, in place of Graphite, and fails on a drifted base or a stale head; init excludes the store from git and every drain pushes it to its orphan branch by plumbing; brief publish commits one brief onto a branch's tree by the same plumbing and pushes it as a fast-forward, so a lead shares a brief with one literal command; commander imported directly and NotFoundError's parameter property a plain field, for Node's type stripping"
     },
     {
       "path": "jrzstack/skills/savvy-mode/scripts/watch-pr/github.ts",
@@ -230,7 +230,7 @@
     {
       "path": "jrzstack/skills/savvy-mode/references/brief-contract.md",
       "kind": "port-only",
-      "why": "the rules every worker brief carries: entry line, no human asks, own-branch pushes, start commit, the machine lock, missing files, leaf workers, the trailered report commit and the nonce trailer a lead finds a cloud report by, a sub-lead's timebox and in-turn wait, and the lead's worker worktrees: the exclude line and removal"
+      "why": "the rules every worker brief carries: entry line, no human asks, own-branch pushes, start commit, the machine lock, missing files, leaf workers, the trailered report commit and the nonce trailer a lead finds a cloud report by, a sub-lead's timebox and in-turn wait, the lead's worker worktrees: the exclude line and removal, and briefs written by the Write tool to the store and published with `orch brief publish`, never by a command built from shell variables"
     },
     {
       "path": "jrzstack/skills/savvy-mode/scripts/check-plan.mjs",
@@ -243,7 +243,7 @@
     {
       "path": "jrzstack/skills/savvy-mode/playbooks/multi-phase-plan.md",
       "kind": "translated",
-      "why": "carries rule 20's spec intake: reads the spec through `gh api` REST, writes the plan at a git-excluded path, lints it through the launcher, posts it on the spec issue or an orphan branch, carries on unless asked for a plan only, and only a landing grant picks Autopilot-full; its skeleton is the wording the check-plan.mjs override checks, so a change to either reaches the other"
+      "why": "carries rule 20's spec intake: reads the spec through `gh api` REST, writes the plan at a git-excluded path, lints it through the launcher, posts it on the spec issue or an orphan branch, carries on unless asked for a plan only, writes and publishes owners' briefs per the brief contract, and only a landing grant picks Autopilot-full; its skeleton is the wording the check-plan.mjs override checks, so a change to either reaches the other"
     },
     {
       "path": "jrzstack/skills/savvy-mode/playbooks/hand-off.md",

@@ -65,6 +65,10 @@ interface InboxDrainOptions {
   readonly peek: boolean;
 }
 
+interface BriefPublishOptions {
+  readonly branch?: string;
+}
+
 interface GateParkOptions {
   readonly question: string;
   readonly options: string;
@@ -424,6 +428,25 @@ function createProgram(io: Io): Command {
       (count) => ({ count })
     )
   );
+
+  const brief = program
+    .command("brief")
+    .description("publish worker briefs")
+    .action(() => requireSubcommand(program));
+  leaf(
+    brief,
+    "publish <name>",
+    "commit briefs/<name> from the store to a branch and push it, never forced"
+  )
+    .option("--branch <branch>", "branch to publish to (default: the store branch)")
+    .action((name: string, options: BriefPublishOptions) =>
+      runStore(
+        program,
+        io,
+        (store) => store.briefs.publish({ name, branch: options.branch }),
+        (result) => `${result.branch}\t${result.path}\t${result.commit}`
+      )
+    );
 
   const gate = program
     .command("gate")
