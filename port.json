@@ -23,7 +23,7 @@
     {
       "path": "jrzstack/hooks/savvy-mode-reminder.sh",
       "kind": "port-only",
-      "why": "savvy-mode's per-turn reminder hook: upstream's reminder text, the skill path, the surface and mode, precedence and the machine lock, and the session marker the compaction hook reads"
+      "why": "savvy-mode's per-turn reminder hook: upstream's reminder text, the skill path, the surface and mode, precedence, the machine lock, writing every file with the Write tool at a literal path and never in Bash, and the session marker the compaction hook reads"
     },
     {
       "path": "jrzstack/hooks/hooks.json",
@@ -230,7 +230,7 @@
     {
       "path": "jrzstack/skills/savvy-mode/references/brief-contract.md",
       "kind": "port-only",
-      "why": "the rules every worker brief carries: entry line, no human asks, own-branch pushes, start commit, the machine lock, missing files, leaf workers, the trailered report commit and the nonce trailer a lead finds a cloud report by, a sub-lead's timebox and in-turn wait, the lead's worker worktrees: the exclude line and removal, and briefs written by the Write tool to the store and published with `orch brief publish`, never by a command built from shell variables"
+      "why": "the rules every worker brief carries: entry line, no human asks, own-branch pushes, start commit, the machine lock, missing files, leaf workers, the trailered report commit and the nonce trailer a lead finds a cloud report by, a sub-lead's timebox and in-turn wait, the lead's worker worktrees: the exclude line and removal, and every file the lead or a worker writes made by the Write tool at a literal path, never generated in Bash, with briefs kept in the store and published with `orch brief publish`"
     },
     {
       "path": "jrzstack/skills/savvy-mode/scripts/check-plan.mjs",
