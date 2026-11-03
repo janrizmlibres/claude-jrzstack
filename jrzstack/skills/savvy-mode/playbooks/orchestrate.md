@@ -35,6 +35,7 @@ The store is `.claude/jrzstack/orchestrate/<program-slug>/` in the lead's checko
 - `preferences.md` is the standing-orders register: numbered lines, one constraint each (model policy, stack shape and count, each stack's stacker, verification bar, landing grant, forbidden paths, escalation policy), added with `orch standing add`. When Multi-phase plan routed the program here, its plan becomes the standing orders. Paste it verbatim into every spawn and every resume. Directives decay across resumes, and each dropped one costs a human turn. When you catch yourself restating an instruction, append the line before you act (the **principle-encode-lessons-in-structure** skill; read ${CLAUDE_PLUGIN_ROOT}/skills/principle-encode-lessons-in-structure/SKILL.md).
 - `overview.md` is the durable PR and issue DB. Append. Never rewrite wholesale per event.
 - `units.tsv` has one row per unit: id, track, state, branch, PR, head SHA, brief path. Update rows in place.
+- `briefs/` holds every brief the lead and sub-leads author, one file each, written with the Write tool to its literal path and published with `orch brief publish <name>.md` per the brief contract's clause 13. Never build a brief's write path or a git chain from shell variables or `$(…)`.
 - `frontier.json` is the computed merge frontier, per Stack safety.
 - `ledger.tsv` is the verification ledger, per Verification.
 - `inbox/` holds completion pointers. `gates.md` parks human gates (question, options, default on no answer).
@@ -43,7 +44,7 @@ The store is `.claude/jrzstack/orchestrate/<program-slug>/` in the lead's checko
 
 #### The brief
 
-Your prompts to agents are your only product, and a sloppy brief compounds into slop across the whole tree. Every spawn carries all of it. A field you cannot fill is a unit you have not scoped yet. Every brief follows the brief contract (read ${CLAUDE_PLUGIN_ROOT}/skills/savvy-mode/references/brief-contract.md): its entry line, its own-branch rule, its start commit, the machine lock, missing files, leaf workers and the report commit are part of the brief, not extras around it.
+Your prompts to agents are your only product, and a sloppy brief compounds into slop across the whole tree. Every spawn carries all of it. A field you cannot fill is a unit you have not scoped yet. Every brief follows the brief contract (read ${CLAUDE_PLUGIN_ROOT}/skills/savvy-mode/references/brief-contract.md): its entry line, its own-branch rule, its start commit, the machine lock, missing files, leaf workers and the report commit are part of the brief, not extras around it. Write the brief to `briefs/<name>.md` in the store with the Write tool before the spawn, and when a separate-session worker or the human reads it from the remote, publish it with `orch brief publish <name>.md` (add `--branch <ref>` for another branch, such as the plan's). That is one command with literal arguments, which auto mode runs without a prompt.
 
 ```
 GOAL         one sentence, the outcome, executable by a stranger with no chat access

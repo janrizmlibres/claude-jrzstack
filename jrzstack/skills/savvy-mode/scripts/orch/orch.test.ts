@@ -15,6 +15,7 @@ import {
   UserError,
   openStore,
   parseVerdict,
+  publishPlan,
   type OpenStoreOptions,
   type PullRequest,
   type PullRequestReader,
@@ -761,6 +762,210 @@ describe("Store branch", () => {
     );
   });
 
+  it("publishes a brief to the store branch by plumbing and pushes it", async () => {
+    const lead = await makeLeadCheckout(await makeDirectory());
+    const store = useStore(lead.store);
+    await store.init();
+    await mkdir(join(lead.store, "briefs"));
+    await writeFile(join(lead.store, "briefs", "u1.md"), "brief one\n");
+    git({ repo: lead.repo, args: ["status", "--porcelain"] });
+    const indexPath = join(lead.repo, ".git", "index");
+    const indexBefore = await readFile(indexPath);
+    const headBefore = git({ repo: lead.repo, args: ["rev-parse", "HEAD"] });
+
+    const first = await store.briefs.publish({ name: "u1.md" });
+
+    const branch = "refs/heads/jrzstack/orchestrate/demo";
+    const remoteGit = (args: readonly string[]): string =>
+      git({ repo: lead.remote, args });
+    expect(first).toEqual({
+      branch: "jrzstack/orchestrate/demo",
+      path: "briefs/u1.md",
+      commit: remoteGit(["rev-parse", branch]),
+    });
+    expect(remoteGit(["ls-tree", "-r", "--name-only", first.commit])).toBe(
+      "briefs/u1.md"
+    );
+    expect(await readFile(indexPath)).toEqual(indexBefore);
+    expect(git({ repo: lead.repo, args: ["rev-parse", "HEAD"] })).toBe(headBefore);
+    expect(
+      git({ repo: lead.repo, args: ["status", "--porcelain", "--untracked-files=all"] })
+    ).toBe("");
+
+    await writeFile(join(lead.store, "briefs", "u2.md"), "brief two\n");
+    const second = await store.briefs.publish({ name: "u2.md" });
+    expect(remoteGit(["rev-list", "--parents", "-n", "1", second.commit])).toBe(
+      `${second.commit} ${first.commit}`
+    );
+    expect(
+      remoteGit(["ls-tree", "-r", "--name-only", second.commit]).split("\n")
+    ).toEqual(["briefs/u1.md", "briefs/u2.md"]);
+
+    expect((await store.briefs.publish({ name: "u2.md" })).commit).toBe(
+      second.commit
+    );
+
+    await store.inbox.drain();
+    const drained = remoteGit(["rev-parse", branch]);
+    expect(remoteGit(["rev-parse", `${drained}^`])).toBe(second.commit);
+    expect(remoteGit(["show", `${drained}:briefs/u1.md`])).toBe("brief one");
+  });
+
+  it("publishes a brief beside a plan on another branch, keeping its tree", async () => {
+    const directory = await makeDirectory();
+    const lead = await makeLeadCheckout(directory);
+    const other = join(directory, "other");
+    git({ repo: directory, args: ["clone", "--quiet", lead.remote, other] });
+    git({ repo: other, args: ["config", "user.name", "Orch Test"] });
+    git({ repo: other, args: ["config", "user.email", "orch@example.com"] });
+    git({ repo: other, args: ["checkout", "--quiet", "--orphan", "plan"] });
+    git({ repo: other, args: ["rm", "--quiet", "-rf", "--ignore-unmatch", "."] });
+    await writeFile(join(other, "plan.md"), "the plan\n");
+    git({ repo: other, args: ["add", "plan.md"] });
+    git({ repo: other, args: ["commit", "--quiet", "-m", "plan"] });
+    git({
+      repo: other,
+      args: ["push", "--quiet", "origin", "HEAD:refs/heads/jrzstack/plan/demo"],
+    });
+    const plan = git({ repo: other, args: ["rev-parse", "HEAD"] });
+    const store = useStore(lead.store);
+    await store.init();
+    await mkdir(join(lead.store, "briefs"));
+    await writeFile(join(lead.store, "briefs", "verify.md"), "verify\n");
+
+    const published = await store.briefs.publish({
+      name: "verify.md",
+      branch: "refs/heads/jrzstack/plan/demo",
+    });
+
+    const remoteGit = (args: readonly string[]): string =>
+      git({ repo: lead.remote, args });
+    expect(published.branch).toBe("jrzstack/plan/demo");
+    expect(remoteGit(["rev-parse", "refs/heads/jrzstack/plan/demo"])).toBe(
+      published.commit
+    );
+    expect(remoteGit(["rev-parse", `${published.commit}^`])).toBe(plan);
+    expect(
+      remoteGit(["ls-tree", "-r", "--name-only", published.commit]).split("\n")
+    ).toEqual(["briefs/verify.md", "plan.md"]);
+    expect(
+      remoteGit(["show", "--quiet", "--format=%s", published.commit])
+    ).toBe("orch: brief verify.md");
+  });
+
+  it("never force pushes a brief over a branch it could not fetch", async () => {
+    const directory = await makeDirectory();
+    const lead = await makeLeadCheckout(directory);
+    const store = useStore(lead.store);
+    await store.init();
+    await mkdir(join(lead.store, "briefs"));
+    await writeFile(join(lead.store, "briefs", "u1.md"), "brief\n");
+    git({
+      repo: lead.repo,
+      args: ["push", "--quiet", "origin", "main:refs/heads/jrzstack/plan/demo"],
+    });
+    const before = git({
+      repo: lead.remote,
+      args: ["rev-parse", "refs/heads/jrzstack/plan/demo"],
+    });
+    git({
+      repo: lead.repo,
+      args: ["update-ref", "-d", "refs/remotes/origin/jrzstack/plan/demo"],
+    });
+    git({ repo: lead.repo, args: ["config", "remote.origin.pushurl", lead.remote] });
+    git({
+      repo: lead.repo,
+      args: ["config", "remote.origin.url", join(directory, "missing.git")],
+    });
+
+    await expect(
+      store.briefs.publish({ name: "u1.md", branch: "jrzstack/plan/demo" })
+    ).rejects.toThrow("pushing jrzstack/plan/demo failed");
+    expect(
+      git({ repo: lead.remote, args: ["rev-parse", "refs/heads/jrzstack/plan/demo"] })
+    ).toBe(before);
+  });
+
+  it("posts a plan as plan.md to its orphan branch, keeping its briefs", async () => {
+    const lead = await makeLeadCheckout(await makeDirectory());
+    const plans = join(lead.repo, ".claude", "jrzstack", "plans");
+    await mkdir(plans, { recursive: true });
+    await writeFile(join(plans, "demo.md"), "plan one\n");
+    git({ repo: lead.repo, args: ["status", "--porcelain"] });
+    const indexPath = join(lead.repo, ".git", "index");
+    const indexBefore = await readFile(indexPath);
+    const headBefore = git({ repo: lead.repo, args: ["rev-parse", "HEAD"] });
+
+    const first = await publishPlan({
+      file: join(plans, "demo.md"),
+      title: "Demo program",
+    });
+
+    const remoteGit = (args: readonly string[]): string =>
+      git({ repo: lead.remote, args });
+    expect(first).toEqual({
+      branch: "jrzstack/plan/demo",
+      path: "plan.md",
+      commit: remoteGit(["rev-parse", "refs/heads/jrzstack/plan/demo"]),
+    });
+    expect(remoteGit(["rev-list", "--parents", "-n", "1", first.commit])).toBe(
+      first.commit
+    );
+    expect(remoteGit(["show", "--quiet", "--format=%s", first.commit])).toBe(
+      "plan: Demo program"
+    );
+    expect(await readFile(indexPath)).toEqual(indexBefore);
+    expect(git({ repo: lead.repo, args: ["rev-parse", "HEAD"] })).toBe(headBefore);
+
+    const store = useStore(lead.store);
+    await store.init();
+    await mkdir(join(lead.store, "briefs"));
+    await writeFile(join(lead.store, "briefs", "verify.md"), "verify\n");
+    const brief = await store.briefs.publish({
+      name: "verify.md",
+      branch: "jrzstack/plan/demo",
+    });
+    await writeFile(join(plans, "demo.md"), "plan two\n");
+
+    const second = await publishPlan({ file: join(plans, "demo.md") });
+
+    expect(remoteGit(["rev-parse", `${second.commit}^`])).toBe(brief.commit);
+    expect(
+      remoteGit(["ls-tree", "-r", "--name-only", second.commit]).split("\n")
+    ).toEqual(["briefs/verify.md", "plan.md"]);
+    expect(remoteGit(["show", `${second.commit}:plan.md`])).toBe("plan two");
+    expect(remoteGit(["show", "--quiet", "--format=%s", second.commit])).toBe(
+      "plan: demo"
+    );
+  });
+
+  it("refuses a missing plan and one outside a git checkout", async () => {
+    const directory = await makeDirectory();
+    await expect(
+      publishPlan({ file: join(directory, "absent.md") })
+    ).rejects.toThrow("no plan at");
+    await writeFile(join(directory, "loose.md"), "plan\n");
+    await expect(
+      publishPlan({ file: join(directory, "loose.md") })
+    ).rejects.toThrow("is not inside a git checkout");
+  });
+
+  it("refuses a missing brief and a path for a name", async () => {
+    const lead = await makeLeadCheckout(await makeDirectory());
+    const store = useStore(lead.store);
+    await store.init();
+
+    await expect(store.briefs.publish({ name: "absent.md" })).rejects.toThrow(
+      "no brief at"
+    );
+    await expect(
+      store.briefs.publish({ name: "../units.tsv" })
+    ).rejects.toThrow("brief name must be a file name");
+    expect(
+      git({ repo: lead.remote, args: ["branch", "--list", "jrzstack/*"] })
+    ).toBe("");
+  });
+
   it("drains nothing when the store branch cannot be pushed", async () => {
     const lead = await makeLeadCheckout(await makeDirectory());
     git({ repo: lead.repo, args: ["remote", "remove", "origin"] });
@@ -868,6 +1073,54 @@ describe("orch CLI", () => {
       verdict: "NOT-VERIFIED",
     });
     expect(missingLedger.stderr).toBe("");
+  });
+
+  it("publishes a brief with one command of literal arguments", async () => {
+    const lead = await makeLeadCheckout(await makeDirectory());
+    expect(runCli(["--store", lead.store, "init"]).code).toBe(0);
+    await mkdir(join(lead.store, "briefs"));
+    await writeFile(join(lead.store, "briefs", "u1.md"), "brief\n");
+
+    const published = runCli([
+      "--store",
+      lead.store,
+      "brief",
+      "publish",
+      "u1.md",
+      "--branch",
+      "jrzstack/plan/demo",
+    ]);
+
+    expect(published.stderr).toBe("");
+    expect(published.code).toBe(0);
+    const commit = git({
+      repo: lead.remote,
+      args: ["rev-parse", "refs/heads/jrzstack/plan/demo"],
+    });
+    expect(published.stdout).toBe(
+      `jrzstack/plan/demo\tbriefs/u1.md\t${commit}\n`
+    );
+  });
+
+  it("posts a plan with one command of literal arguments and no store", async () => {
+    const lead = await makeLeadCheckout(await makeDirectory());
+    const plans = join(lead.repo, ".claude", "jrzstack", "plans");
+    await mkdir(plans, { recursive: true });
+    await writeFile(join(plans, "demo.md"), "plan\n");
+    const env = { ...process.env, ORCH_STORE: undefined };
+
+    const posted = runCli(
+      ["plan", "publish", join(plans, "demo.md"), "--title", "Demo program"],
+      env
+    );
+
+    expect(posted.stderr).toBe("");
+    expect(posted.code).toBe(0);
+    const commit = git({
+      repo: lead.remote,
+      args: ["rev-parse", "refs/heads/jrzstack/plan/demo"],
+    });
+    expect(posted.stdout).toBe(`jrzstack/plan/demo\tplan.md\t${commit}\n`);
   });
 
   it("runs under Node's type stripping", async () => {

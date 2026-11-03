@@ -158,6 +158,23 @@ export interface PushInboxParams {
   readonly report?: string;
 }
 
+export interface PublishBriefParams {
+  readonly name: string;
+  readonly branch?: string;
+}
+
+export interface PublishPlanParams {
+  readonly file: string;
+  readonly branch?: string;
+  readonly title?: string;
+}
+
+export interface PublishedFile {
+  readonly branch: string;
+  readonly path: string;
+  readonly commit: string;
+}
+
 export interface ParkGateParams {
   readonly id: string;
   readonly question: string;
@@ -218,6 +235,9 @@ export interface Store {
     readonly drain: () => Promise<readonly InboxPointer[]>;
     readonly peek: () => Promise<readonly InboxPointer[]>;
     readonly count: () => Promise<number>;
+  };
+  readonly briefs: {
+    readonly publish: (params: PublishBriefParams) => Promise<PublishedFile>;
   };
   readonly gates: {
     readonly park: (params: ParkGateParams) => Promise<OpenGate>;
@@ -1244,25 +1264,51 @@ async function storeFiles(store: string, prefix = ""): Promise<string[]> {
   return result.sort();
 }
 
-// Commits the store as it stands after the drain (its inbox empty) to its
-// orphan branch through a temporary index and commit-tree, so the checkout's
-// working tree, index and HEAD never move. The commit builds on origin's copy
-// of the branch when there is one, so a branch pushed from elsewhere never
-// wedges the push.
-async function commitStore(store: string, target: StoreBranch): Promise<void> {
-  const files = (await storeFiles(store)).filter(
-    (file) => !file.startsWith("inbox/")
+// The commit a write to branch builds on: origin's copy, fetched first, so a
+// branch pushed from elsewhere never wedges the push; else the local branch;
+// else null, for a new orphan branch.
+function branchTip(store: string, branch: string): string | null {
+  const remoteRef = `refs/remotes/${REMOTE}/${branch}`;
+  gitOrNull({
+    args: ["fetch", "--quiet", REMOTE, `+refs/heads/${branch}:${remoteRef}`],
+    cwd: store,
+  });
+  return (
+    commitOrNull({ cwd: store, ref: remoteRef }) ??
+    commitOrNull({ cwd: store, ref: `refs/heads/${branch}` })
   );
-  const remoteRef = `refs/remotes/${REMOTE}/${target.branch}`;
+}
+
+// Writes entries over parent's tree (or an empty one) through a temporary
+// index and commit-tree, so the checkout's working tree, index and HEAD never
+// move. Returns parent itself when the tree comes out the same.
+async function commitFiles({
+  store,
+  parent,
+  base,
+  files,
+  message,
+}: {
+  store: string;
+  parent: string | null;
+  base: string | null;
+  files: readonly { readonly path: string; readonly source: string }[];
+  message: string;
+}): Promise<string> {
   const scratch = await mkdtemp(join(tmpdir(), "orch-index-"));
   try {
-    gitOrNull({
-      args: ["fetch", "--quiet", REMOTE, `+${target.ref}:${remoteRef}`],
-      cwd: store,
-    });
     const index = { GIT_INDEX_FILE: join(scratch, "index") };
+    if (base !== null) {
+      runGit({ args: ["read-tree", base], cwd: store, env: index });
+    }
     const shas = runGit({
-      args: ["hash-object", "-w", "--no-filters", "--", ...files],
+      args: [
+        "hash-object",
+        "-w",
+        "--no-filters",
+        "--",
+        ...files.map((file) => file.source),
+      ],
       cwd: store,
     }).split("\n");
     runGit({
@@ -1270,35 +1316,50 @@ async function commitStore(store: string, target: StoreBranch): Promise<void> {
       cwd: store,
       env: index,
       input: files
-        .map((file, i) => `100644 ${shas[i] ?? ""}\t${file}\0`)
+        .map((file, i) => `100644 ${shas[i] ?? ""}\t${file.path}\0`)
         .join(""),
     });
     const tree = runGit({ args: ["write-tree"], cwd: store, env: index });
-    const parent =
-      commitOrNull({ cwd: store, ref: remoteRef }) ??
-      commitOrNull({ cwd: store, ref: target.ref });
-    const unchanged =
+    if (
       parent !== null &&
-      runGit({ args: ["rev-parse", `${parent}^{tree}`], cwd: store }) === tree;
-    const commit = unchanged
-      ? parent
-      : runGit({
-          args: [
-            "commit-tree",
-            tree,
-            ...(parent === null ? [] : ["-p", parent]),
-            "-m",
-            `orch: store at drain ${new Date().toISOString()}`,
-          ],
-          cwd: store,
-        });
+      runGit({ args: ["rev-parse", `${parent}^{tree}`], cwd: store }) === tree
+    ) {
+      return parent;
+    }
+    return runGit({
+      args: [
+        "commit-tree",
+        tree,
+        ...(parent === null ? [] : ["-p", parent]),
+        "-m",
+        message,
+      ],
+      cwd: store,
+    });
+  } finally {
+    await rm(scratch, { recursive: true, force: true });
+  }
+}
+
+// Commits the store as it stands after the drain (its inbox empty) to its
+// orphan branch, replacing the branch's tree with the store's.
+async function commitStore(store: string, target: StoreBranch): Promise<void> {
+  const files = (await storeFiles(store)).filter(
+    (file) => !file.startsWith("inbox/")
+  );
+  try {
+    const commit = await commitFiles({
+      store,
+      parent: branchTip(store, target.branch),
+      base: null,
+      files: files.map((file) => ({ path: file, source: file })),
+      message: `orch: store at drain ${new Date().toISOString()}`,
+    });
     runGit({ args: ["update-ref", target.ref, commit], cwd: store });
   } catch (error) {
     throw new UserError(
       `committing the store to ${target.branch} failed: ${failureDetail(error)}`
     );
-  } finally {
-    await rm(scratch, { recursive: true, force: true });
   }
 }
 
@@ -1314,6 +1375,123 @@ async function pushStore(store: string, target: StoreBranch): Promise<void> {
       `pushing ${target.branch} failed: ${failureDetail(error)}`
     );
   }
+}
+
+function briefName(value: string): string {
+  const name = value.trim();
+  if (name.length === 0 || name.startsWith(".") || /[\\/]/.test(name)) {
+    throw new UsageError(
+      `brief name must be a file name in the store's briefs/, not ${JSON.stringify(value)}`
+    );
+  }
+  return name;
+}
+
+function branchName(store: string, value: string): string {
+  const branch = value.trim().replace(/^refs\/heads\//, "");
+  if (
+    gitOrNull({
+      args: ["check-ref-format", `refs/heads/${branch}`],
+      cwd: store,
+    }) === null
+  ) {
+    throw new UsageError(`${value} is not a valid branch name`);
+  }
+  return branch;
+}
+
+// Commits one file onto branch's tree at path and pushes it as a
+// fast-forward, never a force push, so a lead publishes a brief or a plan with
+// one command of literal arguments.
+async function publishFile({
+  cwd,
+  branch,
+  path,
+  source,
+  message,
+}: {
+  cwd: string;
+  branch: string;
+  path: string;
+  source: string;
+  message: string;
+}): Promise<PublishedFile> {
+  let commit: string;
+  try {
+    const parent = branchTip(cwd, branch);
+    commit = await commitFiles({
+      store: cwd,
+      parent,
+      base: parent,
+      files: [{ path, source }],
+      message,
+    });
+  } catch (error) {
+    throw new UserError(
+      `committing ${path} to ${branch} failed: ${failureDetail(error)}`
+    );
+  }
+  try {
+    runGit({
+      args: ["push", "--quiet", REMOTE, `${commit}:refs/heads/${branch}`],
+      cwd,
+    });
+  } catch (error) {
+    throw new UserError(`pushing ${branch} failed: ${failureDetail(error)}`);
+  }
+  runGit({
+    args: ["update-ref", `refs/remotes/${REMOTE}/${branch}`, commit],
+    cwd,
+  });
+  return { branch, path, commit };
+}
+
+async function publishBrief(
+  store: string,
+  branch: string,
+  name: string
+): Promise<PublishedFile> {
+  const path = `briefs/${name}`;
+  const source = join(store, path);
+  if (!(await exists(source))) {
+    throw new UserError(`no brief at ${source}; write it there first`);
+  }
+  return publishFile({
+    cwd: store,
+    branch,
+    path,
+    source,
+    message: `orch: brief ${name}`,
+  });
+}
+
+// Posts a plan file as plan.md on its orphan branch, jrzstack/plan/<slug> from
+// the file's name unless branch is given, keeping the briefs published there.
+// Needs no store: the plan lives in the checkout beside it.
+export async function publishPlan(
+  params: PublishPlanParams
+): Promise<PublishedFile> {
+  const source = resolve(params.file);
+  if (!(await exists(source))) {
+    throw new UserError(`no plan at ${source}`);
+  }
+  const cwd = dirname(source);
+  if (gitOrNull({ args: ["rev-parse", "--show-toplevel"], cwd }) === null) {
+    throw new UserError(
+      `${source} is not inside a git checkout; there is no remote to post to`
+    );
+  }
+  const slug = basename(source).replace(/\.md$/, "");
+  const branch = branchName(cwd, params.branch ?? `jrzstack/plan/${slug}`);
+  const title =
+    params.title === undefined ? slug : requiredLine(params.title, "title");
+  return publishFile({
+    cwd,
+    branch,
+    path: "plan.md",
+    source,
+    message: `plan: ${title}`,
+  });
 }
 
 export function openStore(
@@ -1550,6 +1728,23 @@ export function openStore(
       count: async () => {
         ensureOpen();
         return (await readPointers(join(store, "inbox"))).length;
+      },
+    },
+    briefs: {
+      publish: async (params) => {
+        await beginWrite();
+        const name = briefName(params.name);
+        const target = await storeBranch(store);
+        if (target === null) {
+          throw new UserError(
+            `store is not inside a git checkout at ${store}; there is no branch to publish to`
+          );
+        }
+        const branch =
+          params.branch === undefined
+            ? target.branch
+            : branchName(store, params.branch);
+        return publishBrief(store, branch, name);
       },
     },
     gates: {

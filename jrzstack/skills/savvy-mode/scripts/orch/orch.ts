@@ -11,6 +11,7 @@ import {
   UsageError,
   openStore,
   parseVerdict,
+  publishPlan,
   type Counts,
   type Frontier,
   type InboxPointer,
@@ -63,6 +64,15 @@ interface InboxPushOptions {
 
 interface InboxDrainOptions {
   readonly peek: boolean;
+}
+
+interface BriefPublishOptions {
+  readonly branch?: string;
+}
+
+interface PlanPublishOptions {
+  readonly branch?: string;
+  readonly title?: string;
 }
 
 interface GateParkOptions {
@@ -424,6 +434,55 @@ function createProgram(io: Io): Command {
       (count) => ({ count })
     )
   );
+
+  const brief = program
+    .command("brief")
+    .description("publish worker briefs")
+    .action(() => requireSubcommand(program));
+  leaf(
+    brief,
+    "publish <name>",
+    "commit briefs/<name> from the store to a branch and push it, never forced"
+  )
+    .option("--branch <branch>", "branch to publish to (default: the store branch)")
+    .action((name: string, options: BriefPublishOptions) =>
+      runStore(
+        program,
+        io,
+        (store) => store.briefs.publish({ name, branch: options.branch }),
+        (result) => `${result.branch}\t${result.path}\t${result.commit}`
+      )
+    );
+
+  const plan = program
+    .command("plan")
+    .description("post plans")
+    .action(() => {
+      throw new UsageError("a valid command is required");
+    });
+  leaf(
+    plan,
+    "publish <file>",
+    "commit a plan as plan.md to its orphan branch and push it, never forced; needs no store"
+  )
+    .option(
+      "--branch <branch>",
+      "branch to post to (default: jrzstack/plan/<file name without .md>)"
+    )
+    .option("--title <title>", "commit title (default: the file name)")
+    .action(async (file: string, options: PlanPublishOptions) => {
+      const result = await publishPlan({
+        file,
+        branch: options.branch,
+        title: options.title,
+      });
+      emit(
+        io,
+        program.opts<GlobalOptions>().json,
+        result,
+        (row) => `${row.branch}\t${row.path}\t${row.commit}`
+      );
+    });
 
   const gate = program
     .command("gate")
