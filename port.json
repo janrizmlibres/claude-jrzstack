@@ -243,7 +243,7 @@
     {
       "path": "jrzstack/skills/savvy-mode/playbooks/multi-phase-plan.md",
       "kind": "translated",
-      "why": "carries rule 20's spec intake: reads the spec through `gh api` REST, writes the plan at a git-excluded path, lints it through the launcher, posts it on the spec issue or an orphan branch, carries on unless asked for a plan only, writes and publishes owners' briefs per the brief contract, and only a landing grant picks Autopilot-full; its skeleton is the wording the check-plan.mjs override checks, so a change to either reaches the other"
+      "why": "carries rule 20's spec intake: reads the spec through `gh api` REST, writes the plan at a git-excluded path, lints it through the launcher, posts it on the spec issue or an orphan branch, carries on unless asked for a plan only, and only a landing grant picks Autopilot-full; its skeleton is the wording the check-plan.mjs override checks, so a change to either reaches the other"
     },
     {
       "path": "jrzstack/skills/savvy-mode/playbooks/hand-off.md",

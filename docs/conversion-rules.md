@@ -381,7 +381,6 @@ These keep `skills/savvy-mode/playbooks/multi-phase-plan.md` translated while it
 - the plan is posted beside the input, never in it: as a comment on a spec issue, or for other input on the orphan branch `jrzstack/plan/<slug>` through git plumbing, with no worktree;
 - the hand-back becomes the go: a spec handed in, "run until done" or a brief's go grant carries on under the execution playbook the plan names; only a request for the plan alone ("plan #42", "plan only"), or a plan the operator asked for, stops after posting; landing stays withheld unless granted, and without a landing grant the execution playbook is always Autopilot-stack;
 - the skeleton reads the playbooks it names from `${CLAUDE_PLUGIN_ROOT}` instead of `git show origin/main:`, adds the brief contract to that list and to each owner's brief, branches from `<base-branch>` instead of `main`, runs its live lanes on `savvy-agent` on the Volume setting, and its audit tick's prompt reads savvy-mode by path, with rule 10's cloud surface line on the tick;
-- on the go, each owner's brief is written with the Write tool to a literal path in the store's `briefs/` and published with `orch brief publish`, per the brief contract's clause 13, never through a write path or git chain built from shell variables or `$(…)`;
 - `check-plan.mjs` is an override whose markers match this skeleton, so a change to either is carried into the other.
 
 ```detect
