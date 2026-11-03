@@ -163,7 +163,13 @@ export interface PublishBriefParams {
   readonly branch?: string;
 }
 
-export interface PublishedBrief {
+export interface PublishPlanParams {
+  readonly file: string;
+  readonly branch?: string;
+  readonly title?: string;
+}
+
+export interface PublishedFile {
   readonly branch: string;
   readonly path: string;
   readonly commit: string;
@@ -231,7 +237,7 @@ export interface Store {
     readonly count: () => Promise<number>;
   };
   readonly briefs: {
-    readonly publish: (params: PublishBriefParams) => Promise<PublishedBrief>;
+    readonly publish: (params: PublishBriefParams) => Promise<PublishedFile>;
   };
   readonly gates: {
     readonly park: (params: ParkGateParams) => Promise<OpenGate>;
@@ -1381,7 +1387,7 @@ function briefName(value: string): string {
   return name;
 }
 
-function briefBranch(store: string, value: string): string {
+function branchName(store: string, value: string): string {
   const branch = value.trim().replace(/^refs\/heads\//, "");
   if (
     gitOrNull({
@@ -1394,28 +1400,31 @@ function briefBranch(store: string, value: string): string {
   return branch;
 }
 
-// Commits one brief onto branch's tree at briefs/<name> and pushes it as a
-// fast-forward, never a force push, so a lead publishes a brief with one
-// command of literal arguments.
-async function publishBrief(
-  store: string,
-  branch: string,
-  name: string
-): Promise<PublishedBrief> {
-  const path = `briefs/${name}`;
-  const source = join(store, path);
-  if (!(await exists(source))) {
-    throw new UserError(`no brief at ${source}; write it there first`);
-  }
+// Commits one file onto branch's tree at path and pushes it as a
+// fast-forward, never a force push, so a lead publishes a brief or a plan with
+// one command of literal arguments.
+async function publishFile({
+  cwd,
+  branch,
+  path,
+  source,
+  message,
+}: {
+  cwd: string;
+  branch: string;
+  path: string;
+  source: string;
+  message: string;
+}): Promise<PublishedFile> {
   let commit: string;
   try {
-    const parent = branchTip(store, branch);
+    const parent = branchTip(cwd, branch);
     commit = await commitFiles({
-      store,
+      store: cwd,
       parent,
       base: parent,
       files: [{ path, source }],
-      message: `orch: brief ${name}`,
+      message,
     });
   } catch (error) {
     throw new UserError(
@@ -1425,16 +1434,64 @@ async function publishBrief(
   try {
     runGit({
       args: ["push", "--quiet", REMOTE, `${commit}:refs/heads/${branch}`],
-      cwd: store,
+      cwd,
     });
   } catch (error) {
     throw new UserError(`pushing ${branch} failed: ${failureDetail(error)}`);
   }
   runGit({
     args: ["update-ref", `refs/remotes/${REMOTE}/${branch}`, commit],
-    cwd: store,
+    cwd,
   });
   return { branch, path, commit };
+}
+
+async function publishBrief(
+  store: string,
+  branch: string,
+  name: string
+): Promise<PublishedFile> {
+  const path = `briefs/${name}`;
+  const source = join(store, path);
+  if (!(await exists(source))) {
+    throw new UserError(`no brief at ${source}; write it there first`);
+  }
+  return publishFile({
+    cwd: store,
+    branch,
+    path,
+    source,
+    message: `orch: brief ${name}`,
+  });
+}
+
+// Posts a plan file as plan.md on its orphan branch, jrzstack/plan/<slug> from
+// the file's name unless branch is given, keeping the briefs published there.
+// Needs no store: the plan lives in the checkout beside it.
+export async function publishPlan(
+  params: PublishPlanParams
+): Promise<PublishedFile> {
+  const source = resolve(params.file);
+  if (!(await exists(source))) {
+    throw new UserError(`no plan at ${source}`);
+  }
+  const cwd = dirname(source);
+  if (gitOrNull({ args: ["rev-parse", "--show-toplevel"], cwd }) === null) {
+    throw new UserError(
+      `${source} is not inside a git checkout; there is no remote to post to`
+    );
+  }
+  const slug = basename(source).replace(/\.md$/, "");
+  const branch = branchName(cwd, params.branch ?? `jrzstack/plan/${slug}`);
+  const title =
+    params.title === undefined ? slug : requiredLine(params.title, "title");
+  return publishFile({
+    cwd,
+    branch,
+    path: "plan.md",
+    source,
+    message: `plan: ${title}`,
+  });
 }
 
 export function openStore(
@@ -1686,7 +1743,7 @@ export function openStore(
         const branch =
           params.branch === undefined
             ? target.branch
-            : briefBranch(store, params.branch);
+            : branchName(store, params.branch);
         return publishBrief(store, branch, name);
       },
     },

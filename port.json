@@ -163,7 +163,7 @@
     {
       "path": "jrzstack/skills/savvy-mode/scripts/orch",
       "kind": "port-only",
-      "why": "the bookkeeping CLI Orchestrate's lead keeps its store with, kept after upstream deleted it for Cursor's Project tracker and event subscriptions, which Claude Code lacks: frontier set takes the stacker's PR order from the store, PR state and merged heads from gh api REST and open heads from git rev-parse, in place of Graphite, and fails on a drifted base or a stale head; init excludes the store from git and every drain pushes it to its orphan branch by plumbing; brief publish commits one brief onto a branch's tree by the same plumbing and pushes it as a fast-forward, so a lead shares a brief with one literal command; commander imported directly and NotFoundError's parameter property a plain field, for Node's type stripping"
+      "why": "the bookkeeping CLI Orchestrate's lead keeps its store with, kept after upstream deleted it for Cursor's Project tracker and event subscriptions, which Claude Code lacks: frontier set takes the stacker's PR order from the store, PR state and merged heads from gh api REST and open heads from git rev-parse, in place of Graphite, and fails on a drifted base or a stale head; init excludes the store from git and every drain pushes it to its orphan branch by plumbing; brief publish commits one brief onto a branch's tree by the same plumbing and pushes it as a fast-forward, so a lead shares a brief with one literal command; plan publish posts a plan file as plan.md on its jrzstack/plan/<slug> branch the same way, with no store; commander imported directly and NotFoundError's parameter property a plain field, for Node's type stripping"
     },
     {
       "path": "jrzstack/skills/savvy-mode/scripts/watch-pr/github.ts",
@@ -243,7 +243,7 @@
     {
       "path": "jrzstack/skills/savvy-mode/playbooks/multi-phase-plan.md",
       "kind": "translated",
-      "why": "carries rule 20's spec intake: reads the spec through `gh api` REST, writes the plan at a git-excluded path, lints it through the launcher, posts it on the spec issue or an orphan branch, carries on unless asked for a plan only, writes and publishes owners' briefs per the brief contract, and only a landing grant picks Autopilot-full; its skeleton is the wording the check-plan.mjs override checks, so a change to either reaches the other"
+      "why": "carries rule 20's spec intake: reads the spec through `gh api` REST, writes the plan at a git-excluded path, lints it through the launcher, posts it on the spec issue or an orphan branch with `orch plan publish`, carries on unless asked for a plan only, writes and publishes owners' briefs per the brief contract, and only a landing grant picks Autopilot-full; its skeleton is the wording the check-plan.mjs override checks, so a change to either reaches the other"
     },
     {
       "path": "jrzstack/skills/savvy-mode/playbooks/hand-off.md",
