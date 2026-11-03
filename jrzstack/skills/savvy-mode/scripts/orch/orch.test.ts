@@ -819,7 +819,7 @@ describe("Store branch", () => {
     git({ repo: other, args: ["config", "user.name", "Orch Test"] });
     git({ repo: other, args: ["config", "user.email", "orch@example.com"] });
     git({ repo: other, args: ["checkout", "--quiet", "--orphan", "plan"] });
-    git({ repo: other, args: ["rm", "--quiet", "-rf", "."] });
+    git({ repo: other, args: ["rm", "--quiet", "-rf", "--ignore-unmatch", "."] });
     await writeFile(join(other, "plan.md"), "the plan\n");
     git({ repo: other, args: ["add", "plan.md"] });
     git({ repo: other, args: ["commit", "--quiet", "-m", "plan"] });
