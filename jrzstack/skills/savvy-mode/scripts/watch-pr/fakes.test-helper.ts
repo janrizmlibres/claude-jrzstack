@@ -169,8 +169,11 @@ export interface RestStatus {
 
 export interface RestPullSummary {
   readonly number: number;
-  readonly head: { readonly ref: string };
-  readonly base: { readonly ref: string };
+  readonly head: {
+    readonly ref: string;
+    readonly repo: { readonly full_name: string } | null;
+  };
+  readonly base: { readonly ref: string; readonly repo: { readonly full_name: string } };
 }
 
 export interface FakeRestOptions {

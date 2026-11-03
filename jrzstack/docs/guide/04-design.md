@@ -28,7 +28,7 @@ The design isn't sacred once code starts. If implementation shows the same worka
 /jrzstack:arena take my prompt to the arena verbatim. i want to compare their proposals with yours.
 ```
 
-[`/jrzstack:arena`](../../skills/arena/SKILL.md) is the general tool underneath. Runners attempt the same design or code brief in parallel, each writing to its own worktree or directory. The lead gives each runner its own direction, a structurally distinct whole shape to build, plus one fourth-way runner that looks for a shape outside all of them. A read-only judge reads every candidate blind, in a fresh context, and scores it against a rubric. The lead reads each candidate end to end too, picks a base, grafts in the best ideas from the losers, and verifies the result.
+[`/jrzstack:arena`](../../skills/arena/SKILL.md) is the general tool underneath. Runners attempt the same design or code brief in parallel, each writing to its own worktree or directory. The lead gives each runner its own direction, a structurally distinct whole shape to build, plus one fourth-way runner that looks for a shape outside all of them. A read-only judge reads every candidate blind, in a fresh context, and scores it against a rubric. Every arena gets one, whatever the number of candidates. The lead reads each candidate end to end too, picks a base, grafts in the best ideas from the losers, and verifies the result.
 
 ```mermaid
 flowchart LR
@@ -66,9 +66,9 @@ Reach for it when parallelism buys coverage or lets independent checks race. `/j
 /jrzstack:interrogate the whole branch, but skeptically. no nitpicks unless it's an actual bug or regression.
 ```
 
-[`/jrzstack:interrogate`](../../skills/interrogate/SKILL.md) sends the same diff and intent to three reviewers, each owning one lens of the rubric: Breakage, Fit, and Simplicity. Distinct lenses are the point. Each reviewer looks deeper at its own part of the rubric than one reviewer could at all of it, and a Coverage Map shows what each lens checked and what no lens examined. The lead verifies every finding it acts on, by tracing the code path or running a test, instead of counting votes. The lead sorts everything into `Act on`, `Consider`, `Noted`, and `Dismissed`, with a reason for each dismissal, and applies nothing automatically.
+[`/jrzstack:interrogate`](../../skills/interrogate/SKILL.md) gives the change and its intent to three adversaries, each owning one lens: Breakage, Fit, and Stress. Each tries to break the change with a run against the real code. Distinct lenses are the point, since the adversaries find different failures. A finding survives only when rerunning its command shows a failure that breaks the intent. The report lists every verified finding with the lenses that found it, then what each lens dropped and why, and applies nothing.
 
-Read the dismissals too. The lead is a pragmatic senior engineer, not an oracle, and you can override it.
+Read the Dropped list too. You can override the verdict.
 
 ## Prototype instead of debating
 
@@ -86,7 +86,7 @@ The same idea scales up to a real design. Pair `/jrzstack:architect` with protot
 /jrzstack:savvy-mode we need rate limiting for external webhooks. /jrzstack:architect it first, and answer open questions with prototypes. let me review before proceeding.
 ```
 
-Don't spend reviewers on an abstract plan. `/jrzstack:interrogate` belongs on a diff. Point adversarial review at a plan with no code behind it and the reviewers invent theoretical risks and edge cases that will never happen. Let prototypes settle the questions, then review what got built.
+Don't spend adversaries on an abstract plan. `/jrzstack:interrogate` drops every finding a run does not prove, so a plan with no code behind it gives them little to break. Let prototypes settle the questions, then review what got built.
 
 ## Write the README first for shared code
 

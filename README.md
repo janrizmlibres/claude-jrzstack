@@ -1,7 +1,7 @@
 # jrzstack
 
 <!-- BEGIN generated from upstream/snapshot.json — do not edit by hand -->
-**Tracks upstream pstack v0.15.29** (`cursor/plugins@190d287`).
+**Tracks upstream pstack v0.15.36** (`cursor/plugins@ae5650f`).
 <!-- END generated -->
 pstack is © Lauren Tan, MIT; this port is MIT too (see [License and credit](#license-and-credit)).
 
@@ -226,8 +226,6 @@ In cloud, your user-level `CLAUDE.md` isn't there: rules come from the request a
 | `skills/architect/references/runner-prompt.md` | override | arena's directed or fourth-way block replaces the each-on-a-different-model paragraph, and a spec's Implementation Decisions bind every shape |
 | `skills/arena/SKILL.md` | override | runners on Work with two whole-shape directions, a fourth-way seat and their escapes, and a blind judge on every arena, in place of a runner per model family and a cross-family judge |
 | `skills/interrogate/SKILL.md` | override | three lens adversaries (Breakage, Fit, Stress) on savvy-agent on Judgement in worktrees, always all three, each proving findings with a run, in place of one adversary per model with arena's fan-out |
-| `skills/interrogate/references/lead-judgment.md` | override | the verification gate replaces the consensus signal: Act on needs a traced path, and every dismissed critical is re-checked |
-| `skills/interrogate/references/reviewer-prompt.md` | override | a lens brief: one lens's sections, the other lenses named for critical-only spillover, and a required Checked list |
 | `skills/savvy-help/SKILL.md` | override | Cursor-only sections (Custom Mode, Option+Enter, .cursor/rules, /add-plugin) rewritten for Claude Code's install, settings and surfaces, with a row for re-entering the mode after a resume |
 | `skills/savvy-mode/playbooks/eval.md` | override | spawns its own blind samples, 3 per variant on the model the change meets in use, with one blind Judgement judge over all of them and an opt-in cross-model sweep, in place of arena's model fan-out and cross-family judge; a user-invoked skill's samples run on the general-purpose agent, which inherits the lead's model, since `savvy-agent`'s jrzstack body would skew them |
 | `skills/savvy-mode/playbooks/orchestrate.md` | override | a lead and sub-leads place units by surface (cloud workers, local-only worktrees, in-VM worktree subagents, create_session in Auto), retry by failure mode, take the full gate at landing as the ledger verdict, land only under a landing grant with Close listing leftover branches, run orch through the launcher with its store on an orphan branch, and split restart from compaction; keeps orch's store where upstream moved to Cursor's Project tracker, and takes upstream's supervision habits as a Supervision section |
