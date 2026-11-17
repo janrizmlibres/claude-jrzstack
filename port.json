@@ -82,15 +82,7 @@
     {
       "path": "jrzstack/skills/architect/SKILL.md",
       "kind": "override",
-      "why": "Phase B's two distinct candidates come from arena's directions, the architect runners model line goes, and a spec's Implementation Decisions reach every runner as fixed constraints",
-      "depends_on": [
-        "upstream/pstack/skills/arena/SKILL.md"
-      ]
-    },
-    {
-      "path": "jrzstack/skills/architect/references/runner-prompt.md",
-      "kind": "override",
-      "why": "arena's directed or fourth-way block replaces the each-on-a-different-model paragraph, and a spec's Implementation Decisions bind every shape",
+      "why": "upstream's short brief, plus a spec's Implementation Decisions as fixed constraints on every shape, and arena's two directions as the two shapes when a large or contested design runs arena",
       "depends_on": [
         "upstream/pstack/skills/arena/SKILL.md"
       ]

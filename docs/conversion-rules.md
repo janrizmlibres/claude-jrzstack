@@ -48,7 +48,7 @@ undetectable: a flag's presence is a property of a file's frontmatter, not of an
 
 ## 3. Multi-model steps
 
-Classify each multi-model step by the job left on one family: breadth or fresh context. Drop a step only when what remains duplicates another. Breadth comes from distinct prompts (directions, lenses). Identical briefs only in `first pass` races; `best-of` and `rank all` need distinct arms. Model races stay opt-in and are labelled a cost check. Volume roles never escalate quietly: when none returns `PASS`, the report says so and the parent may rerun on `opus`. A failed worker retries once on the same model and effort; a second failure is `BLOCKED` with evidence (orchestrate's override refines this).
+Classify each multi-model step by the job left on one family: breadth or fresh context. Drop a step only when what remains duplicates another. Breadth comes from distinct prompts (directions, lenses). Identical briefs only in `first pass` races; `best-of` and `rank all` need distinct arms. Model races stay opt-in and are labelled a cost check. Volume roles never escalate quietly: when none returns `PASS`, the report says so and the parent may rerun on `opus`. A failed worker retries once on the same model and effort; a second failure is `BLOCKED` with evidence.
 
 ```detect
 pattern: \b[Dd]ifferent models\b
@@ -66,7 +66,7 @@ after: Distinct lenses are the point.
 
 Text names a setting (Work, Judgement, Volume), never a model ID or `pstack-models.mdc`. Settings travel with each spawn, as ADR 0002 records. `subagent_type: savvy-agent` stays `savvy-agent`, and `generalPurpose` maps to it, or to `savvy-reader` with `readonly` or when the role only reads. The text names the role's setting beside the agent ("on `savvy-reader` on the Judgement setting"). Every spawn passes its setting's model and effort: `${user_config.<setting>_model}` as `model:` and `${user_config.<setting>_effort}` as `effort:`, or the setting's defaults (Work `opus` at `medium`, Judgement `opus` at `high`, Volume `sonnet` at `high`) for a literal placeholder or an empty value. Both agents' frontmatter falls back to Work's defaults, so a spawn that leaves either out runs on Work's. A spawn upstream leaves untyped gets its role's agent and setting: `automate-me`'s transcript miners run on `savvy-reader` on Volume, `maintain-verification-skill`'s per-feature source readers on `savvy-reader` on Work. The six per-setting agents the port once had (`work`, `judgement`, `volume` and their readers) are gone, and a name of theirs is a leftover.
 
-A reasoning level, a speed, or both picked per spawn become the spawn's `effort:`. Upstream's "Match the model to the job" paragraph becomes savvy-mode's "Match the effort to the job": start from the setting's effort, `${user_config.<setting>_effort}` or its default (Work `medium`, Judgement `high`, Volume `high`), raise one step up to `max` for the hardest or subtlest work, lower one step for routine work and two for mechanical work, never below `low`; swarm verifiers stay at the Volume effort; change only `effort:`, never the agent or the model. Its step down for judgment is dropped, since judgment already runs on Judgement and the step would undercut that setting's default. Fast mode is a session toggle in Claude Code with no per-spawn form, so a fast-or-standard choice is dropped. Upstream's per-skill pointer to the Subagents section keeps its place and names effort alone.
+A reasoning level, a speed, or both picked per spawn become the spawn's `effort:`. Upstream's "Match the model to the job" paragraph becomes savvy-mode's "Match the effort to the job": start from the setting's effort, `${user_config.<setting>_effort}` or its default (Work `medium`, Judgement `high`, Volume `high`), raise one step, never above `xhigh`, for the hardest or subtlest work (an effort the user picks in `/config` stays as picked), lower one step for routine work and two for mechanical work, never below `low`; swarm verifiers stay at the Volume effort; change only `effort:`, never the agent or the model. Its step down for judgment is dropped, since judgment already runs on Judgement and the step would undercut that setting's default. Fast mode is a session toggle in Claude Code with no per-spawn form, so a fast-or-standard choice is dropped. Upstream's per-skill pointer to the Subagents section keeps its place and names effort alone. Upstream's default-slug list and its Fable exception (Fable runs outside a panel only when named or after two failed Opus runs) go, since the settings pick each model; a dispatch-only, polling or packing agent runs on Volume. The hardest changes run on Work, raised one step, as upstream's retired `hardest tasks` tier leaves them.
 
 ```detect
 pattern: \bclaude-(?:opus|sonnet|haiku|fable)-\d
@@ -110,10 +110,12 @@ pattern: \bdifferent model famil(?:y|ies)\b
 pattern: \bdiverse-model\b
 pattern: \bagainst a different model\b
 pattern: \bcross-judge\b
+pattern: \banother vendor's model\b
 before: Before handing back, spawn a subagent on a different model family from the one that did the work.
 before: Routed workflow skills set their own `subagent_type` for diverse-model review.
 before: A second opinion is the same prompt against a different model. Agreement is high-signal.
 before: delegate via the **arena** skill instead so the runners surface the alternatives and the cross-judge guards the pick.
+before: A second opinion is the same prompt on another vendor's model.
 after: Before handing back, spawn a fresh-context review on `savvy-reader` on the Judgement setting, given the trail and transcript paths and never your reasoning.
 after: Routed workflow skills set their own agents for lens- or source-partitioned review.
 after: A second opinion is the same prompt in a fresh context. Agreement rules out a fluke, not a shared blind spot.
@@ -267,7 +269,7 @@ after: Write it into the `wip:` commit's body (`--allow-empty` on a clean tree).
 
 ## 13. Landing and leftover branches
 
-In cloud, `gh pr merge <pr> --squash` → `gh api -X PUT repos/{owner}/{repo}/pulls/<n>/merge -f merge_method=squash`; `--auto` (merge-when-ready) → watch-then-merge from a background wait, never `/ccr/auto_merge`. At every merge step, the first refused merge stops that PR at merge-ready, with the refusal recorded as a gate; no retry, no workaround. Every landing playbook's Reply (Shipping, Autopilot-full, Orchestrate's Close) lists the leftover branches the run pushed (merged heads still present, closed or abandoned unit branches; open-PR heads left out; a store branch listed as kept) and one `git push origin --delete …` line for the user to run locally. No lead deletes a remote branch on either surface. A landing playbook lands only under a landing grant; without one it stops at merge-ready. Babysit and Shipping run `watch-pr` through the runtime launcher, `${CLAUDE_PLUGIN_ROOT}/skills/savvy-mode/scripts/run watch-pr/watch-pr`, and hold its watch from a background wait in place of upstream's `/loop`; with no runtime (exit 69) they say so once with the install line and stop before calling a PR ready, never reading the forge by hand in the watcher's place.
+In cloud, `gh pr merge <pr> --squash` → `gh api -X PUT repos/{owner}/{repo}/pulls/<n>/merge -f merge_method=squash`; `--auto` (merge-when-ready) → watch-then-merge from a background wait, never `/ccr/auto_merge`. At every merge step, the first refused merge stops that PR at merge-ready, with the refusal recorded as a gate; no retry, no workaround. Every landing playbook's Reply (Shipping, Autopilot-full) lists the leftover branches the run pushed (merged heads still present, closed or abandoned unit branches; open-PR heads left out; a store branch listed as kept) and one `git push origin --delete …` line for the user to run locally. No lead deletes a remote branch on either surface. A landing playbook lands only under a landing grant; without one it stops at merge-ready. Babysit and Shipping run `watch-pr` through the runtime launcher, `${CLAUDE_PLUGIN_ROOT}/skills/savvy-mode/scripts/run watch-pr/watch-pr`, and hold its watch from a background wait in place of upstream's `/loop`; with no runtime (exit 69) they say so once with the install line and stop before calling a PR ready, never reading the forge by hand in the watcher's place.
 
 ```detect
 pattern: /ccr/auto_merge\b
@@ -297,7 +299,7 @@ These keep `skills/savvy-mode/SKILL.md` translated:
 - one line, once: jrzstack skills are reached by reading their `SKILL.md`; the Skill tool refuses them by design, so a read is the intended route, not a workaround;
 - the router names `playbooks/hand-off.md` in one line, read by path;
 - beside the todolist's `skip: <reason>`, a short passage says a panel step a playbook lists unconditionally, or whose condition holds, is never the agent's to skip and has no size gate, and that only the user can waive it, in the run prompt or `CLAUDE.md`, recorded as `skip: user waived` in the list and the Reply;
-- the router sends a spec handed in (`build <issue URL>`, an issue number, a spec file) or a request for a plan ("plan only", "plan #42") to the multi-phase-plan playbook first, whatever its size and ahead of figure-it-out and Orchestrate, in one entry that also says it carries on unless only the plan was asked for;
+- the router sends a spec handed in (`build <issue URL>`, an issue number, a spec file) or a request for a plan ("plan only", "plan #42") to the multi-phase-plan playbook first, whatever its size and ahead of figure-it-out, in one entry that also says it carries on unless only the plan was asked for;
 - "Defaults for every `Agent` call" opens with the brief contract, by path, for every spawn, not only a playbook step's;
 - "You own every subagent's work" gains one sentence: a worker's worktree is removed once its result is integrated or discarded, keeping its branch;
 - the router's "work the user steps away from goes to `figure-it-out`" clause is narrowed: being handed off doesn't count as stepping away;
@@ -337,22 +339,25 @@ after: After `--resume`, type `/jrzstack:savvy-mode` again, because a resume dro
 
 ## 18. Cloud workers and other Cursor products
 
-Cursor as the product pstack runs in becomes Claude Code. Cursor cloud agents, cloud subagents and the `/in-cloud` command become cloud workers, placed as ADR 0001 places them: a local lead sends swarm workers, orchestrate units and autopilot owners to cloud workers by default (Auto on the account and a default cloud environment), "local only" keeps them in local worktrees, and "hand this off" moves the whole run to a cloud lead. A Cursor Project becomes one lead session per body of work, local or handed off. Cursor automations become routines (`/schedule`), each a cloud lead as ADR 0001 describes. A Cursor-only habit with no counterpart, such as dragging chats into a Project, goes. A link to cursor.com becomes the matching Claude Code docs page, or goes when none matches.
+Cursor as the product pstack runs in becomes Claude Code. Cursor cloud agents, cloud subagents and the `/in-cloud` command become cloud workers, placed as ADR 0001 places them: a local lead sends swarm workers and autopilot owners to cloud workers by default (Auto on the account and a default cloud environment), "local only" keeps them in local worktrees, and "hand this off" moves the whole run to a cloud lead. A Cursor Project becomes one lead session per body of work, local or handed off, and a Project worker becomes a cloud worker ("a Task subagent or a Project worker" → "an `Agent` subagent or a cloud worker"). Cursor automations become routines (`/schedule`), each a cloud lead as ADR 0001 describes. A Cursor-only habit with no counterpart, such as dragging chats into a Project, goes. A link to cursor.com becomes the matching Claude Code docs page, or goes when none matches.
 
 ```detect
 pattern: \bCursor cloud agents?\b
 pattern: \bcloud subagents?\b
 pattern: (?<![\w-])/in-cloud\b
 pattern: \bCursor Projects?\b
+pattern: \bProject workers?\b
 pattern: \bcursor\.com\b
 before: The cleanest isolation is a [cloud subagent](https://cursor.com/docs/subagents#cloud-subagents).
 before: Type `/in-cloud` before the task, or ask the parent chat to hand work to cloud subagents.
 before: A [Cursor Project](https://cursor.com/blog/projects) gives one coordinator agent a persistent thread.
 before: One Cursor cloud agent per PR owns build, the first verification round, and merge.
+before: Starting any agent, whether a Task subagent or a Project worker → the first line of its kickoff reads worker.md.
 after: The cleanest isolation is a [cloud worker](https://code.claude.com/docs/en/claude-code-on-the-web), a cloud session on its own VM and branch.
 after: Say "local only" to keep a run's workers in local worktrees, or "hand this off" to move the whole run to a cloud lead.
 after: Give each body of work its own lead session, local or handed off to the cloud.
 after: One cloud worker per PR owns build, the first verification round, and merge.
+after: Starting any agent, whether an `Agent` subagent or a cloud worker → the first line of its kickoff reads worker.md.
 ```
 
 ## 19. Vendored and dropped files
@@ -372,17 +377,14 @@ after: `control-cli` and `control-ui` ship with jrzstack too.
 
 ## 20. Spec intake
 
-These keep `skills/savvy-mode/playbooks/multi-phase-plan.md` translated while it takes a spec to a plan and on to execution:
+These keep `skills/savvy-mode/playbooks/multi-phase-plan.md` translated while it takes a spec to a plan and on to execution. Upstream cut the playbook to five short steps in 0.15.43, with no plan skeleton and no `check-plan.mjs`, and the port follows: the skeleton, its lint and their markers go.
 
 - a first step reads the input: a spec is read and never edited, and an issue (a URL or a number) is read with `gh api` REST on both surfaces, comments included;
-- step 2's one-or-two-file skip never applies to a spec handed in or a request for the plan;
 - the plan file goes to `.claude/jrzstack/plans/<slug>.md` unless the operator names a path, listed in the exclude file `git rev-parse --git-path info/exclude` names, and is never committed on the run branch; the plan keeps `${CLAUDE_PLUGIN_ROOT}` literal;
-- `check-plan.mjs` runs through the runtime launcher, `${CLAUDE_PLUGIN_ROOT}/skills/savvy-mode/scripts/run`; with no runtime (exit 69) the plan is posted as not linted, never linted by hand;
-- the plan is posted beside the input, never in it: as a comment on a spec issue, or for other input on the orphan branch `jrzstack/plan/<slug>` with `orch plan publish` through the runtime launcher, one command of literal arguments that commits by git plumbing with no worktree and pushes a fast-forward, never a chain built from shell variables or `$(…)`;
-- the hand-back becomes the go: a spec handed in, "run until done" or a brief's go grant carries on under the execution playbook the plan names; only a request for the plan alone ("plan #42", "plan only"), or a plan the operator asked for, stops after posting; landing stays withheld unless granted, and without a landing grant the execution playbook is always Autopilot-stack;
-- the skeleton reads the playbooks it names from `${CLAUDE_PLUGIN_ROOT}` instead of `git show origin/main:`, adds the brief contract to that list and to each owner's brief, branches from `<base-branch>` instead of `main`, runs its live lanes on `savvy-agent` on the Volume setting, and its audit tick's prompt reads savvy-mode by path, with rule 10's cloud surface line on the tick;
-- on the go, each owner's brief is written with the Write tool to a literal path in the store's `briefs/` and published with `orch brief publish`, per the brief contract's clause 13, never through a write path or git chain built from shell variables or `$(…)`;
-- `check-plan.mjs` is an override whose markers match this skeleton, so a change to either is carried into the other.
+- the plan names its execution playbook, and without a landing grant that playbook is always Autopilot-stack;
+- the plan is posted beside the input, never in it: as a comment on a spec issue, or for other input on the orphan branch `jrzstack/plan/<slug>` with `orch plan publish` through the runtime launcher, `${CLAUDE_PLUGIN_ROOT}/skills/savvy-mode/scripts/run`, one command of literal arguments, never a chain built from shell variables or `$(…)`;
+- the hand-back becomes the go: a spec handed in, "run until done" or a brief's go grant carries on under the execution playbook the plan names; only a request for the plan alone ("plan #42", "plan only"), or a plan the operator asked for, stops after posting; landing stays withheld unless granted;
+- on the go, each owner is briefed per the brief contract (read ${CLAUDE_PLUGIN_ROOT}/skills/savvy-mode/references/brief-contract.md), its brief written with the Write tool to a literal path and published with `orch brief publish`, per the contract's clause 13.
 
 ```detect
 undetectable: each asks for a step or a skeleton line to be present in multi-phase-plan.md, and an absence is not a line a pattern can match
@@ -397,9 +399,10 @@ Worktrees Cursor makes under `~/.cursor/worktrees/<repo>/` become Claude Code's,
 - Worktree cleanup's chats become Claude Code sessions, read from the transcripts `worktree-audit.sh` names, and its audit step names the script's `stray` bucket. Its reclaimers drop Cursor's app data. Its simulator step runs only on the local surface, and on the cloud surface, where earlier sessions' transcripts aren't available, a `stray` is unverified rather than abandoned.
 
 ```detect
-pattern: \bgit worktree off main\b
+pattern: \bgit worktree off (?:main|trunk)\b
 pattern: Application Support/Cursor\b
 before: **Worktree.** Work from a git worktree off main. Subagents inherit it.
+before: Work from a git worktree off trunk, and keep unrelated work out of it.
 before: More when needed: Xcode `DerivedData` and `iOS DeviceSupport`, `~/Library/Application Support/Cursor` (`state.vscdb.backup`), package caches (pnpm, uv, brew, yarn).
 after: **Worktree.** Work from a git worktree off the PR's base. Subagents inherit it.
 after: More when needed: Xcode `DerivedData` and `iOS DeviceSupport`, package caches (pnpm, uv, brew, yarn).
@@ -431,7 +434,7 @@ after: Also check that no path in `git diff --name-only HEAD...origin/main` is a
 
 ## 23. Agent stores
 
-Cursor gives each agent a store whose path the system prompt names; Claude Code has none. A decision trail upstream keeps in the agent's store rides in the bodies of the commits its writer pushes (an empty commit is fine), so a replacement reads it from the branch's log and a squash merge, which takes the PR body, never lands it. Orchestrate's store is kept by `orch`, a port-only CLI since upstream deleted it, and checkpointed to its orphan branch.
+Cursor gives each agent a store whose path the system prompt names; Claude Code has none. A decision trail upstream keeps in the agent's store rides in the bodies of the commits its writer pushes (an empty commit is fine), so a replacement reads it from the branch's log and a squash merge, which takes the PR body, never lands it. Upstream deleted the Orchestrate playbook in 0.15.43 and the port follows: `playbooks/orchestrate.md` goes, program-scale work routes to `figure-it-out` as upstream routes it, and `orch`, a port-only CLI, keeps only its two publish commands, `orch plan publish` and `orch brief publish`, which rule 20 and the brief contract use. A mention of Orchestrate, its lead, its store or its frontier goes with its sentence.
 
 ```detect
 pattern: \bagent's store\b
@@ -489,4 +492,19 @@ after: # Savvy subagent
 pattern: \bedit the copy\. Never open a PR or push\b
 before: Never edit a skill under `plugins/cache/`. Before approval, show its destination, `.cursor/skills/<skill>/` or `~/.cursor/skills/<skill>/`. After approval, copy the skill folder there and edit the copy. Never open a PR or push.
 after: Never edit a skill under `plugins/cache/`. Before approval, show its destination: for a jrzstack skill, the patch file `~/.claude/jrzstack/reflect/<skill>.patch`, and for another plugin's skill, `.claude/skills/<skill>/` or `~/.claude/skills/<skill>/`. After approval, write a jrzstack skill's edit to its patch file as a unified diff against the plugin's file, for the user to apply to the port's repo, or copy another plugin's skill folder to its destination and edit it there. Never open a PR or push.
+```
+
+## 27. Worker rules
+
+Upstream's `skills/savvy-mode/worker.md` holds the operator's rules every agent savvy-mode starts reads first. The port translates it at its path, beside the brief contract, which holds the rules Claude Code workers need that Cursor's runtime gives upstream's for free. These keep it and its readers translated:
+
+- a same-session subagent's kickoff opens with `Read ${CLAUDE_PLUGIN_ROOT}/skills/savvy-mode/worker.md before anything else.`, the path substituted; a separate-session worker's brief keeps the brief contract's `/jrzstack:<skill>` first line and reads worker.md, named by its place in savvy-mode's skill directory, on its second;
+- worker.md's own line about starting an agent says the same, and gains one line after it: follow the brief contract at `references/brief-contract.md` beside this file, which binds every worker;
+- worker.md's stop list gains "a merge without a landing grant", per rule 13;
+- upstream's "plus this file's absolute path for a `poteto-agent`" stays as the `savvy-agent` read-by-path line the agent already carries.
+
+```detect
+pattern: Read <path>/worker\.md\b
+before: If you start an agent, the first line of its kickoff is `Read <path>/worker.md before anything else.`, with `<path>` the absolute path of the folder that holds this file.
+after: If you start an agent, the first line of its kickoff is `Read ${CLAUDE_PLUGIN_ROOT}/skills/savvy-mode/worker.md before anything else.`, the path substituted.
 ```

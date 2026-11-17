@@ -222,8 +222,7 @@ In cloud, your user-level `CLAUDE.md` isn't there: rules come from the request a
 | File | Kind | Why |
 |---|---|---|
 | `agents/savvy-agent.md` | override | upstream's body with the read-by-path line, as the one writer for every setting: each spawn passes its setting's model and effort, and the frontmatter falls back to Work's opus at medium, in the background |
-| `skills/architect/SKILL.md` | override | Phase B's two distinct candidates come from arena's directions, the architect runners model line goes, and a spec's Implementation Decisions reach every runner as fixed constraints |
-| `skills/architect/references/runner-prompt.md` | override | arena's directed or fourth-way block replaces the each-on-a-different-model paragraph, and a spec's Implementation Decisions bind every shape |
+| `skills/architect/SKILL.md` | override | upstream's short brief, plus a spec's Implementation Decisions as fixed constraints on every shape, and arena's two directions as the two shapes when a large or contested design runs arena |
 | `skills/arena/SKILL.md` | override | runners on Work with two whole-shape directions, a fourth-way seat and their escapes, and a blind judge on every arena, in place of a runner per model family and a cross-family judge |
 | `skills/interrogate/SKILL.md` | override | three lens adversaries (Breakage, Fit, Stress) on savvy-agent on Judgement in worktrees, always all three, each proving findings with a run, in place of one adversary per model with arena's fan-out |
 | `skills/savvy-help/SKILL.md` | override | Cursor-only sections (Custom Mode, Option+Enter, .cursor/rules, /add-plugin) rewritten for Claude Code's install, settings and surfaces, with a row for re-entering the mode after a resume |
