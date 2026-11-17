@@ -96,7 +96,7 @@ after: | Fit | `savvy-reader` on Judgement |
 after: Spawn one reviewer per lens on `savvy-reader` on the Judgement setting.
 after: **Use `savvy-agent` for any subagent you spawn inside a playbook step**
 after: One message, three calls on `savvy-reader` on the Work setting, each passing the setting's `model:` and `effort:`.
-after: code delegates (feature, refactoring, bug fix, perf, hillclimb) run on Work, while the hardest changes, prose, and judgment run on Judgement.
+after: code delegates (feature, refactoring, bug fix, perf, hillclimb) run on Work, the hardest changes too at one step more effort, while prose and judgment run on Judgement.
 after: Pick each subagent's effort for the job, per the Subagents section of the **savvy-mode** skill.
 after: **Match the effort to the job.** Before each spawn, start from the setting's effort, chosen in `/config`.
 ```
@@ -380,6 +380,7 @@ after: `control-cli` and `control-ui` ship with jrzstack too.
 These keep `skills/savvy-mode/playbooks/multi-phase-plan.md` translated while it takes a spec to a plan and on to execution. Upstream cut the playbook to five short steps in 0.15.43, with no plan skeleton and no `check-plan.mjs`, and the port follows: the skeleton, its lint and their markers go.
 
 - a first step reads the input: a spec is read and never edited, and an issue (a URL or a number) is read with `gh api` REST on both surfaces, comments included;
+- the one-or-two-file skip never applies to a spec handed in or a request for the plan;
 - the plan file goes to `.claude/jrzstack/plans/<slug>.md` unless the operator names a path, listed in the exclude file `git rev-parse --git-path info/exclude` names, and is never committed on the run branch; the plan keeps `${CLAUDE_PLUGIN_ROOT}` literal;
 - the plan names its execution playbook, and without a landing grant that playbook is always Autopilot-stack;
 - the plan is posted beside the input, never in it: as a comment on a spec issue, or for other input on the orphan branch `jrzstack/plan/<slug>` with `orch plan publish` through the runtime launcher, `${CLAUDE_PLUGIN_ROOT}/skills/savvy-mode/scripts/run`, one command of literal arguments, never a chain built from shell variables or `$(…)`;

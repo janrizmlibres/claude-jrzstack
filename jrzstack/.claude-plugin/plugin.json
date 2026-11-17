@@ -13,7 +13,7 @@
     "work_model": {
       "type": "string",
       "title": "Work model",
-      "description": "Model for the Work setting: code delegates, arena runners, unit workers and sub-leads.",
+      "description": "Model for the Work setting: code delegates, the hardest changes, arena runners, unit workers and sub-leads.",
       "options": ["opus", "sonnet", "haiku", "fable"],
       "default": "opus"
     },
@@ -27,7 +27,7 @@
     "judgement_model": {
       "type": "string",
       "title": "Judgement model",
-      "description": "Model for the Judgement setting: the hardest tasks, judges, reviewers and fresh-context reviews.",
+      "description": "Model for the Judgement setting: prose, judges, reviewers and fresh-context reviews.",
       "options": ["opus", "sonnet", "haiku", "fable"],
       "default": "opus"
     },

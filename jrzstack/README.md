@@ -30,7 +30,7 @@ two steps:
 
 new here? the [jrzstack guide](./docs/guide/README.md) walks you through a first real task, from setup and prompting through verification and overnight runs. stuck, or unsure which skill fits? ask [`/jrzstack:savvy-help`](./skills/savvy-help/SKILL.md).
 
-that's it. the other skills are situational, and the mode skill uses them for you as needed. out of the box the mode splits work by setting: code delegates (feature, refactoring, bug fix, perf, hillclimb) run on Work, while the hardest changes, prose, and judgment run on Judgement, and swarm and race workers run on Volume. Work and Judgement default to opus, Volume to sonnet, and the port fixes each setting's effort, which a spawn raises at most to xhigh. `/config` changes the models.
+that's it. the other skills are situational, and the mode skill uses them for you as needed. out of the box the mode splits work by setting: code delegates (feature, refactoring, bug fix, perf, hillclimb) run on Work, the hardest changes too at one step more effort, while prose and judgment run on Judgement, and swarm and race workers run on Volume. Work and Judgement default to opus, Volume to sonnet, and the port fixes each setting's effort, which a spawn raises at most to xhigh. `/config` changes the models.
 
 ## usage
 
@@ -264,7 +264,7 @@ jrzstack has no planning skill. personally, i don't believe in planning. the bes
 
 type [`/jrzstack:automate-me`](./skills/automate-me/SKILL.md). it mines your recent transcripts, drafts a `<your-name>-mode` skill from how you've actually worked, and routes through jrzstack underneath. you keep jrzstack as the base and end up with your own routing skill alongside `savvy-mode`.
 
-models and effort are configurable too. pick a model and a starting effort for each of the three settings in `/config`: Work (code delegates and runners), Judgement (the hardest changes, judges and reviewers) and Volume (swarm and race workers). an unset setting keeps its default, so you override only what you want. each spawn raises or lowers the effort to fit its job. type [`/jrzstack:setup-jrzstack`](./skills/setup-jrzstack/SKILL.md) to see the settings and get the setup line that carries them to cloud environments.
+models and effort are configurable too. pick a model and a starting effort for each of the three settings in `/config`: Work (code delegates, the hardest changes and runners), Judgement (prose, judges and reviewers) and Volume (swarm and race workers). an unset setting keeps its default, so you override only what you want. each spawn raises or lowers the effort to fit its job. type [`/jrzstack:setup-jrzstack`](./skills/setup-jrzstack/SKILL.md) to see the settings and get the setup line that carries them to cloud environments.
 
 ## license
 

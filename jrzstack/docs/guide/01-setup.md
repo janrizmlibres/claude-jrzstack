@@ -27,8 +27,8 @@ jrzstack has three settings, and every role a skill spawns runs on one of them:
 
 | Setting | Runs | Default model | Default effort |
 |---|---|---|---|
-| Work | code delegates, arena runners, unit workers, sub-leads | `opus` | medium |
-| Judgement | the hardest changes, judges, reviewers, fresh-context reviews | `opus` | high |
+| Work | code delegates, the hardest changes (one step more effort), arena runners, unit workers, sub-leads | `opus` | medium |
+| Judgement | prose, judges, reviewers, fresh-context reviews | `opus` | high |
 | Volume | swarm workers, first-pass race workers | `sonnet` | high |
 
 Pick a model and an effort for any of them in `/config`, or with `/plugin configure`. Each model takes `opus`, `sonnet`, `haiku` or `fable`, and each effort `low`, `medium`, `high`, `xhigh` or `max`. The effort is a starting level: a spawn raises it one step for the hardest work and lowers it for routine work, and never raises it above `xhigh`. An unset setting keeps its default, so you only override what you care about.
