@@ -5,7 +5,7 @@
 # when it is installed, and otherwise with Node 22.18+ or 24.2+, the releases
 # that both strip TypeScript types by default and have import.meta.main. A
 # relative <script> resolves beside this launcher, so
-# `run orch/orch.ts init` works from any directory.
+# `run orch/orch.ts plan publish <file>` works from any directory.
 #
 # Exits with the script's own code, or:
 #   69  no usable runtime: prints the install line

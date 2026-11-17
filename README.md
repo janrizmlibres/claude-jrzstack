@@ -7,7 +7,7 @@ pstack is © Lauren Tan, MIT; this port is MIT too (see [License and credit](#li
 
 A Claude Code port of [pstack](https://github.com/cursor/plugins/tree/main/pstack), Lauren Tan's
 Cursor plugin of agent workflows, kept in step with upstream. Type `/jrzstack:savvy-mode` with a
-task, an issue or a spec: jrzstack picks a playbook (Feature, Bug fix, Refactoring, Orchestrate…),
+task, an issue or a spec: jrzstack picks a playbook (Feature, Bug fix, Refactoring, Autopilot…),
 runs it with parallel workers and review panels, and opens the PRs. It runs the same way on your
 machine and in a Claude Code cloud session.
 
@@ -20,7 +20,7 @@ playbooks are otherwise upstream's.
 **Prerequisites**
 - Claude Code 2.1.294 or later, the version CI validates the plugin with.
 - `gh`, signed in.
-- **Bun, or Node ≥ 22.18**, for orchestrate, babysitting PRs, shipping and multi-phase plans.
+- **Bun, or Node ≥ 22.18**, for babysitting PRs, shipping and posting multi-phase plans.
   Without one, those steps stop and print the install line; the rest of jrzstack runs.
 
 **Install**
@@ -76,7 +76,7 @@ checkout is left alone.
 
 ## Cloud workers from a local run
 
-A local lead sends **swarm workers, orchestrate units and autopilot owners** to Claude Code cloud
+A local lead sends **swarm workers and autopilot owners** to Claude Code cloud
 sessions by default. That needs:
 1. **Auto mode** on your account: the lead starts cloud workers with
    `claude --permission-mode auto --cloud`. Any other mode would stop on a click per worker.
@@ -236,15 +236,15 @@ In cloud, your user-level `CLAUDE.md` isn't there: rules come from the request a
 | `.claude-plugin/plugin.json` | port-only | Claude Code's plugin manifest, with the three model settings as userConfig and no version |
 | `agents/savvy-reader.md` | port-only | the one reader for every setting, in place of a readonly generalPurpose spawn: no Edit, Write or NotebookEdit, each spawn passing its setting's model and effort |
 | `hooks/hooks.json` | port-only | registers the compaction hook on SessionStart's compact matcher, which skill frontmatter can't: its SessionStart never fires |
-| `hooks/savvy-mode-compaction.sh` | port-only | after a compaction in a marked savvy-mode session, lists the durable state to re-read before acting: the skill, any store, the transcript, a trail and a resume note |
+| `hooks/savvy-mode-compaction.sh` | port-only | after a compaction in a marked savvy-mode session, lists the durable state to re-read before acting: the skill, the transcript, a trail and a resume note |
 | `hooks/savvy-mode-reminder.sh` | port-only | savvy-mode's per-turn reminder hook: upstream's reminder text, the skill path, the surface and mode, precedence, the machine lock, writing every file with the Write tool at a literal path and never in Bash, and the session marker the compaction hook reads |
 | `scripts/exclude-worktrees` | port-only | adds .claude/worktrees/ to the exclude file once, one plain command a worktree-isolated agent's guard accepts |
 | `scripts/heavy` | port-only | the machine lock: runs one heavy command at a time per machine, released by the kernel when its holder dies |
 | `scripts/wait-report` | port-only | a sub-lead's wait on a worker's report commit, one plain command a worktree-isolated agent's guard accepts |
 | `skills/savvy-mode/playbooks/hand-off.md` | port-only | the Hand-off playbook: on an explicit request only, pushes the input, starts a cloud lead with `claude --permission-mode auto --cloud` and a fixed brief whose first check ends a bundled session with no GitHub remote, then prints the link and ends, or says why once and stays local |
-| `skills/savvy-mode/references/brief-contract.md` | port-only | the rules every worker brief carries: entry line, no human asks, own-branch pushes, start commit, the machine lock, missing files, leaf workers, the trailered report commit and the nonce trailer a lead finds a cloud report by, a sub-lead's timebox and in-turn wait, the lead's worker worktrees: the exclude line and removal, and every file the lead or a worker writes made by the Write tool at a literal path, never generated in Bash, with briefs kept in the store and published with `orch brief publish` |
+| `skills/savvy-mode/references/brief-contract.md` | port-only | the rules every worker brief carries: entry line, no human asks, own-branch pushes, start commit, the machine lock, missing files, leaf workers, the trailered report commit and the nonce trailer a lead finds a cloud report by, a sub-lead's timebox and in-turn wait, the lead's worker worktrees: the exclude line and removal, and every file the lead or a worker writes made by the Write tool at a literal path, never generated in Bash, with briefs kept at a git-excluded path and published with `orch brief publish` |
 | `skills/savvy-mode/scripts/node_modules/commander/` | port-only | commander 14.0.0, the version upstream's bun.lock pins, vendored with its MIT licence so upstream's imports resolve without an install |
-| `skills/savvy-mode/scripts/orch/` | port-only | the bookkeeping CLI Orchestrate's lead keeps its store with, kept after upstream deleted it for Cursor's Project tracker and event subscriptions, which Claude Code lacks: frontier set takes the stacker's PR order from the store, PR state and merged heads from gh api REST and open heads from git rev-parse, in place of Graphite, and fails on a drifted base or a stale head; init excludes the store from git and every drain pushes it to its orphan branch by plumbing; brief publish commits one brief onto a branch's tree by the same plumbing and pushes it as a fast-forward, so a lead shares a brief with one literal command; plan publish posts a plan file as plan.md on its jrzstack/plan/<slug> branch the same way, with no store; commander imported directly and NotFoundError's parameter property a plain field, for Node's type stripping |
+| `skills/savvy-mode/scripts/orch/` | port-only | the publish CLI, all that's left of the bookkeeping CLI the port kept for Orchestrate until upstream's 0.15.43 retired the playbook: plan publish posts a plan file as plan.md on its jrzstack/plan/<slug> branch, and brief publish commits a brief file as briefs/<name> onto a named branch, each by git plumbing with no worktree and pushed as a fast-forward, so a lead shares either with one literal command; commander imported directly, for Node's type stripping |
 | `skills/savvy-mode/scripts/run` | port-only | the runtime launcher: runs savvy-mode's scripts with Bun, else Node 22.18+, in place of bootstrap.ts's install |
 | `.cursor-plugin/` | dropped | Cursor's plugin manifest, replaced by Claude Code's in .claude-plugin/plugin.json |
 | `.gitignore` | dropped | upstream's plugin-level ignore list: its node_modules/ line would hide the vendored commander, and the repo's root .gitignore covers the rest |

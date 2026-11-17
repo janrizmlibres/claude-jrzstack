@@ -30,11 +30,11 @@ const scripts = join(pluginDir, "skills", "savvy-mode", "scripts");
 
 describe("runtime launcher", () => {
   test("runs the script with Bun when Bun is present, resolving it beside the launcher", () => {
-    const result = launch(binWith({ bun: bunStub, node: nodeStub("v24.15.0") }), ["orch/orch.ts", "init", "--x"]);
+    const result = launch(binWith({ bun: bunStub, node: nodeStub("v24.15.0") }), ["orch/orch.ts", "plan", "--x"]);
 
     expect(result.stderr).toBe("");
     expect(result.exitCode).toBe(0);
-    expect(result.stdout).toBe(`bun --no-install ${scripts}/orch/orch.ts init --x\n`);
+    expect(result.stdout).toBe(`bun --no-install ${scripts}/orch/orch.ts plan --x\n`);
   });
 
   test("passes an absolute script path through and keeps the script's exit code", () => {
@@ -59,11 +59,11 @@ describe("runtime launcher", () => {
   test.each(["v22.18.0", "v22.21.1", "v24.2.0", "v24.15.0", "v25.0.0", "v26.1.0"])(
     "runs the script with Node %s when Bun is absent",
     (version) => {
-      const result = launch(binWith({ node: nodeStub(version) }), ["orch/orch.ts", "init"]);
+      const result = launch(binWith({ node: nodeStub(version) }), ["orch/orch.ts", "plan"]);
 
       expect(result.stderr).toBe("");
       expect(result.exitCode).toBe(0);
-      expect(result.stdout).toBe(`node ${scripts}/orch/orch.ts init\n`);
+      expect(result.stdout).toBe(`node ${scripts}/orch/orch.ts plan\n`);
     },
   );
 
@@ -72,7 +72,7 @@ describe("runtime launcher", () => {
   test.each(["v22.17.1", "v20.19.5", "v23.11.1", "v24.1.0", "v18.20.8"])(
     "refuses Node %s with the missing-runtime code and the install line",
     (version) => {
-      const result = launch(binWith({ node: nodeStub(version) }), ["orch/orch.ts", "init"]);
+      const result = launch(binWith({ node: nodeStub(version) }), ["orch/orch.ts", "plan"]);
 
       expect(result.exitCode).toBe(missingRuntimeCode);
       expect(result.stdout).toBe("");
@@ -82,7 +82,7 @@ describe("runtime launcher", () => {
   );
 
   test("with neither runtime, exits with the missing-runtime code and the install line", () => {
-    const result = launch(binWith({}), ["orch/orch.ts", "init"]);
+    const result = launch(binWith({}), ["orch/orch.ts", "plan"]);
 
     expect(result.exitCode).toBe(missingRuntimeCode);
     expect(result.stderr).toContain("run: orch/orch.ts needs Bun, or Node 22.18+ (24.2+ on Node 24)");
