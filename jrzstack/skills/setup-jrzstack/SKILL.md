@@ -25,11 +25,11 @@ Show one table, marking each unset model or effort `(default)`:
 
 | Setting | Model | Effort | Runs |
 |---|---|---|---|
-| Work | the Work model | the Work effort | code delegates, arena runners, hillclimb, orchestrate unit workers, the stacker, sub-leads, how's explorers, reflect's reviewers |
-| Judgement | the Judgement model | the Judgement effort | the hardest changes, every judge, interrogate's lenses, the show-me-your-work auditor, synthesizers, the second opinion, orchestrate's verifier and brief auditor |
-| Volume | the Volume model | the Volume effort | swarm and `first pass` race workers, why's investigators, recall's bulk readers, orchestrate's babysitter and retro watcher |
+| Work | the Work model | the Work effort | code delegates, the hardest changes (raised one step), arena runners, hillclimb, sub-leads |
+| Judgement | the Judgement model | the Judgement effort | every judge, interrogate's lenses, the show-me-your-work auditor, the second opinion, how's explainer |
+| Volume | the Volume model | the Volume effort | swarm and `first pass` race workers, recall's bulk readers and source investigators, agents that only dispatch, poll or pack results |
 
-Say that the effort is a starting level: a spawn raises it one step for the hardest work and lowers it for routine work.
+Say that the effort is a starting level: a spawn raises it one step, never above `xhigh`, for the hardest work and lowers it for routine work. An effort picked in `/config` stays as picked, `max` included.
 
 ### 3. Point to `/config`
 

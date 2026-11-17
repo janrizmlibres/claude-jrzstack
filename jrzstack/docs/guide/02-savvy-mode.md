@@ -1,6 +1,6 @@
 # Route work through `/jrzstack:savvy-mode`
 
-`/jrzstack:savvy-mode` is the front door. You give it a goal, it matches one of twenty-four playbooks, copies that playbook's steps into the todo list, and calls the other skills as the steps need them. In this page you learn what a good prompt looks like, and how little of one you actually need.
+`/jrzstack:savvy-mode` is the front door. You give it a goal, it matches one of twenty-three playbooks, copies that playbook's steps into the todo list, and calls the other skills as the steps need them. In this page you learn what a good prompt looks like, and how little of one you actually need.
 
 ![A dispatcher pulls a switch lever to route robots on rail handcars toward lit gates, under a /savvy-mode departure board listing BUG FIX, FEATURE, and INVESTIGATION.](./images/router.jpg)
 
@@ -25,7 +25,7 @@ flowchart TD
     J --> K
 ```
 
-The diagram shows the common routes. There are also playbooks for hillclimbing a metric, diagnosing runtime symptoms and captured traces, prototypes, visual parity, authoring and evaluating skills, autonomous runs, opening a PR, babysitting a PR or stack to merge-ready, shipping a verified stack, running a PR queue or a stack on autopilot, orchestrating project-scale programs, session pickup, pausing safely, handing a run off to the cloud, multi-phase plans, and worktree cleanup. The [playbook directory](../../skills/savvy-mode/playbooks/) has the full set.
+The diagram shows the common routes. There are also playbooks for hillclimbing a metric, diagnosing runtime symptoms and captured traces, prototypes, visual parity, authoring and evaluating skills, autonomous runs, opening a PR, babysitting a PR or stack to merge-ready, shipping a verified stack, running a PR queue or a stack on autopilot, session pickup, pausing safely, handing a run off to the cloud, multi-phase plans, and worktree cleanup. The [playbook directory](../../skills/savvy-mode/playbooks/) has the full set.
 
 ## Say the goal, not the ceremony
 
@@ -35,7 +35,7 @@ You don't write a spec. You say what's wrong or what you want, plus anything you
 /jrzstack:savvy-mode users get two notifications after a retry. repro first, then fix and verify.
 ```
 
-That's a Bug fix prompt. "repro first" is a real constraint, not politeness, and the playbook honors it. Watch the todo list fill with the Bug fix steps. A skipped step stays visible with `skip: <reason>`.
+That's a Bug fix prompt. "repro first" is a real constraint, not politeness, and the playbook honors it. Watch the todo list fill with the Bug fix steps.
 
 ## What goes in a prompt
 
@@ -72,7 +72,7 @@ When you're unsure whether a prompt is aimed right, run [`/jrzstack:sharpen`](..
 /jrzstack:sharpen write a migration guide for the v2 config format.
 ```
 
-The agent says what a top professional would do that you didn't ask for, the rawest material they would start from, the methods and tools they would use, and what other than you or the agent would show the result is right. Then it rewrites your prompt to ask for exactly that, deeper but not bigger, and leaves your choices open. It doesn't do the task. Read the rewrite, then send it, for example with `/jrzstack:savvy-mode`.
+The agent says what a top professional would do that you didn't ask for, the rawest material they would start from, the methods and tools they would use, and what other than you or the agent would show the result is right. Then it rewrites your prompt to ask for exactly that, deeper but not bigger. The rewrite asks the agent to prototype any choice an experiment can settle and to recommend an option from what it observed, and it leaves product and preference choices to you. It doesn't do the task. Read the rewrite, then send it, for example with `/jrzstack:savvy-mode`.
 
 ## Follow up short
 
@@ -104,7 +104,7 @@ A long chat accumulates context from the last task. When you change subjects, sa
 
 ## Give parallel work its own machine
 
-If you run several agents against one repository on one computer, they will fight over the working tree, the ports, and the build output. The cleanest isolation is a cloud worker, a [Claude Code cloud session](https://code.claude.com/docs/en/claude-code-on-the-web) on its own VM and branch, so it can install dependencies, run your app, and record video of the result without touching your machine. A local `/jrzstack:savvy-mode` run already sends its big fan-outs (swarm workers, orchestrate units and autopilot owners) to cloud workers. That needs Auto mode on your account and a default cloud environment, which you set with `/remote-env`. Say "local only" to keep a run's workers in local worktrees instead, or "hand this off" to move the whole run to a cloud lead.
+If you run several agents against one repository on one computer, they will fight over the working tree, the ports, and the build output. The cleanest isolation is a cloud worker, a [Claude Code cloud session](https://code.claude.com/docs/en/claude-code-on-the-web) on its own VM and branch, so it can install dependencies, run your app, and record video of the result without touching your machine. A local `/jrzstack:savvy-mode` run already sends its big fan-outs (swarm workers and autopilot owners) to cloud workers. That needs Auto mode on your account and a default cloud environment, which you set with `/remote-env`. Say "local only" to keep a run's workers in local worktrees instead, or "hand this off" to move the whole run to a cloud lead.
 
 When the work has to stay local, ask for a worktree up front:
 
@@ -132,7 +132,7 @@ When you step away, say what done means and go:
 
 Work you'll review later routes through [`/jrzstack:figure-it-out`](../../skills/figure-it-out/SKILL.md), which designs the run's phases and keeps a [`/jrzstack:show-me-your-work`](../../skills/show-me-your-work/SKILL.md) decision log. [Run work while you sleep](./07-overnight.md) covers the full overnight contract.
 
-**Pitfall:** don't enumerate skills in your prompt ("use /jrzstack:how, then /jrzstack:architect, then /jrzstack:arena..."). The playbook already sequences them, and a hand-written sequence usually reorders or drops steps the playbook would have kept. Name a skill only when you want to override a specific choice.
+**Pitfall:** don't enumerate skills in your prompt ("use /jrzstack:architect, then /jrzstack:arena, then /jrzstack:interrogate..."). The playbook already sequences them, and a hand-written sequence usually reorders or drops steps the playbook would have kept. Name a skill only when you want to override a specific choice.
 
 Read [`savvy-mode`](../../skills/savvy-mode/SKILL.md) itself for the full routing rules.
 

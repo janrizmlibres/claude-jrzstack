@@ -42,7 +42,7 @@ When every setting is unset and it matters, offer once to pick models now. It ma
 4. For cloud sessions, paste that setup line into the setup script of every cloud environment that should carry jrzstack.
 5. Start a real task with `/jrzstack:savvy-mode`, a goal, and a check that can pass or fail.
 
-Some playbooks need `gh`. Orchestrate, babysit, shipping and multi-phase plans run scripts on Bun, or Node 22.18 or later; without either, the step that needs one stops and prints the install line.
+Some playbooks need `gh`. Babysit, shipping and multi-phase plans run scripts on Bun, or Node 22.18 or later; without either, the step that needs one stops and prints the install line.
 
 Installing changes nothing until the user invokes a skill. Only `/jrzstack:setup-jrzstack` loads from the user's words. The [README](../../README.md) and [guide page 1](../../docs/guide/01-setup.md) have the details. Offer to word their first prompt with them, per [`references/prompting.md`](references/prompting.md).
 
@@ -52,7 +52,7 @@ jrzstack is the Claude Code port of Lauren Tan's Cursor plugin. It runs on Claud
 
 ## Start a task with `/jrzstack:savvy-mode`
 
-`/jrzstack:savvy-mode` matches the task to a playbook, copies the playbook's steps into the todo list, and runs the other skills as the steps need them. A step it skips stays in the list as `skip: <reason>`. A good prompt states the goal and how to tell it's done. It doesn't list skills, because a hand-written sequence tends to drop or reorder steps the playbook would keep. Read [`references/prompting.md`](references/prompting.md) before you help word one. [Guide page 2](../../docs/guide/02-savvy-mode.md) has examples.
+`/jrzstack:savvy-mode` matches the task to a playbook, copies the playbook's steps into the todo list, and runs the other skills as the steps need them. A good prompt states the goal and how to tell it's done. It doesn't list skills, because a hand-written sequence tends to drop or reorder steps the playbook would keep. Read [`references/prompting.md`](references/prompting.md) before you help word one. [Guide page 2](../../docs/guide/02-savvy-mode.md) has examples.
 
 How long `/jrzstack:savvy-mode` stays on:
 
@@ -113,16 +113,15 @@ Close calls:
 
 - `/jrzstack:how` explains what the code does. `/jrzstack:why` explains the reasons. `/jrzstack:teach` runs one or both and explains the result plainly.
 - `/jrzstack:arena` gives every runner the same brief in its own direction and merges the best parts. `/jrzstack:swarm` splits work into slices or a race and returns one report.
-- `/jrzstack:architect` implements right after it settles the design. Add "with checkpoint" to review the design before it writes code.
 - `/jrzstack:interrogate` reviews the diff. `/jrzstack:blast-radius` looks for breakage outside the diff and proves the one fact that makes the change safe.
 - `/jrzstack:recall` rebuilds context across recent sessions. `/jrzstack:ketchup` covers only this session since the user's last message. Resuming one specific session or branch is the Session pickup playbook.
-- `/jrzstack:figure-it-out` designs one rigorous run. The Orchestrate playbook runs a program that spans days and many PRs. The Autonomous run playbook drives one task to a finish condition.
+- `/jrzstack:figure-it-out` designs one rigorous run. The Autonomous run playbook drives one task to a finish condition.
 
 Shipped hidden, or not in jrzstack:
 
 - `/jrzstack:deslop`, `control-cli`, and `control-ui` ship with jrzstack, vendored from the `cursor-team-kit` plugin. Playbooks read them; the user can type `/jrzstack:deslop`.
 - `/loop` and `/goal` are Claude Code built-ins. Claude Code ships no skill-authoring skill; the authoring playbook uses one if the user has it installed, such as `skill-creator`.
-- jrzstack has no `/orchestrate` skill. Orchestrate is a `/jrzstack:savvy-mode` playbook. If the slash menu shows `/orchestrate`, another plugin provides it.
+- jrzstack has no `/orchestrate` skill. If the slash menu shows `/orchestrate`, another plugin provides it.
 
 ## Playbooks and principles
 
@@ -136,7 +135,7 @@ Playbooks are step lists inside `/jrzstack:savvy-mode`, not skills, so they have
 - "full autopilot on this queue" runs Autopilot-full. "autopilot, don't merge" runs Autopilot-stack.
 - "run the eval playbook" runs Eval.
 
-Without `/jrzstack:savvy-mode`, a phrase such as "babysit this pr" can start another installed skill whose description matches the same words. The Playbooks section of [`savvy-mode`](../savvy-mode/SKILL.md) lists every playbook and when it applies. [Guide page 6](../../docs/guide/06-verify-and-ship.md) covers opening, babysitting, and landing a PR.
+Without `/jrzstack:savvy-mode`, a phrase such as "babysit this pr" can start another installed skill whose description matches the same words. The Playbooks section of [`savvy-mode`](../savvy-mode/SKILL.md) lists every playbook. [Guide page 6](../../docs/guide/06-verify-and-ship.md) covers opening, babysitting, and landing a PR.
 
 jrzstack has no planning skill. For work that spans phases or stacked PRs, asking `/jrzstack:savvy-mode` for a plan runs the [Multi-phase plan playbook](../savvy-mode/playbooks/multi-phase-plan.md), which writes the plan and doesn't implement it. For a design question, the Prototype playbook or `/jrzstack:architect` settles it in code first.
 

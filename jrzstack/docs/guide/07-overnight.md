@@ -77,7 +77,7 @@ For a quick status instead of an audit, run [`/jrzstack:ketchup`](../../skills/k
 
 ## When the night holds a queue, not a task
 
-The contract above drives one task to one finish condition. Some nights hold more, a queue of independent changes or a whole program. Three playbooks scale the same trust up.
+The contract above drives one task to one finish condition. Some nights hold more, a queue of independent changes or a whole program. Two playbooks and one skill scale the same trust up.
 
 [Autopilot-full](../../skills/savvy-mode/playbooks/autopilot-full.md) runs a queue of independent PRs to merged. Each PR gets one owner agent that carries it from build through merge, and no owner merges on its own verdict. A swarm of fresh verifiers checks the owner's code-ready head. A later rebase or minor fix gets one fresh verifier, and only new behavior or a large new diff calls the full swarm again. Only a clean verdict on the patch that merges authorizes the merge:
 
@@ -91,15 +91,15 @@ The contract above drives one task to one finish condition. Some nights hold mor
 /jrzstack:savvy-mode autopilot these five changes, but don't merge. i'll land them in the morning.
 ```
 
-[Orchestrate](../../skills/savvy-mode/playbooks/orchestrate.md) is for a program that outlives any single agent: multi-day, many stacked PRs, fleets of workers under one standing lead session. The lead authors briefs, decides which worker does each piece of work, checks what each one produces, and never writes code itself. If one agent could finish the work in a session, the playbook itself routes you back to the overnight contract above:
+A whole program, such as a migration across many packages, has no playbook of its own. `/jrzstack:savvy-mode` routes large or cross-cutting work to [`/jrzstack:figure-it-out`](../../skills/figure-it-out/SKILL.md), which designs one rigorous run for it:
 
 ```text
-/jrzstack:savvy-mode orchestrate the store migration. own it until every package is converted and merged. i'll check in twice a day.
+/jrzstack:savvy-mode migrate every package to the new store. own it until each one is converted and merged. i'll check in twice a day.
 ```
 
 ## Run many projects in parallel
 
-Give each body of work its own lead session, such as a feature, a migration, a perf push, or a tech-debt cleanup. Several can run side by side. A lead for a program doesn't write code. It directs workers, and a local lead sends the big fan-outs to cloud workers, so that work runs on their machines. That's the shape the Orchestrate playbook expects. Start your prompts to each lead with `/jrzstack:savvy-mode`, and the workers it spawns follow the playbooks. A local lead itself runs on your laptop, so keep the laptop on, or say "hand this off" to move the run to a cloud lead.
+Give each body of work its own lead session, such as a feature, a migration, a perf push, or a tech-debt cleanup. Several can run side by side. A lead for a program doesn't write code. It directs workers, and a local lead sends the big fan-outs to cloud workers, so that work runs on their machines. Start your prompts to each lead with `/jrzstack:savvy-mode`, and the workers it spawns follow the playbooks. Each agent it starts reads [`worker.md`](../../skills/savvy-mode/worker.md) first, so workers hold to the kickoff's bar, decide reversible calls instead of asking you, and open PRs ready for review. A local lead itself runs on your laptop, so keep the laptop on, or say "hand this off" to move the run to a cloud lead.
 
 A few habits help:
 

@@ -19,7 +19,7 @@ jrzstack's skills read each other's files inside the installed plugin. If you ru
 Read(~/.claude/plugins/cache/claude-jrzstack/**)
 ```
 
-Some playbooks also need `gh`, and orchestrate, babysit, shipping and multi-phase plans run scripts that need Bun or Node 22.18 or later. A step that needs a missing tool stops and says what to install.
+Some playbooks also need `gh`, and babysit, shipping and multi-phase plans run scripts that need Bun or Node 22.18 or later. A step that needs a missing tool stops and says what to install.
 
 ## Pick your models and effort
 
@@ -27,11 +27,11 @@ jrzstack has three settings, and every role a skill spawns runs on one of them:
 
 | Setting | Runs | Default model | Default effort |
 |---|---|---|---|
-| Work | code delegates, arena runners, unit workers, sub-leads | `opus` | medium |
-| Judgement | the hardest changes, judges, reviewers, fresh-context reviews | `opus` | high |
+| Work | code delegates, the hardest changes (one step more effort), arena runners, unit workers, sub-leads | `opus` | medium |
+| Judgement | prose, judges, reviewers, fresh-context reviews | `opus` | high |
 | Volume | swarm workers, first-pass race workers | `sonnet` | high |
 
-Pick a model and an effort for any of them in `/config`, or with `/plugin configure`. Each model takes `opus`, `sonnet`, `haiku` or `fable`, and each effort `low`, `medium`, `high`, `xhigh` or `max`. The effort is a starting level: a spawn raises it one step for the hardest work and lowers it for routine work. An unset setting keeps its default, so you only override what you care about.
+Pick a model and an effort for any of them in `/config`, or with `/plugin configure`. Each model takes `opus`, `sonnet`, `haiku` or `fable`, and each effort `low`, `medium`, `high`, `xhigh` or `max`. The effort is a starting level: a spawn raises it one step for the hardest work and lowers it for routine work, and never raises it above `xhigh`. An unset setting keeps its default, so you only override what you care about.
 
 To see what's set, run:
 
@@ -69,7 +69,7 @@ Pick something real but small, and describe it the way you'd describe it to a co
 /jrzstack:savvy-mode add a --json flag to this command. text output stays byte-identical. verify both.
 ```
 
-Watch the todo list. Its first items are the matched playbook's steps copied in, the Feature playbook for this prompt. If `/jrzstack:savvy-mode` skips a step, the step stays in the list with `skip: <reason>`, so you can see what it chose not to do.
+Watch the todo list. Its first items are the matched playbook's steps copied in, the Feature playbook for this prompt.
 
 From here you can type normal follow-ups. `/jrzstack:savvy-mode` stays on for the rest of the session: its reminder hook brings it back on every turn, and it stays out of casual turns. Say so to opt out. A resumed session (`--resume`) loses the hook, so type `/jrzstack:savvy-mode` again after a resume.
 

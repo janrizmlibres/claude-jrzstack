@@ -98,11 +98,6 @@
       "why": "spawns its own blind samples, 3 per variant on the model the change meets in use, with one blind Judgement judge over all of them and an opt-in cross-model sweep, in place of arena's model fan-out and cross-family judge; a user-invoked skill's samples run on the general-purpose agent, which inherits the lead's model, since `savvy-agent`'s jrzstack body would skew them"
     },
     {
-      "path": "jrzstack/skills/savvy-mode/playbooks/orchestrate.md",
-      "kind": "override",
-      "why": "a lead and sub-leads place units by surface (cloud workers, local-only worktrees, in-VM worktree subagents, create_session in Auto), retry by failure mode, take the full gate at landing as the ledger verdict, land only under a landing grant with Close listing leftover branches, run orch through the launcher with its store on an orphan branch and its briefs written by the Write tool and published with `orch brief publish`, and split restart from compaction; keeps orch's store where upstream moved to Cursor's Project tracker, and takes upstream's supervision habits as a Supervision section"
-    },
-    {
       "path": "jrzstack/automations/benny",
       "kind": "dropped",
       "why": "Cursor Slack automations, outside the port's scope"
@@ -202,7 +197,7 @@
     {
       "path": "jrzstack/README.md",
       "kind": "translated",
-      "why": "adds the port-only Hand-off playbook to the playbook table, points cloud installs to the setup line, and names orchestrate's lead as the orchestrate override does"
+      "why": "adds the port-only Hand-off playbook to the playbook table and points cloud installs to the setup line"
     },
     {
       "path": "jrzstack/docs/guide/01-setup.md",
@@ -217,7 +212,7 @@
     {
       "path": "jrzstack/docs/guide/07-overnight.md",
       "kind": "translated",
-      "why": "names orchestrate's lead as the orchestrate override does, and says what a routine run gets under ADR 0001"
+      "why": "says what a routine run gets under ADR 0001"
     },
     {
       "path": "jrzstack/skills/savvy-mode/references/brief-contract.md",
@@ -225,17 +220,9 @@
       "why": "the rules every worker brief carries: entry line, no human asks, own-branch pushes, start commit, the machine lock, missing files, leaf workers, the trailered report commit and the nonce trailer a lead finds a cloud report by, a sub-lead's timebox and in-turn wait, the lead's worker worktrees: the exclude line and removal, and every file the lead or a worker writes made by the Write tool at a literal path, never generated in Bash, with briefs kept in the store and published with `orch brief publish`"
     },
     {
-      "path": "jrzstack/skills/savvy-mode/scripts/check-plan.mjs",
-      "kind": "override",
-      "why": "its markers match the port's plan wording: live lanes on `savvy-agent` on Volume instead of a named model, and playbooks read from the plugin instead of from trunk with `git show`",
-      "depends_on": [
-        "upstream/pstack/skills/poteto-mode/playbooks/multi-phase-plan.md"
-      ]
-    },
-    {
       "path": "jrzstack/skills/savvy-mode/playbooks/multi-phase-plan.md",
       "kind": "translated",
-      "why": "carries rule 20's spec intake: reads the spec through `gh api` REST, writes the plan at a git-excluded path, lints it through the launcher, posts it on the spec issue or an orphan branch with `orch plan publish`, carries on unless asked for a plan only, writes and publishes owners' briefs per the brief contract, and only a landing grant picks Autopilot-full; its skeleton is the wording the check-plan.mjs override checks, so a change to either reaches the other"
+      "why": "carries rule 20's spec intake on upstream's five short steps: reads the spec through `gh api` REST, writes the plan at a git-excluded path, posts it on the spec issue or an orphan branch with `orch plan publish` through the launcher, carries on unless asked for a plan only, briefs owners per the brief contract with `orch brief publish`, and only a landing grant picks Autopilot-full"
     },
     {
       "path": "jrzstack/skills/savvy-mode/playbooks/hand-off.md",
