@@ -65,7 +65,6 @@ const intro =
   "jrzstack: this session was just compacted, and its summary is lossy. " +
   "Before your next spawn, merge or push, re-read these, in order:";
 const skillLine = `- the savvy-mode skill: ${pluginDir}/skills/savvy-mode/SKILL.md`;
-const storeLine = (dir: string) => `- the orchestrate store: ${dir}/`;
 const transcriptLine = (path: string) =>
   `- the pre-compaction transcript: ${path}. Read it in a subagent and keep only the timeline it reduces it to.`;
 const trailLine = (path: string) => `- the show-me-your-work trail: ${path}`;
@@ -92,8 +91,6 @@ describe("savvy-mode compaction hook", () => {
     markSession(s);
     writeTranscript(s);
     writeFiles(s.cwd, {
-      ".claude/jrzstack/orchestrate/migrate/units.tsv": "",
-      ".claude/jrzstack/orchestrate/rename/units.tsv": "",
       "decisions.tsv": "",
       ".audit/rename.tsv": "",
     });
@@ -105,8 +102,6 @@ describe("savvy-mode compaction hook", () => {
     expect(lines(result.stdout)).toEqual([
       intro,
       skillLine,
-      storeLine(join(s.cwd, ".claude/jrzstack/orchestrate/migrate")),
-      storeLine(join(s.cwd, ".claude/jrzstack/orchestrate/rename")),
       transcriptLine(s.transcript),
       trailLine(join(s.cwd, "decisions.tsv")),
       trailLine(join(s.cwd, ".audit/rename.tsv")),
@@ -124,11 +119,11 @@ describe("savvy-mode compaction hook", () => {
     expect(lines(result.stdout)).toEqual([intro, skillLine]);
   });
 
-  test("lists only the state that exists, and no resume note when the last commit isn't a wip: commit", () => {
+  test("lists only the state that exists, never a leftover Orchestrate store, and no resume note when the last commit isn't a wip: commit", () => {
     const s = session();
     markSession(s);
     writeTranscript(s);
-    writeFiles(s.cwd, { ".audit/fix.tsv": "", ".claude/jrzstack/orchestrate/.keep": "" });
+    writeFiles(s.cwd, { ".audit/fix.tsv": "", ".claude/jrzstack/orchestrate/migrate/units.tsv": "" });
     repoWithCommit(s, "Fix the parser", "wip: not a pause");
 
     const result = compacted(s);

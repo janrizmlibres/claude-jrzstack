@@ -4,8 +4,8 @@
 #
 # Silent unless the reminder hook marked this session as being in savvy-mode.
 # Then it lists the durable state the compacted session should re-read, in
-# order and only what exists: the savvy-mode skill, any orchestrate store in
-# cwd, the pre-compaction transcript, any show-me-your-work trail, and a
+# order and only what exists: the savvy-mode skill, the pre-compaction
+# transcript, any show-me-your-work trail, and a
 # resume note (the body of a `wip:` commit at HEAD). Reads the hook input JSON
 # on stdin. Always exits 0: a hook failure must never block the session.
 
@@ -30,9 +30,6 @@ shopt -s nullglob
 
 echo "jrzstack: this session was just compacted, and its summary is lossy. Before your next spawn, merge or push, re-read these, in order:"
 echo "- the savvy-mode skill: $root/skills/savvy-mode/SKILL.md"
-for store in "$cwd"/.claude/jrzstack/orchestrate/*/; do
-  echo "- the orchestrate store: $store"
-done
 if [[ -n $transcript && -f $transcript ]]; then
   echo "- the pre-compaction transcript: $transcript. Read it in a subagent and keep only the timeline it reduces it to."
 fi

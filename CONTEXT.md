@@ -54,7 +54,7 @@ _Avoid_: environment (a cloud environment is the setup-script and network config
 
 **Lead**:
 The session a run is handed to (a spec, or a task verbatim). It plans the fan-out, starts the workers and integrates what they return. Has a surface of its own, independent of its workers'.
-_Avoid_: coordinator (reserved for upstream's `orchestrate`), orchestrator, parent
+_Avoid_: coordinator, orchestrator, parent
 
 **Worker**:
 A session or subagent a lead starts to carry out one piece of a run.
@@ -62,7 +62,7 @@ _Avoid_: child, agent
 
 **Sub-lead**:
 A worker that starts workers of its own for its piece of the run, such as an Autopilot owner running its own panels. The lead decides at brief time whether a worker is one.
-_Avoid_: sub-coordinator (reserved for upstream's `orchestrate`), nested lead
+_Avoid_: sub-coordinator, nested lead
 
 **Leaf worker**:
 A worker that never starts workers of its own. At a panel trigger it returns to its lead, which runs the panel.
@@ -129,12 +129,8 @@ A project's whole verification (the full suite, the build, end-to-end checks), r
 _Avoid_: CI run, final check, verification pass
 
 **Program**:
-A run too large for any single agent, such as a multi-day effort landing many stacked PRs, driven by one lead through orchestrate. A run one agent could finish within its budget is not a program, however it is phrased.
+A run too large for any single agent, such as a multi-day effort landing many stacked PRs, which savvy-mode routes to `figure-it-out`. A run one agent could finish within its budget is not a program, however it is phrased.
 _Avoid_: project (a Claude Project is a claude.ai product), campaign, epic
-
-**Store**:
-A program's durable bookkeeping: its standing orders, units, verification ledger, inbox, human gates and status. The lead keeps it and checkpoints it where it outlives the session, so a lead coming back from compaction or a restart rebuilds its view from the store, not from memory.
-_Avoid_: state, scratch, notes
 
 **Restart**:
 A lead taking a run up again in a new session or through `--resume`. Its in-VM workers are dead and its separate-session workers alive, so it rebuilds from durable state and respawns what died. Contrast compaction, where the same session goes on and its in-VM workers are still running, so it re-reads its durable state and respawns nothing.

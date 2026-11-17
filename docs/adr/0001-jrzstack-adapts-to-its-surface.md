@@ -20,6 +20,8 @@ Parallel work is isolated the way upstream isolates it: **each parallel code-wri
 - **One machine lock covers every local worktree.** Heavy commands, a fresh worktree's dependency install included, queue on it however many worktrees exist. A worktree has tracked files only: a worker missing another gitignored file it needs (such as `.env`) reports it and never copies it, and the user's `.worktreeinclude` is the fix.
 - **Hand-off is the user's choice, never a default.** The entry point pushes the input first, because a cloud session sees only pushed work, and keeps no control afterwards. A cloud session can't message a local one, so a done status comes back only by polling GitHub or watching the session.
 
+Since 0.15.43, when upstream deleted the Orchestrate playbook and the port followed (conversion rule 23), the big fan-outs this ADR places are swarm workers and autopilot owners. Its mentions of orchestrate units describe the port before that sync.
+
 ## Not viable
 
 These stay out until Claude Code changes:

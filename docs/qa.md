@@ -41,10 +41,6 @@ Each candidate gets a tracking issue with the release checks as checkboxes, each
 | `lock-macos-death` | release | local | On macOS, the lock is freed when its holder is killed with `SIGKILL`. |
 | `lock-busy` | release | local | The wrapper exits with its busy code after its wait cap, and a re-run after the holder finishes goes through. |
 | `foreign-failure` | release | local | A failure already at the base in a file the worker doesn't own comes back as `foreign failure: <file>`, unfixed, and reaches the lead's full gate. |
-| **Orchestrate** | | | |
-| `orch-store-push` | release | local | `orch` commits the store to its orphan branch by plumbing and pushes it, with no worktree created and the working tree and index untouched. |
-| `orch-frontier-drift` | release | local | `frontier set` fails when a PR's base ref has drifted from its parent. |
-| `orch-compaction` | release | local | A compacted orchestrate lead re-reads its store and respawns nothing. |
 | **Spec intake** | | | |
 | `spec-build-cloud` | release | cloud | `/jrzstack:savvy-mode build <issue URL>` reads the issue and its comments through `gh api` REST, and plans then executes without stopping. |
 | `plan-only` | release | local | "plan only" stops once the plan is posted. |

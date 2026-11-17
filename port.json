@@ -33,7 +33,7 @@
     {
       "path": "jrzstack/hooks/savvy-mode-compaction.sh",
       "kind": "port-only",
-      "why": "after a compaction in a marked savvy-mode session, lists the durable state to re-read before acting: the skill, any store, the transcript, a trail and a resume note"
+      "why": "after a compaction in a marked savvy-mode session, lists the durable state to re-read before acting: the skill, the transcript, a trail and a resume note"
     },
     {
       "path": "jrzstack/agents/savvy-agent.md",
@@ -150,7 +150,7 @@
     {
       "path": "jrzstack/skills/savvy-mode/scripts/orch",
       "kind": "port-only",
-      "why": "the bookkeeping CLI Orchestrate's lead keeps its store with, kept after upstream deleted it for Cursor's Project tracker and event subscriptions, which Claude Code lacks: frontier set takes the stacker's PR order from the store, PR state and merged heads from gh api REST and open heads from git rev-parse, in place of Graphite, and fails on a drifted base or a stale head; init excludes the store from git and every drain pushes it to its orphan branch by plumbing; brief publish commits one brief onto a branch's tree by the same plumbing and pushes it as a fast-forward, so a lead shares a brief with one literal command; plan publish posts a plan file as plan.md on its jrzstack/plan/<slug> branch the same way, with no store; commander imported directly and NotFoundError's parameter property a plain field, for Node's type stripping"
+      "why": "the publish CLI, all that's left of the bookkeeping CLI the port kept for Orchestrate until upstream's 0.15.43 retired the playbook: plan publish posts a plan file as plan.md on its jrzstack/plan/<slug> branch, and brief publish commits a brief file as briefs/<name> onto a named branch, each by git plumbing with no worktree and pushed as a fast-forward, so a lead shares either with one literal command; commander imported directly, for Node's type stripping"
     },
     {
       "path": "jrzstack/skills/savvy-mode/scripts/watch-pr/github.ts",
@@ -217,7 +217,7 @@
     {
       "path": "jrzstack/skills/savvy-mode/references/brief-contract.md",
       "kind": "port-only",
-      "why": "the rules every worker brief carries: entry line, no human asks, own-branch pushes, start commit, the machine lock, missing files, leaf workers, the trailered report commit and the nonce trailer a lead finds a cloud report by, a sub-lead's timebox and in-turn wait, the lead's worker worktrees: the exclude line and removal, and every file the lead or a worker writes made by the Write tool at a literal path, never generated in Bash, with briefs kept in the store and published with `orch brief publish`"
+      "why": "the rules every worker brief carries: entry line, no human asks, own-branch pushes, start commit, the machine lock, missing files, leaf workers, the trailered report commit and the nonce trailer a lead finds a cloud report by, a sub-lead's timebox and in-turn wait, the lead's worker worktrees: the exclude line and removal, and every file the lead or a worker writes made by the Write tool at a literal path, never generated in Bash, with briefs kept at a git-excluded path and published with `orch brief publish`"
     },
     {
       "path": "jrzstack/skills/savvy-mode/playbooks/multi-phase-plan.md",
