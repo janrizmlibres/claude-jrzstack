@@ -30,7 +30,7 @@ two steps:
 
 new here? the [jrzstack guide](./docs/guide/README.md) walks you through a first real task, from setup and prompting through verification and overnight runs. stuck, or unsure which skill fits? ask [`/jrzstack:savvy-help`](./skills/savvy-help/SKILL.md).
 
-that's it. the other skills are situational, and the mode skill uses them for you as needed. out of the box the mode splits work by setting: code delegates (feature, refactoring, bug fix, perf, hillclimb) run on Work, while the hardest changes, prose, and judgment run on Judgement, and swarm and race workers run on Volume. Work and Judgement default to opus, Volume to sonnet, and the port fixes each setting's effort. `/config` changes the models.
+that's it. the other skills are situational, and the mode skill uses them for you as needed. out of the box the mode splits work by setting: code delegates (feature, refactoring, bug fix, perf, hillclimb) run on Work, while the hardest changes, prose, and judgment run on Judgement, and swarm and race workers run on Volume. Work and Judgement default to opus, Volume to sonnet, and the port fixes each setting's effort, which a spawn raises at most to xhigh. `/config` changes the models.
 
 ## usage
 
@@ -40,7 +40,7 @@ pick `/jrzstack:savvy-mode` from the `/` menu before you type your task, so clau
 
 ### just use [`/jrzstack:savvy-mode`](./skills/savvy-mode/SKILL.md)
 
-this skill is the main shortcut. i use it whenever i need the agent to do rigorous engineering work. it comes with twenty-four playbooks:
+this skill is the main shortcut. i use it whenever i need the agent to do rigorous engineering work. it comes with twenty-three playbooks:
 
 ```
 /jrzstack:savvy-mode this pr has a subtle bug where the scroll drifts every 750ms even when idle. repro
@@ -53,7 +53,7 @@ morning.
 ```
 
 <details>
-<summary>the twenty-four playbooks</summary>
+<summary>the twenty-three playbooks</summary>
 
 | playbook | for |
 |---|---|
@@ -72,7 +72,6 @@ morning.
 | [babysit](./skills/savvy-mode/playbooks/babysit.md) | drive a pr or a stack to merge-ready: conflicts, review threads, ci. |
 | [shipping](./skills/savvy-mode/playbooks/shipping.md) | independently verify a green stack, then land the contiguous verified run bottom-up through github. |
 | [autonomous run](./skills/savvy-mode/playbooks/autonomous-run.md) | drive a long task to completion without stopping. |
-| [orchestrate](./skills/savvy-mode/playbooks/orchestrate.md) | a standing program handed to one lead session: multi-day, many stacked prs, fleets of workers. |
 | [autopilot-full](./skills/savvy-mode/playbooks/autopilot-full.md) | run independent prs to merged with one owner per pr. a swarm verifies each code-ready head, and every later change to the patch gets a fresh check. |
 | [autopilot-stack](./skills/savvy-mode/playbooks/autopilot-stack.md) | autopilot-full without the merge. build and verify prs for the operator to review and land, stacking a pr only on a pr it builds on. |
 | [session pickup](./skills/savvy-mode/playbooks/session-pickup.md) | resume or take over a prior agent's in-flight work. |
@@ -100,7 +99,7 @@ the full rules and playbooks live in [`skills/savvy-mode/SKILL.md`](./skills/sav
 
 ## skills
 
-[`/jrzstack:savvy-mode`](./skills/savvy-mode/SKILL.md) runs most of these for you when a step needs them (`how`, `why`, `architect`, `arena`, `swarm`, `interrogate`, `unslop`, `no-comments`, `technical-writing`, `tdd`, and the principles). the table below is for when you want one directly:
+[`/jrzstack:savvy-mode`](./skills/savvy-mode/SKILL.md) runs most of these for you when a step needs them (`why`, `architect`, `arena`, `swarm`, `interrogate`, `unslop`, `no-comments`, `technical-writing`, `tdd`, and the principles). the table below is for when you want one directly:
 
 ```
 /jrzstack:how do we cancel runs? do we have an n+1 when we look up every run to cancel?
@@ -118,9 +117,9 @@ the full rules and playbooks live in [`skills/savvy-mode/SKILL.md`](./skills/sav
 | [`/jrzstack:savvy-mode`](./skills/savvy-mode/SKILL.md) | default entry point for any non-trivial task. |
 | [`/jrzstack:savvy-help`](./skills/savvy-help/SKILL.md) | you're new to jrzstack, or unsure which skill, playbook, or principle fits. finds out what you're trying to do, answers that part, and hands you a prompt to type. runs only when you type `/jrzstack:savvy-help`. |
 | [`/jrzstack:in-your-own-words`](./skills/in-your-own-words/SKILL.md) | you want the agent to play back your goal and the problem before it starts. runs only when you type `/jrzstack:in-your-own-words`. |
-| [`/jrzstack:sharpen`](./skills/sharpen/SKILL.md) | you want a prompt made deeper, not bigger, before you send it: what a top professional would do that you didn't ask for, the raw material they'd start from, their methods and tools, and an outside check that the result is right. hands back the rewritten prompt and leaves your choices open. doesn't do the task. runs only when you type `/jrzstack:sharpen`. |
+| [`/jrzstack:sharpen`](./skills/sharpen/SKILL.md) | you want a prompt made deeper, not bigger, before you send it: what a top professional would do that you didn't ask for, the raw material they'd start from, their methods and tools, and an outside check that the result is right. hands back the rewritten prompt, which asks the agent to prototype any choice an experiment can settle and leaves product and preference choices to you. doesn't do the task. runs only when you type `/jrzstack:sharpen`. |
 | [`/jrzstack:how`](./skills/how/SKILL.md) | you want a walkthrough of how a subsystem works. |
-| [`/jrzstack:why`](./skills/why/SKILL.md) | you want to know why something was built this way. discovers available MCPs at run time and queries each evidence category in parallel (source control, issue tracker, long-form docs, real-time chat, infra observability, error tracking, analytics warehouse). |
+| [`/jrzstack:why`](./skills/why/SKILL.md) | you want to know why something was built this way. answers from the record, not the code: the commits and pr discussions that introduced it and each later change, and other sources when that trail is thin. cites what the authors wrote, marks its own inferences, and says what the record does not answer. |
 | [`/jrzstack:recall`](./skills/recall/SKILL.md) | you're starting or resuming work and want your recent context on a topic rebuilt from your own chat history and the shared record, handed back as a tight current-state brief. |
 | [`/jrzstack:ketchup`](./skills/ketchup/SKILL.md) | you want what changed in this chat since your last message, in plain words and small visuals, with every item waiting on you listed and decidable from the reply alone, even when that makes the reply long. |
 | [`/jrzstack:ketchup-video`](./skills/ketchup-video/SKILL.md) | you want the `/jrzstack:ketchup` catch-up as a short subtitled video of slides, with the calls waiting on you as text under it. |

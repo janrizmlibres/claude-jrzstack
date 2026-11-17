@@ -56,7 +56,7 @@ In context, that's enough. [`/jrzstack:tdd`](../../skills/tdd/SKILL.md) writes t
 
 ## Clean before you commit
 
-The [Opening a PR playbook](../../skills/savvy-mode/playbooks/opening-a-pr.md) runs `/jrzstack:deslop` on the diff before each commit and applies [`/jrzstack:unslop`](../../skills/unslop/SKILL.md) to the PR description and commit bodies. `/jrzstack:deslop` ships with jrzstack, vendored from the `cursor-team-kit` plugin and hidden until you type it. It removes narrating comments, unsupported guards, dead compatibility paths, and unrelated edits.
+The [Opening a PR playbook](../../skills/savvy-mode/playbooks/opening-a-pr.md) runs `/jrzstack:deslop` on the diff before each commit, and savvy-mode applies [`/jrzstack:unslop`](../../skills/unslop/SKILL.md) to the PR description and commit bodies. `/jrzstack:deslop` ships with jrzstack, vendored from the `cursor-team-kit` plugin and hidden until you type it. It removes narrating comments, unsupported guards, dead compatibility paths, and unrelated edits.
 
 For prose, `/jrzstack:unslop` takes a target and any extra rules you have:
 

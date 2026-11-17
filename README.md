@@ -1,7 +1,7 @@
 # jrzstack
 
 <!-- BEGIN generated from upstream/snapshot.json — do not edit by hand -->
-**Tracks upstream pstack v0.15.36** (`cursor/plugins@ae5650f`).
+**Tracks upstream pstack v0.15.43** (`cursor/plugins@e1cc031`).
 <!-- END generated -->
 pstack is © Lauren Tan, MIT; this port is MIT too (see [License and credit](#license-and-credit)).
 
@@ -227,8 +227,6 @@ In cloud, your user-level `CLAUDE.md` isn't there: rules come from the request a
 | `skills/interrogate/SKILL.md` | override | three lens adversaries (Breakage, Fit, Stress) on savvy-agent on Judgement in worktrees, always all three, each proving findings with a run, in place of one adversary per model with arena's fan-out |
 | `skills/savvy-help/SKILL.md` | override | Cursor-only sections (Custom Mode, Option+Enter, .cursor/rules, /add-plugin) rewritten for Claude Code's install, settings and surfaces, with a row for re-entering the mode after a resume |
 | `skills/savvy-mode/playbooks/eval.md` | override | spawns its own blind samples, 3 per variant on the model the change meets in use, with one blind Judgement judge over all of them and an opt-in cross-model sweep, in place of arena's model fan-out and cross-family judge; a user-invoked skill's samples run on the general-purpose agent, which inherits the lead's model, since `savvy-agent`'s jrzstack body would skew them |
-| `skills/savvy-mode/playbooks/orchestrate.md` | override | a lead and sub-leads place units by surface (cloud workers, local-only worktrees, in-VM worktree subagents, create_session in Auto), retry by failure mode, take the full gate at landing as the ledger verdict, land only under a landing grant with Close listing leftover branches, run orch through the launcher with its store on an orphan branch and its briefs written by the Write tool and published with `orch brief publish`, and split restart from compaction; keeps orch's store where upstream moved to Cursor's Project tracker, and takes upstream's supervision habits as a Supervision section |
-| `skills/savvy-mode/scripts/check-plan.mjs` | override | its markers match the port's plan wording: live lanes on `savvy-agent` on Volume instead of a named model, and playbooks read from the plugin instead of from trunk with `git show` |
 | `skills/savvy-mode/scripts/watch-pr/fakes.test-helper.ts` | override | adds a fake of the REST API serving the proxy's /ccr/review_threads shape |
 | `skills/savvy-mode/scripts/watch-pr/github.test.ts` | override | adds tests of the REST reader against a fake of the proxy's routes, its verdicts beside GraphQL's on the same threads, the fallback and the review-bot logins |
 | `skills/savvy-mode/scripts/watch-pr/github.ts` | override | adds a REST reader for cloud, where the session proxy refuses GraphQL, reading review threads from the proxy's /ccr/review_threads route, and switches to it at the first refusal; review bots are matched from a list of logins |

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # run <script> [args...]
 #
-# Runs one of savvy-mode's scripts (orch, watch-pr, check-plan.mjs) with Bun
+# Runs one of savvy-mode's scripts (orch, watch-pr) with Bun
 # when it is installed, and otherwise with Node 22.18+ or 24.2+, the releases
 # that both strip TypeScript types by default and have import.meta.main. A
 # relative <script> resolves beside this launcher, so

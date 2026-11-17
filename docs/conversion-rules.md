@@ -158,7 +158,7 @@ after: - Tool calls (Bash, Grep, MCP, etc.) that match a skill's documented comm
 
 ## 7. Transcripts
 
-`agent-transcripts/` → `~/.claude/projects/<slug>/${CLAUDE_SESSION_ID}.jsonl`, subagents under `<id>/subagents/`; upstream's "never glob across projects" guard stays; `recall`'s slug rule becomes Claude Code's: the absolute path with every character that isn't a letter or digit turned into "-". A check of a transcript's opening prompt reads its first user line (`"type":"user"`), since Claude Code's first line may be metadata. `session-pickup`'s sources become a local transcript, a cloud session's URL, a pushed branch or a program's store branch (`jrzstack/orchestrate/<program-slug>`). Surface line in `recall` and `session-pickup`: in cloud (`jrzstack: surface=cloud`, or `$CLAUDE_CODE_REMOTE` set when no reminder line is in context), earlier sessions' transcripts aren't available, so fall back to the git trail and pushed branches.
+`agent-transcripts/` → `~/.claude/projects/<slug>/${CLAUDE_SESSION_ID}.jsonl`, subagents under `<id>/subagents/`; upstream's "never glob across projects" guard stays; `recall`'s slug rule becomes Claude Code's: the absolute path with every character that isn't a letter or digit turned into "-". A check of a transcript's opening prompt reads its first user line (`"type":"user"`), since Claude Code's first line may be metadata. `session-pickup`'s sources become a local transcript, a cloud session's URL or a pushed branch. Surface line in `recall` and `session-pickup`: in cloud (`jrzstack: surface=cloud`, or `$CLAUDE_CODE_REMOTE` set when no reminder line is in context), earlier sessions' transcripts aren't available, so fall back to the git trail and pushed branches.
 
 ```detect
 pattern: \bagent-transcripts\b
